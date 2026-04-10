@@ -90,7 +90,11 @@ function buildVEvent(ev: IcsEventInput, calName: string): string[] {
   return lines;
 }
 
-export function buildHouseCalendarIcs(calName: string, events: IcsEventInput[]): string {
+export function buildHouseCalendarIcs(
+  calName: string,
+  events: IcsEventInput[],
+  opts?: { /** Identità stabile del calendario per client in abbonamento */ relCalId?: string },
+): string {
   const header = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -100,6 +104,9 @@ export function buildHouseCalendarIcs(calName: string, events: IcsEventInput[]):
     icsFold(`X-WR-CALNAME:${icsEscape(calName)}`),
     "REFRESH-INTERVAL;VALUE=DURATION:PT4H",
   ];
+  if (opts?.relCalId) {
+    header.push(icsFold(`X-WR-RELCALID:${icsEscape(opts.relCalId)}`));
+  }
 
   const body: string[] = [];
   for (const ev of events) {

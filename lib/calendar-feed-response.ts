@@ -8,9 +8,12 @@ const FEED_HEADERS = {
 
 /**
  * Risposta ICS per abbonamenti (Google Calendar, Apple, ecc.).
- * Stessi header per `/api/calendar/feed/[token]` e `.../[token]/calendar.ics`.
+ * `canonicalRequestUrl`: URL della richiesta (per header `Link: rel=self`).
  */
-export async function getCalendarFeedIcsResponse(token: string): Promise<Response> {
+export async function getCalendarFeedIcsResponse(
+  token: string,
+  canonicalRequestUrl?: string,
+): Promise<Response> {
   if (!token || token.length < 16) {
     return new Response("Not found", { status: 404 });
   }
@@ -38,13 +41,16 @@ export async function getCalendarFeedIcsResponse(token: string): Promise<Respons
       endsAt: e.endsAt,
       allDay: e.allDay,
     })),
+    { relCalId: `${house.id}@convivia-feed` },
   );
+
+  const headers: Record<string, string> = { ...FEED_HEADERS };
+  if (canonicalRequestUrl) {
+    headers.Link = `<${canonicalRequestUrl}>; rel="self"; type="text/calendar"`;
+  }
 
   return new Response(ics, {
     status: 200,
-    headers: {
-      ...FEED_HEADERS,
-      'Content-Disposition': 'inline; filename="convivia-casa.ics"',
-    },
+    headers,
   });
 }

@@ -1,14 +1,21 @@
 "use client";
 
+import {
+  IconCalendar,
+  IconCart,
+  IconCheck,
+  IconHome,
+  IconWallet,
+} from "@/components/CasaSectionIcons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: (id: string) => `/casa/${id}`, label: "Home" },
-  { href: (id: string) => `/casa/${id}/spese`, label: "Spese" },
-  { href: (id: string) => `/casa/${id}/calendario`, label: "Calendario" },
-  { href: (id: string) => `/casa/${id}/liste`, label: "Liste spesa" },
-  { href: (id: string) => `/casa/${id}/compiti`, label: "Compiti" },
+  { href: (id: string) => `/casa/${id}`, label: "Home", Icon: IconHome },
+  { href: (id: string) => `/casa/${id}/spese`, label: "Spese", Icon: IconWallet },
+  { href: (id: string) => `/casa/${id}/calendario`, label: "Calendario", Icon: IconCalendar },
+  { href: (id: string) => `/casa/${id}/liste`, label: "Liste spesa", Icon: IconCart },
+  { href: (id: string) => `/casa/${id}/compiti`, label: "Compiti", Icon: IconCheck },
 ] as const;
 
 export function CasaSubNav({
@@ -43,9 +50,7 @@ export function CasaSubNav({
               href={homeHref}
               className="inline-flex items-center gap-2 rounded-xl border border-emerald-300/60 bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-green-500/25 transition hover:from-emerald-500 hover:to-green-500"
             >
-              <svg className="h-4 w-4 shrink-0 opacity-95" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z" />
-              </svg>
+              <IconHome className="h-4 w-4 shrink-0 opacity-95" />
               Home della casa
             </Link>
           ) : null}
@@ -58,16 +63,18 @@ export function CasaSubNav({
         {links.map((l) => {
           const href = l.href(houseId);
           const active = pathname === href;
+          const Icon = l.Icon;
           return (
             <Link
               key={l.label}
               href={href}
               className={
                 active
-                  ? "rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-green-500/25"
-                  : "cv-pill-nav"
+                  ? "inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-green-500/25"
+                  : "cv-pill-nav inline-flex items-center gap-2"
               }
             >
+              <Icon className={`h-[1.1rem] w-[1.1rem] shrink-0 ${active ? "text-white" : "text-emerald-700"}`} />
               {l.label}
             </Link>
           );
