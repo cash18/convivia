@@ -11,7 +11,7 @@ Portale web per coinquilini: **case multi-utente**, **spese condivise** (con rip
 ## Avvio locale
 
 ```bash
-cd convivia
+# dalla root del repository (es. dopo clone: cd convivia)
 cp .env.example .env
 # Imposta AUTH_SECRET (es. openssl rand -base64 32) e DATABASE_URL se diversi
 npm install
