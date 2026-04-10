@@ -18,6 +18,8 @@ export const viewport: Viewport = {
   themeColor: "#6366f1",
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
+  colorScheme: "light",
 };
 
 export const metadata: Metadata = {
@@ -26,6 +28,9 @@ export const metadata: Metadata = {
   description:
     "Convivia: portale per coinquilini — spese condivise, calendario casa, liste spesa e compiti assegnati.",
   manifest: "/manifest.webmanifest",
+  formatDetection: {
+    telephone: false,
+  },
   appleWebApp: {
     capable: true,
     title: "Convivia",
@@ -47,7 +52,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" className={`${plusJakarta.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-dvh min-h-full flex-col">
         <Providers>{children}</Providers>
       </body>
     </html>

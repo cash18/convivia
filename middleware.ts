@@ -13,6 +13,7 @@ export default auth((req) => {
     pathname.startsWith("/registrati") ||
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/calendar/feed/") ||
+    pathname === "/sw.js" ||
     pathname === "/manifest.webmanifest" ||
     pathname.startsWith("/manifest") ||
     pathname.startsWith("/apple-icon") ||

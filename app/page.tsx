@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden">
+    <div className="relative flex min-h-dvh flex-1 flex-col overflow-hidden">
       <div
         className="pointer-events-none absolute -right-24 top-32 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl"
         aria-hidden
@@ -13,7 +13,7 @@ export default function HomePage() {
         aria-hidden
       />
 
-      <header className="relative z-10 border-b border-white/40 bg-white/35 backdrop-blur-xl">
+      <header className="relative z-10 border-b border-white/40 bg-white/35 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <BrandLogo />
           <div className="flex items-center gap-2">
