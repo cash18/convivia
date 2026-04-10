@@ -1,0 +1,123 @@
+// Casa condivisa — modelli dati
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String             @id @default(cuid())
+  email          String             @unique
+  passwordHash   String
+  name           String
+  createdAt      DateTime           @default(now())
+  memberships    HouseMember[]
+  expensesPaid   Expense[]          @relation("ExpensePayer")
+  expenseSplits  ExpenseSplit[]
+  eventsCreated  CalendarEvent[]    @relation("EventCreator")
+  tasksAssigned  Task[]             @relation("TaskAssignee")
+  tasksCreated   Task[]             @relation("TaskCreator")
+  shoppingItems  ShoppingListItem[] @relation("ItemAdder")
+}
+
+model House {
+  id         String   @id @default(cuid())
+  name       String
+  inviteCode String   @unique
+  createdAt  DateTime @default(now())
+  members    HouseMember[]
+  expenses   Expense[]
+  events     CalendarEvent[]
+  lists      ShoppingList[]
+  tasks      Task[]
+}
+
+model HouseMember {
+  id       String   @id @default(cuid())
+  userId   String
+  houseId  String
+  role     String   @default("MEMBER") // OWNER | MEMBER
+  joinedAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  house    House    @relation(fields: [houseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, houseId])
+}
+
+model Expense {
+  id          String         @id @default(cuid())
+  houseId     String
+  title       String
+  amountCents Int
+  paidById    String
+  expenseDate DateTime       @default(now())
+  notes       String?
+  createdAt   DateTime       @default(now())
+  house       House          @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  paidBy      User           @relation("ExpensePayer", fields: [paidById], references: [id])
+  splits      ExpenseSplit[]
+}
+
+model ExpenseSplit {
+  id         String  @id @default(cuid())
+  expenseId  String
+  userId     String
+  shareCents Int
+  expense    Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([expenseId, userId])
+}
+
+model CalendarEvent {
+  id          String    @id @default(cuid())
+  houseId     String
+  title       String
+  description String?
+  startsAt    DateTime
+  endsAt      DateTime?
+  allDay      Boolean   @default(false)
+  createdById String
+  createdAt   DateTime  @default(now())
+  house       House     @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  createdBy   User      @relation("EventCreator", fields: [createdById], references: [id])
+}
+
+model ShoppingList {
+  id        String             @id @default(cuid())
+  houseId   String
+  name      String
+  createdAt DateTime           @default(now())
+  house     House              @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  items     ShoppingListItem[]
+}
+
+model ShoppingListItem {
+  id         String   @id @default(cuid())
+  listId     String
+  name       String
+  done       Boolean  @default(false)
+  addedById  String?
+  createdAt  DateTime @default(now())
+  list       ShoppingList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  addedBy    User?    @relation("ItemAdder", fields: [addedById], references: [id])
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  houseId     String
+  title       String
+  description String?
+  assigneeId  String?
+  dueDate     DateTime?
+  status      String    @default("TODO") // TODO | DONE
+  createdById String
+  createdAt   DateTime  @default(now())
+  house       House     @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  assignee    User?     @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  createdBy   User      @relation("TaskCreator", fields: [createdById], references: [id])
+}
