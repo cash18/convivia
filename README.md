@@ -57,6 +57,21 @@ Il file `vercel.json` imposta la build come `prisma migrate deploy && next build
 | `npm run build` | Migrazioni + build di produzione |
 | `npm run db:studio` | Interfaccia dati Prisma |
 | `npx vercel` | Anteprima deploy; `npx vercel --prod` per produzione |
+| `npm run import:report` | Importa le spese dal report Aprile 2026 (vedi sotto) |
+
+### Import spese da report (Andrea / Francesco)
+
+1. Nella casa devono esserci due membri con nomi che contengono **Andrea** e **Francesco** (come nel report).
+2. Copia l’**id casa** dall’URL: `/casa/[houseId]/...`.
+3. Esegui dalla root del repo:
+
+```bash
+HOUSE_ID=<il-tuo-houseId> npm run import:report
+```
+
+Se rilanci lo script, usa `HOUSE_ID=... npm run import:report -- --force` per cancellare le spese già importate (stessa nota sulle righe) e reimportarle.
+
+Le transazioni importate sono le **10** del report (date e importi come in allegato); hanno nota `Da report finanziario Aprile 2026`.
 
 ## Note
 

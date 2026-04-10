@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { Providers } from "@/app/providers";
 import "./globals.css";
@@ -14,11 +14,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#6366f1",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   applicationName: "Convivia",
   title: "Convivia — spese, calendario e compiti",
   description:
     "Convivia: portale per coinquilini — spese condivise, calendario casa, liste spesa e compiti assegnati.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Convivia",
+    statusBarStyle: "default",
+  },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml", sizes: "any" },
+      { url: "/convivia-icon.svg", type: "image/svg+xml", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-icon", type: "image/png", sizes: "180x180" }],
+  },
 };
 
 export default function RootLayout({

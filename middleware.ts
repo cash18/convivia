@@ -11,7 +11,11 @@ export default auth((req) => {
     pathname === "/" ||
     pathname.startsWith("/accedi") ||
     pathname.startsWith("/registrati") ||
-    pathname.startsWith("/api/auth");
+    pathname.startsWith("/api/auth") ||
+    pathname === "/manifest.webmanifest" ||
+    pathname.startsWith("/manifest") ||
+    pathname.startsWith("/apple-icon") ||
+    pathname.startsWith("/icon");
 
   if (isPublic) return;
 
