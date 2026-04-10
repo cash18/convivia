@@ -1,8 +1,11 @@
 import { AddEventForm } from "@/components/AddEventForm";
+import { CalendarFeedPanel } from "@/components/CalendarFeedPanel";
+import { HouseCalendarGrid, type CalendarEventDTO } from "@/components/HouseCalendarGrid";
 import { auth } from "@/auth";
 import { deleteCalendarEvent } from "@/lib/actions/calendar";
 import { getMembershipOrRedirect } from "@/lib/house-access";
 import { prisma } from "@/lib/prisma";
+import { headers } from "next/headers";
 
 export default async function CalendarioPage({
   params,
@@ -13,13 +16,33 @@ export default async function CalendarioPage({
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  await getMembershipOrRedirect(houseId, session.user.id);
+  const membership = await getMembershipOrRedirect(houseId, session.user.id);
 
   const events = await prisma.calendarEvent.findMany({
     where: { houseId },
     orderBy: { startsAt: "asc" },
     include: { createdBy: { select: { name: true } } },
   });
+
+  const headerList = await headers();
+  const host = headerList.get("x-forwarded-host") ?? headerList.get("host") ?? "";
+  const proto = headerList.get("x-forwarded-proto") ?? "http";
+  const baseUrl =
+    host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "");
+  const feedHttpsUrl =
+    baseUrl && membership.house.calendarFeedToken
+      ? `${baseUrl}/api/calendar/feed/${membership.house.calendarFeedToken}`
+      : "";
+
+  const gridEvents: CalendarEventDTO[] = events.map((ev) => ({
+    id: ev.id,
+    title: ev.title,
+    description: ev.description,
+    startsAt: ev.startsAt.toISOString(),
+    endsAt: ev.endsAt?.toISOString() ?? null,
+    allDay: ev.allDay,
+    createdByName: ev.createdBy.name,
+  }));
 
   async function removeEventAction(formData: FormData) {
     "use server";
@@ -29,10 +52,27 @@ export default async function CalendarioPage({
 
   return (
     <div className="space-y-8">
-      <AddEventForm houseId={houseId} />
+      <div className="grid gap-8 lg:grid-cols-2">
+        <AddEventForm houseId={houseId} />
+        {feedHttpsUrl ? (
+          <CalendarFeedPanel
+            houseId={houseId}
+            houseName={membership.house.name}
+            feedHttpsUrl={feedHttpsUrl}
+            canRotateToken={membership.role === "OWNER"}
+          />
+        ) : (
+          <div className="cv-card-solid p-5 text-sm text-slate-600">
+            Impossibile costruire il link del calendario (host sconosciuto). In produzione usa un dominio pubblico o
+            imposta <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_APP_URL</code> e ricarica.
+          </div>
+        )}
+      </div>
+
+      <HouseCalendarGrid events={gridEvents} />
 
       <section>
-        <h2 className="text-lg font-bold text-slate-900">Eventi</h2>
+        <h2 className="text-lg font-bold text-slate-900">Elenco eventi</h2>
         {events.length === 0 ? (
           <p className="mt-2 text-sm text-slate-500">Nessun evento. Aggiungi il primo sopra.</p>
         ) : (

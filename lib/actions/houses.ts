@@ -1,9 +1,15 @@
 "use server";
 
+import { randomBytes } from "node:crypto";
+
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { generateInviteCode } from "@/lib/invite-code";
 import { revalidatePath } from "next/cache";
+
+function newCalendarFeedToken(): string {
+  return randomBytes(24).toString("hex");
+}
 
 export async function createHouse(name: string): Promise<{ id: string } | { error: string }> {
   const session = await auth();
@@ -22,6 +28,7 @@ export async function createHouse(name: string): Promise<{ id: string } | { erro
     data: {
       name: trimmed,
       inviteCode: code,
+      calendarFeedToken: newCalendarFeedToken(),
       members: { create: { userId: session.user.id, role: "OWNER" } },
     },
   });

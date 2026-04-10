@@ -10,3 +10,11 @@ export function formatEuroFromCents(cents: number): string {
     currency: "EUR",
   }).format(cents / 100);
 }
+
+/** Formato `12,34` per campi importo dopo OCR o calcoli. */
+export function formatEuroNumberForInput(amount: number): string {
+  return amount.toLocaleString("it-IT", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}

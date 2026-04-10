@@ -26,10 +26,12 @@ model User {
 }
 
 model House {
-  id         String   @id @default(cuid())
-  name       String
-  inviteCode String   @unique
-  createdAt  DateTime @default(now())
+  id                 String   @id @default(cuid())
+  name               String
+  inviteCode         String   @unique
+  /// Segreto per URL feed ICS (Google Calendar / Apple); rigenerabile.
+  calendarFeedToken  String   @unique
+  createdAt          DateTime @default(now())
   members    HouseMember[]
   expenses   Expense[]
   events     CalendarEvent[]
@@ -57,6 +59,10 @@ model Expense {
   paidById    String
   expenseDate DateTime       @default(now())
   notes       String?
+  /// EQUAL = riparto uguale; PERCENT = riparto per percentuali (somma 100)
+  splitMode   String         @default("EQUAL")
+  /// Data URL (es. image/jpeg;base64,...) o URL HTTPS (es. Blob)
+  receiptUrl  String?
   createdAt   DateTime       @default(now())
   house       House          @relation(fields: [houseId], references: [id], onDelete: Cascade)
   paidBy      User           @relation("ExpensePayer", fields: [paidById], references: [id])
@@ -64,12 +70,14 @@ model Expense {
 }
 
 model ExpenseSplit {
-  id         String  @id @default(cuid())
-  expenseId  String
-  userId     String
-  shareCents Int
-  expense    Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
-  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String  @id @default(cuid())
+  expenseId    String
+  userId       String
+  shareCents   Int
+  /// Percentuale 1–100 se splitMode PERCENT; null se EQUAL
+  sharePercent Int?
+  expense      Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([expenseId, userId])
 }

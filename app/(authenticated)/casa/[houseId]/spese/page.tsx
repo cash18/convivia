@@ -25,7 +25,13 @@ export default async function SpesePage({
     prisma.expense.findMany({
       where: { houseId },
       orderBy: { expenseDate: "desc" },
-      include: { paidBy: { select: { name: true } } },
+      include: {
+        paidBy: { select: { name: true } },
+        splits: {
+          orderBy: { shareCents: "desc" },
+          include: { user: { select: { name: true } } },
+        },
+      },
     }),
     computeMemberBalances(houseId),
   ]);
@@ -70,7 +76,9 @@ export default async function SpesePage({
                   <th className="px-4 py-3 font-medium">Data</th>
                   <th className="px-4 py-3 font-medium">Descrizione</th>
                   <th className="px-4 py-3 font-medium">Pagato da</th>
+                  <th className="px-4 py-3 font-medium">Ripartizione</th>
                   <th className="px-4 py-3 font-medium text-right">Importo</th>
+                  <th className="px-4 py-3 font-medium">Scontrino</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -85,8 +93,39 @@ export default async function SpesePage({
                       {e.notes ? <p className="text-xs text-slate-500">{e.notes}</p> : null}
                     </td>
                     <td className="px-4 py-3 text-slate-700">{e.paidBy.name}</td>
+                    <td className="max-w-[14rem] px-4 py-3 text-xs text-slate-600">
+                      {e.splitMode === "PERCENT" ? (
+                        <ul className="space-y-0.5">
+                          {e.splits.map((s) => (
+                            <li key={s.userId}>
+                              {s.user.name}
+                              {s.sharePercent != null ? (
+                                <span className="tabular-nums text-slate-500"> ({s.sharePercent}%)</span>
+                              ) : null}
+                              : {formatEuroFromCents(s.shareCents)}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span className="text-slate-500">Uguale · {e.splits.length} partecipanti</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-right tabular-nums font-semibold text-slate-900">
                       {formatEuroFromCents(e.amountCents)}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {e.receiptUrl ? (
+                        <a
+                          href={e.receiptUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-medium text-violet-700 hover:text-violet-900"
+                        >
+                          Apri
+                        </a>
+                      ) : (
+                        <span className="text-xs text-slate-400">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <form action={removeExpenseAction}>
