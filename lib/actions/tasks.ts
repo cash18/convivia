@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
+import { notifyHouseMembersExceptActor } from "@/lib/push-notify";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -53,6 +54,17 @@ export async function createTask(
 
   revalidatePath(`/casa/${houseId}/compiti`);
   revalidatePath(`/casa/${houseId}`);
+  const who = session.user.name?.trim() || "Qualcuno";
+  const assignHint = assigneeId ? " (assegnato)" : "";
+  void notifyHouseMembersExceptActor({
+    houseId,
+    actorUserId: session.user.id,
+    category: "TASKS",
+    title: "Nuovo compito",
+    body: `${who} ha creato «${title}»${assignHint}.`,
+    path: `/casa/${houseId}/compiti`,
+    tag: `convivia-task-${houseId}`,
+  });
   return {};
 }
 
@@ -76,6 +88,18 @@ export async function setTaskStatus(
   });
   revalidatePath(`/casa/${houseId}/compiti`);
   revalidatePath(`/casa/${houseId}`);
+  if (status === "DONE") {
+    const who = session.user.name?.trim() || "Qualcuno";
+    void notifyHouseMembersExceptActor({
+      houseId,
+      actorUserId: session.user.id,
+      category: "TASKS",
+      title: "Compito completato",
+      body: `${who} ha completato «${task.title}».`,
+      path: `/casa/${houseId}/compiti`,
+      tag: `convivia-task-done-${houseId}`,
+    });
+  }
   return {};
 }
 
@@ -89,8 +113,19 @@ export async function deleteTask(houseId: string, taskId: string) {
   });
   if (!task) return { error: "Compito non trovato." };
 
+  const title = task.title;
   await prisma.task.delete({ where: { id: taskId } });
   revalidatePath(`/casa/${houseId}/compiti`);
   revalidatePath(`/casa/${houseId}`);
+  const who = session.user.name?.trim() || "Qualcuno";
+  void notifyHouseMembersExceptActor({
+    houseId,
+    actorUserId: session.user.id,
+    category: "TASKS",
+    title: "Compito eliminato",
+    body: `${who} ha rimosso «${title}».`,
+    path: `/casa/${houseId}/compiti`,
+    tag: `convivia-task-del-${houseId}`,
+  });
   return {};
 }

@@ -3,8 +3,9 @@
 import { auth } from "@/auth";
 import { MAX_RECEIPT_BYTES, MAX_RECEIPT_DATA_URL_CHARS } from "@/lib/expense-receipt-limits";
 import { centsFromIntegerPercents } from "@/lib/percent-split";
+import { formatEuroFromCents, parseEuroToCents } from "@/lib/money";
+import { notifyHouseMembersExceptActor } from "@/lib/push-notify";
 import { prisma } from "@/lib/prisma";
-import { parseEuroToCents } from "@/lib/money";
 import { revalidatePath } from "next/cache";
 
 async function assertMember(houseId: string, userId: string) {
@@ -123,6 +124,16 @@ export async function createExpense(
 
   revalidatePath(`/casa/${houseId}/spese`);
   revalidatePath(`/casa/${houseId}`);
+  const who = session.user.name?.trim() || "Qualcuno";
+  void notifyHouseMembersExceptActor({
+    houseId,
+    actorUserId: session.user.id,
+    category: "EXPENSES",
+    title: "Nuova spesa",
+    body: `${who} ha aggiunto «${title}» (${formatEuroFromCents(amountCents)}).`,
+    path: `/casa/${houseId}/spese`,
+    tag: `convivia-expense-${houseId}`,
+  });
   return {};
 }
 
@@ -136,8 +147,19 @@ export async function deleteExpense(houseId: string, expenseId: string) {
   });
   if (!exp) return { error: "Spesa non trovata." };
 
+  const title = exp.title;
   await prisma.expense.delete({ where: { id: expenseId } });
   revalidatePath(`/casa/${houseId}/spese`);
   revalidatePath(`/casa/${houseId}`);
+  const who = session.user.name?.trim() || "Qualcuno";
+  void notifyHouseMembersExceptActor({
+    houseId,
+    actorUserId: session.user.id,
+    category: "EXPENSES",
+    title: "Spesa eliminata",
+    body: `${who} ha rimosso «${title}».`,
+    path: `/casa/${houseId}/spese`,
+    tag: `convivia-expense-del-${houseId}`,
+  });
   return {};
 }

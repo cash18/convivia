@@ -31,7 +31,7 @@ export default async function CalendarioPage({
     host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "");
   const feedHttpsUrl =
     baseUrl && membership.house.calendarFeedToken
-      ? `${baseUrl}/api/calendar/feed/${membership.house.calendarFeedToken}`
+      ? `${baseUrl}/api/calendar/feed/${membership.house.calendarFeedToken}/calendar.ics`
       : "";
 
   const gridEvents: CalendarEventDTO[] = events.map((ev) => ({

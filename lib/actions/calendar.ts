@@ -3,6 +3,7 @@
 import { randomBytes } from "node:crypto";
 
 import { auth } from "@/auth";
+import { notifyHouseMembersExceptActor } from "@/lib/push-notify";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -54,6 +55,16 @@ export async function createCalendarEvent(
 
   revalidatePath(`/casa/${houseId}/calendario`);
   revalidatePath(`/casa/${houseId}`);
+  const who = session.user.name?.trim() || "Qualcuno";
+  void notifyHouseMembersExceptActor({
+    houseId,
+    actorUserId: session.user.id,
+    category: "CALENDAR",
+    title: "Nuovo evento",
+    body: `${who} ha aggiunto «${title}» al calendario.`,
+    path: `/casa/${houseId}/calendario`,
+    tag: `convivia-cal-${houseId}`,
+  });
   return {};
 }
 
@@ -67,9 +78,20 @@ export async function deleteCalendarEvent(houseId: string, eventId: string) {
   });
   if (!ev) return { error: "Evento non trovato." };
 
+  const title = ev.title;
   await prisma.calendarEvent.delete({ where: { id: eventId } });
   revalidatePath(`/casa/${houseId}/calendario`);
   revalidatePath(`/casa/${houseId}`);
+  const who = session.user.name?.trim() || "Qualcuno";
+  void notifyHouseMembersExceptActor({
+    houseId,
+    actorUserId: session.user.id,
+    category: "CALENDAR",
+    title: "Evento eliminato",
+    body: `${who} ha rimosso «${title}» dal calendario.`,
+    path: `/casa/${houseId}/calendario`,
+    tag: `convivia-cal-del-${houseId}`,
+  });
   return {};
 }
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
+import { notifyHouseMembersExceptActor } from "@/lib/push-notify";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -25,6 +26,16 @@ export async function createShoppingList(
     data: { houseId, name: trimmed },
   });
   revalidatePath(`/casa/${houseId}/liste`);
+  const who = session.user.name?.trim() || "Qualcuno";
+  void notifyHouseMembersExceptActor({
+    houseId,
+    actorUserId: session.user.id,
+    category: "LISTS",
+    title: "Nuova lista spesa",
+    body: `${who} ha creato la lista «${trimmed}».`,
+    path: `/casa/${houseId}/liste`,
+    tag: `convivia-list-${houseId}`,
+  });
   return { listId: list.id };
 }
 
@@ -48,6 +59,16 @@ export async function addListItem(
     data: { listId, name: trimmed, addedById: session.user.id },
   });
   revalidatePath(`/casa/${houseId}/liste`);
+  const who = session.user.name?.trim() || "Qualcuno";
+  void notifyHouseMembersExceptActor({
+    houseId,
+    actorUserId: session.user.id,
+    category: "LISTS",
+    title: "Lista spesa",
+    body: `${who} ha aggiunto «${trimmed}» in «${list.name}».`,
+    path: `/casa/${houseId}/liste`,
+    tag: `convivia-listitem-${houseId}`,
+  });
   return {};
 }
 

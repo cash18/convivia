@@ -1,5 +1,6 @@
 import { BrandLogo } from "@/components/BrandLogo";
 import { LogoutButton } from "@/components/LogoutButton";
+import { PushNotificationsClient } from "@/components/PushNotificationsClient";
 import Link from "next/link";
 
 export function AppShell({
@@ -17,13 +18,17 @@ export function AppShell({
             <Link href="/case">
               <BrandLogo />
             </Link>
-            <nav className="hidden gap-1 sm:flex">
+            <nav className="flex flex-wrap gap-1">
               <Link href="/case" className="cv-pill-nav">
                 Le mie case
               </Link>
+              <Link href="/impostazioni" className="cv-pill-nav">
+                Impostazioni
+              </Link>
             </nav>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <PushNotificationsClient />
             <span className="max-w-[12rem] truncate text-sm font-medium text-slate-600">{userName}</span>
             <LogoutButton />
           </div>

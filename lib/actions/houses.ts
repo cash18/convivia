@@ -3,6 +3,7 @@
 import { randomBytes } from "node:crypto";
 
 import { auth } from "@/auth";
+import { notifyHouseMembersExceptActor } from "@/lib/push-notify";
 import { prisma } from "@/lib/prisma";
 import { generateInviteCode } from "@/lib/invite-code";
 import { revalidatePath } from "next/cache";
@@ -49,11 +50,27 @@ export async function joinHouse(
   });
   if (!house) return { error: "Nessuna casa trovata con questo codice." };
 
+  const already = await prisma.houseMember.findUnique({
+    where: { userId_houseId: { userId: session.user.id, houseId: house.id } },
+  });
+
   await prisma.houseMember.upsert({
     where: { userId_houseId: { userId: session.user.id, houseId: house.id } },
     create: { userId: session.user.id, houseId: house.id, role: "MEMBER" },
     update: {},
   });
   revalidatePath("/case");
+  if (!already) {
+    const who = session.user.name?.trim() || "Qualcuno";
+    void notifyHouseMembersExceptActor({
+      houseId: house.id,
+      actorUserId: session.user.id,
+      category: "HOUSE",
+      title: "Nuovo membro",
+      body: `${who} è entrato in «${house.name}».`,
+      path: `/casa/${house.id}`,
+      tag: `convivia-join-${house.id}`,
+    });
+  }
   return { ok: true, houseId: house.id };
 }
