@@ -46,7 +46,7 @@ export function CasaHomeQuickNav({ houseId }: { houseId: string }) {
         <Link
           key={s.title}
           href={s.href(houseId)}
-          className="cv-card-solid group flex flex-col gap-1 p-4 transition hover:shadow-[0_12px_40px_-12px_rgba(5,150,105,0.2)]"
+          className="cv-card-solid group flex touch-manipulation flex-col gap-1 p-4 transition hover:shadow-[0_12px_40px_-12px_rgba(5,150,105,0.2)] active:scale-[0.98] active:brightness-[0.98]"
         >
           <div className="flex items-center gap-2">
             <div

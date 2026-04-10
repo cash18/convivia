@@ -128,7 +128,7 @@ export function PushNotificationsClient() {
             type="button"
             disabled={busy}
             onClick={() => void unsubscribe()}
-            className="text-xs font-medium text-slate-500 underline decoration-slate-300 hover:text-slate-800 disabled:opacity-50"
+            className="touch-manipulation text-xs font-medium text-slate-500 underline decoration-slate-300 transition hover:text-slate-800 active:opacity-60 active:decoration-slate-500 disabled:opacity-50"
           >
             Disattiva
           </button>
@@ -142,7 +142,7 @@ export function PushNotificationsClient() {
           type="button"
           disabled={busy}
           onClick={() => void subscribe()}
-          className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-900 shadow-sm transition hover:bg-emerald-50 disabled:opacity-60"
+          className="inline-flex touch-manipulation items-center gap-1.5 rounded-full border border-emerald-300 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-900 shadow-sm transition hover:bg-emerald-50 active:scale-[0.97] active:bg-emerald-100 active:shadow-inner disabled:opacity-60"
         >
           <span aria-hidden>🔔</span>
           {busy ? "Attivazione…" : "Notifiche casa"}
@@ -151,7 +151,7 @@ export function PushNotificationsClient() {
       {hint ? <p className="max-w-xs text-[11px] leading-snug text-red-700">{hint}</p> : null}
       <Link
         href="/impostazioni"
-        className="text-[11px] font-medium text-emerald-800 underline decoration-emerald-300 underline-offset-2 hover:text-emerald-950"
+        className="touch-manipulation text-[11px] font-medium text-emerald-800 underline decoration-emerald-300 underline-offset-2 transition hover:text-emerald-950 active:opacity-60"
       >
         Categorie notifiche
       </Link>

@@ -48,7 +48,7 @@ export function CasaSubNav({
           {!isHouseHome ? (
             <Link
               href={homeHref}
-              className="inline-flex items-center gap-2 rounded-xl border border-emerald-300/60 bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-green-500/25 transition hover:from-emerald-500 hover:to-green-500"
+              className="inline-flex touch-manipulation items-center gap-2 rounded-xl border border-emerald-300/60 bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-green-500/25 transition hover:from-emerald-500 hover:to-green-500 active:scale-[0.97] active:shadow-inner active:brightness-95"
             >
               <IconHome className="h-4 w-4 shrink-0 opacity-95" />
               Home della casa
@@ -70,8 +70,8 @@ export function CasaSubNav({
               href={href}
               className={
                 active
-                  ? "inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-green-500/25"
-                  : "cv-pill-nav inline-flex items-center gap-2"
+                  ? "inline-flex touch-manipulation items-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-green-500/25 transition active:scale-[0.97] active:shadow-inner active:brightness-95"
+                  : "cv-pill-nav inline-flex touch-manipulation items-center gap-2"
               }
             >
               <Icon className={`h-[1.1rem] w-[1.1rem] shrink-0 ${active ? "text-white" : "text-emerald-700"}`} />

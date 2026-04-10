@@ -149,8 +149,11 @@ export function LandingPage() {
               <Link href="/registrati" className="cv-btn-primary px-7 py-3.5 text-base">
                 Crea la tua casa gratis
               </Link>
-              <Link href="/accedi" className="cv-btn-outline px-7 py-3.5 text-base">
-                Ho già un account
+              <Link
+                href="/accedi"
+                className="cv-btn-outline max-w-md px-5 py-3 text-center text-sm leading-snug sm:px-7 sm:py-3.5 sm:text-base"
+              >
+                Accedi al tuo account: crea o gestisci le tue case
               </Link>
             </div>
             <p className="mt-4 text-xs text-slate-500">
@@ -331,8 +334,11 @@ export function LandingPage() {
             <Link href="/registrati" className="cv-btn-primary px-8 py-3.5 text-base">
               Registrati gratis
             </Link>
-            <Link href="/accedi" className="rounded-2xl border-2 border-slate-300/80 bg-white/80 px-8 py-3.5 text-base font-semibold text-slate-800 shadow-sm transition hover:border-emerald-400 hover:bg-white">
-              Accedi
+            <Link
+              href="/accedi"
+              className="max-w-lg touch-manipulation rounded-2xl border-2 border-slate-300/80 bg-white/80 px-5 py-3 text-center text-sm font-semibold leading-snug text-slate-800 shadow-sm transition hover:border-emerald-400 hover:bg-white active:scale-[0.97] active:border-emerald-500/50 active:bg-emerald-50/90 active:shadow-inner sm:px-8 sm:py-3.5 sm:text-base"
+            >
+              Accedi al tuo account: crea o gestisci le tue case
             </Link>
           </div>
         </section>

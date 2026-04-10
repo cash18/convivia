@@ -40,15 +40,15 @@ body {
   }
 
   .cv-btn-primary {
-    @apply rounded-2xl bg-gradient-to-r from-emerald-600 to-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 transition hover:from-emerald-500 hover:to-green-500 disabled:cursor-not-allowed disabled:opacity-55;
+    @apply touch-manipulation rounded-2xl bg-gradient-to-r from-emerald-600 to-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 transition hover:from-emerald-500 hover:to-green-500 active:scale-[0.97] active:shadow-md active:brightness-95 disabled:cursor-not-allowed disabled:opacity-55 disabled:active:scale-100;
   }
 
   .cv-btn-ghost {
-    @apply rounded-2xl border border-white/80 bg-white/40 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur transition hover:bg-white/70;
+    @apply touch-manipulation rounded-2xl border border-white/80 bg-white/40 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur transition hover:bg-white/70 active:scale-[0.97] active:bg-slate-200/50 active:shadow-inner;
   }
 
   .cv-btn-outline {
-    @apply rounded-2xl border-2 border-emerald-500/35 bg-white/50 px-4 py-2 text-sm font-semibold text-emerald-900 shadow-sm backdrop-blur transition hover:border-emerald-400 hover:bg-emerald-50/90 disabled:opacity-55;
+    @apply touch-manipulation rounded-2xl border-2 border-emerald-500/35 bg-white/50 px-4 py-2 text-sm font-semibold text-emerald-900 shadow-sm backdrop-blur transition hover:border-emerald-400 hover:bg-emerald-50/90 active:scale-[0.97] active:border-emerald-600/40 active:bg-emerald-100/95 active:shadow-inner disabled:opacity-55 disabled:active:scale-100;
   }
 
   .cv-input {
@@ -60,11 +60,11 @@ body {
   }
 
   .cv-link {
-    @apply font-medium text-emerald-700 underline decoration-emerald-400/45 underline-offset-2 transition hover:text-green-800 hover:decoration-green-600/55;
+    @apply touch-manipulation font-medium text-emerald-700 underline decoration-emerald-400/45 underline-offset-2 transition hover:text-green-800 hover:decoration-green-600/55 active:text-emerald-950 active:opacity-70 active:decoration-emerald-700;
   }
 
   .cv-pill-nav {
-    @apply rounded-xl border border-slate-200/80 bg-white/50 px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm backdrop-blur transition hover:border-emerald-300/70 hover:bg-emerald-50/90 hover:text-emerald-900;
+    @apply touch-manipulation rounded-xl border border-slate-200/80 bg-white/50 px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm backdrop-blur transition hover:border-emerald-300/70 hover:bg-emerald-50/90 hover:text-emerald-900 active:scale-[0.97] active:border-emerald-400/80 active:bg-emerald-100/90 active:shadow-inner;
   }
 
   .cv-badge {
