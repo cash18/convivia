@@ -119,7 +119,7 @@ export default async function SpesePage({
                           href={e.receiptUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs font-medium text-violet-700 hover:text-violet-900"
+                          className="text-xs font-medium text-emerald-700 hover:text-emerald-900"
                         >
                           Apri
                         </a>

@@ -161,7 +161,7 @@ export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
               onClick={() => setView("month")}
               className={
                 view === "month"
-                  ? "rounded-md bg-violet-600 px-2.5 py-1 text-white"
+                  ? "rounded-md bg-emerald-600 px-2.5 py-1 text-white"
                   : "rounded-md px-2.5 py-1 text-slate-600 hover:bg-slate-50"
               }
             >
@@ -172,7 +172,7 @@ export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
               onClick={() => setView("week")}
               className={
                 view === "week"
-                  ? "rounded-md bg-violet-600 px-2.5 py-1 text-white"
+                  ? "rounded-md bg-emerald-600 px-2.5 py-1 text-white"
                   : "rounded-md px-2.5 py-1 text-slate-600 hover:bg-slate-50"
               }
             >
@@ -226,11 +226,11 @@ export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
                   key={`m-${dateKeyLocal(day)}`}
                   className={`min-h-[5.5rem] bg-white p-1.5 sm:min-h-[6.5rem] sm:p-2 ${
                     inMonth ? "" : "opacity-45"
-                  } ${today ? "ring-1 ring-inset ring-violet-400" : ""}`}
+                  } ${today ? "ring-1 ring-inset ring-emerald-400" : ""}`}
                 >
                   <div
                     className={`text-xs font-semibold tabular-nums ${
-                      today ? "text-violet-700" : inMonth ? "text-slate-800" : "text-slate-400"
+                      today ? "text-emerald-700" : inMonth ? "text-slate-800" : "text-slate-400"
                     }`}
                   >
                     {day.getDate()}
@@ -239,11 +239,11 @@ export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
                     {dayEvts.slice(0, 4).map((ev) => (
                       <li
                         key={ev.id}
-                        className="truncate rounded bg-violet-50 px-1 py-0.5 text-[10px] font-medium text-violet-900 sm:text-[11px]"
+                        className="truncate rounded bg-emerald-50 px-1 py-0.5 text-[10px] font-medium text-emerald-900 sm:text-[11px]"
                         title={`${ev.title}${ev.allDay ? "" : ` · ${new Date(ev.startsAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`}`}
                       >
                         {!ev.allDay ? (
-                          <span className="tabular-nums text-violet-600">
+                          <span className="tabular-nums text-emerald-600">
                             {new Date(ev.startsAt).toLocaleTimeString("it-IT", {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -272,12 +272,12 @@ export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
               <div
                 key={`w-${dateKeyLocal(day)}`}
                 className={`flex min-h-[14rem] flex-col border-slate-100 bg-white sm:min-h-[18rem] ${
-                  today ? "ring-1 ring-inset ring-violet-400" : ""
+                  today ? "ring-1 ring-inset ring-emerald-400" : ""
                 }`}
               >
                 <div
                   className={`border-b border-slate-100 px-2 py-2 text-center text-xs font-semibold ${
-                    today ? "bg-violet-50 text-violet-800" : "bg-slate-50/90 text-slate-700"
+                    today ? "bg-emerald-50 text-emerald-800" : "bg-slate-50/90 text-slate-700"
                   }`}
                 >
                   {formatDayHeader(day)}
@@ -286,10 +286,10 @@ export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
                   {dayEvts.map((ev) => (
                     <li
                       key={ev.id}
-                      className="rounded-lg border border-violet-100 bg-violet-50/90 px-2 py-1.5 text-xs text-violet-950"
+                      className="rounded-lg border border-emerald-100 bg-emerald-50/90 px-2 py-1.5 text-xs text-emerald-950"
                     >
                       <p className="font-semibold leading-tight">{ev.title}</p>
-                      <p className="mt-0.5 text-[10px] text-violet-800/90">
+                      <p className="mt-0.5 text-[10px] text-emerald-800/90">
                         {ev.allDay
                           ? "Tutto il giorno"
                           : new Date(ev.startsAt).toLocaleTimeString("it-IT", {

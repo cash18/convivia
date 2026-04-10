@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" role="img" aria-label="Convivia">
   <defs>
     <linearGradient id="cv-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4f46e5"/>
-      <stop offset="55%" stop-color="#7c3aed"/>
-      <stop offset="100%" stop-color="#c026d3"/>
+      <stop offset="0%" stop-color="#047857"/>
+      <stop offset="50%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#0d9488"/>
     </linearGradient>
     <linearGradient id="cv-glow" x1="50%" y1="0%" x2="50%" y2="100%">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
@@ -12,7 +12,6 @@
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#cv-bg)"/>
   <ellipse cx="256" cy="120" rx="200" ry="88" fill="url(#cv-glow)"/>
-  <!-- Casa stilizzata + sync (archi condivisi) -->
   <path
     d="M256 148 L388 248 V408 H124 V248 Z"
     stroke="#ffffff"
@@ -23,8 +22,8 @@
   <path d="M256 148 L124 248" stroke="#ffffff" stroke-width="22" stroke-linecap="round" opacity="0.95"/>
   <path d="M256 148 L388 248" stroke="#ffffff" stroke-width="22" stroke-linecap="round" opacity="0.95"/>
   <rect x="218" y="302" width="76" height="106" rx="12" fill="#ffffff" fill-opacity="0.92"/>
-  <circle cx="168" cy="392" r="22" fill="#a5b4fc"/>
-  <circle cx="344" cy="392" r="22" fill="#67e8f9"/>
+  <circle cx="168" cy="392" r="22" fill="#6ee7b7"/>
+  <circle cx="344" cy="392" r="22" fill="#5eead4"/>
   <path
     d="M190 392 Q256 352 322 392"
     stroke="#ffffff"

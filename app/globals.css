@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f3ff;
+  --background: #ecfdf5;
   --foreground: #0f172a;
   --card: rgba(255, 255, 255, 0.72);
-  --accent: #6366f1;
-  --accent-soft: #a855f7;
+  --accent: #059669;
+  --accent-soft: #34d399;
   --muted: #64748b;
 }
 
@@ -22,25 +22,25 @@ body {
   min-height: 100%;
   background-color: #f8fafc;
   background-image:
-    radial-gradient(ellipse 120% 80% at 0% -20%, rgba(167, 139, 250, 0.45), transparent 55%),
-    radial-gradient(ellipse 90% 70% at 100% -10%, rgba(34, 211, 238, 0.35), transparent 50%),
-    radial-gradient(ellipse 70% 50% at 50% 110%, rgba(244, 114, 182, 0.22), transparent 55%),
-    linear-gradient(168deg, #f5f3ff 0%, #ecfeff 42%, #fdf4ff 100%);
+    radial-gradient(ellipse 120% 80% at 0% -20%, rgba(52, 211, 153, 0.4), transparent 55%),
+    radial-gradient(ellipse 90% 70% at 100% -10%, rgba(20, 184, 166, 0.32), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 110%, rgba(134, 239, 172, 0.22), transparent 55%),
+    linear-gradient(168deg, #ecfdf5 0%, #f0fdfa 42%, #f7fee7 100%);
   background-attachment: fixed;
 }
 
-/* Smart Sync–style surfaces */
+/* Superfici app */
 @layer components {
   .cv-card {
-    @apply rounded-[1.75rem] border border-white/70 bg-white/65 shadow-[0_8px_40px_-12px_rgba(99,102,241,0.2)] backdrop-blur-xl;
+    @apply rounded-[1.75rem] border border-white/70 bg-white/65 shadow-[0_8px_40px_-12px_rgba(5,150,105,0.18)] backdrop-blur-xl;
   }
 
   .cv-card-solid {
-    @apply rounded-[1.75rem] border border-white/60 bg-white/90 shadow-[0_4px_24px_-8px_rgba(99,102,241,0.15)] backdrop-blur-md;
+    @apply rounded-[1.75rem] border border-white/60 bg-white/90 shadow-[0_4px_24px_-8px_rgba(5,150,105,0.14)] backdrop-blur-md;
   }
 
   .cv-btn-primary {
-    @apply rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:from-indigo-500 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-55;
+    @apply rounded-2xl bg-gradient-to-r from-emerald-600 to-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 transition hover:from-emerald-500 hover:to-green-500 disabled:cursor-not-allowed disabled:opacity-55;
   }
 
   .cv-btn-ghost {
@@ -48,26 +48,26 @@ body {
   }
 
   .cv-btn-outline {
-    @apply rounded-2xl border-2 border-indigo-500/30 bg-white/50 px-4 py-2 text-sm font-semibold text-indigo-800 shadow-sm backdrop-blur transition hover:border-indigo-400 hover:bg-indigo-50/80 disabled:opacity-55;
+    @apply rounded-2xl border-2 border-emerald-500/35 bg-white/50 px-4 py-2 text-sm font-semibold text-emerald-900 shadow-sm backdrop-blur transition hover:border-emerald-400 hover:bg-emerald-50/90 disabled:opacity-55;
   }
 
   .cv-input {
-    @apply rounded-xl border border-slate-200/90 bg-white/95 px-3 py-2 text-base text-slate-900 shadow-inner shadow-slate-900/[0.03] outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/15;
+    @apply rounded-xl border border-slate-200/90 bg-white/95 px-3 py-2 text-base text-slate-900 shadow-inner shadow-slate-900/[0.03] outline-none transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/15;
   }
 
   .cv-input-sm {
-    @apply rounded-xl border border-slate-200/90 bg-white/95 px-3 py-2 text-sm text-slate-900 shadow-inner shadow-slate-900/[0.03] outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/15;
+    @apply rounded-xl border border-slate-200/90 bg-white/95 px-3 py-2 text-sm text-slate-900 shadow-inner shadow-slate-900/[0.03] outline-none transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/15;
   }
 
   .cv-link {
-    @apply font-medium text-violet-700 underline decoration-violet-400/40 underline-offset-2 transition hover:text-indigo-700 hover:decoration-indigo-500/60;
+    @apply font-medium text-emerald-700 underline decoration-emerald-400/45 underline-offset-2 transition hover:text-green-800 hover:decoration-green-600/55;
   }
 
   .cv-pill-nav {
-    @apply rounded-xl border border-slate-200/80 bg-white/50 px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm backdrop-blur transition hover:border-violet-300/60 hover:bg-violet-50/80 hover:text-violet-900;
+    @apply rounded-xl border border-slate-200/80 bg-white/50 px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm backdrop-blur transition hover:border-emerald-300/70 hover:bg-emerald-50/90 hover:text-emerald-900;
   }
 
   .cv-badge {
-    @apply inline-flex items-center rounded-full bg-gradient-to-r from-indigo-500/15 to-fuchsia-500/15 px-3 py-1 text-xs font-semibold tracking-wide text-indigo-800 uppercase ring-1 ring-indigo-500/20;
+    @apply inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500/18 to-teal-500/15 px-3 py-1 text-xs font-semibold tracking-wide text-emerald-900 uppercase ring-1 ring-emerald-500/25;
   }
 }

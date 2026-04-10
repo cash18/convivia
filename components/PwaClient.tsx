@@ -85,7 +85,7 @@ export function PwaClient() {
   if (installEvent) {
     return (
       <div
-        className="fixed bottom-0 left-0 right-0 z-[60] border-t border-violet-200/80 bg-white/95 p-3 shadow-[0_-8px_30px_-10px_rgba(99,102,241,0.35)] backdrop-blur-md pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        className="fixed bottom-0 left-0 right-0 z-[60] border-t border-emerald-200/80 bg-white/95 p-3 shadow-[0_-8px_30px_-10px_rgba(5,150,105,0.3)] backdrop-blur-md pb-[max(0.75rem,env(safe-area-inset-bottom))]"
         role="region"
         aria-label="Installa applicazione"
       >
@@ -109,7 +109,7 @@ export function PwaClient() {
   if (showIosHint) {
     return (
       <div
-        className="fixed bottom-0 left-0 right-0 z-[60] border-t border-violet-200/80 bg-white/95 p-3 shadow-[0_-8px_30px_-10px_rgba(99,102,241,0.35)] backdrop-blur-md pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        className="fixed bottom-0 left-0 right-0 z-[60] border-t border-emerald-200/80 bg-white/95 p-3 shadow-[0_-8px_30px_-10px_rgba(5,150,105,0.3)] backdrop-blur-md pb-[max(0.75rem,env(safe-area-inset-bottom))]"
         role="region"
         aria-label="Aggiungi a schermata Home"
       >

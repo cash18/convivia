@@ -81,7 +81,7 @@ export function CalendarFeedPanel({ houseId, houseName, feedHttpsUrl, canRotateT
           <button
             type="button"
             onClick={() => void copy(feedHttpsUrl, "https")}
-            className="shrink-0 rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-xs font-medium text-violet-900 hover:bg-violet-100"
+            className="shrink-0 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-900 hover:bg-emerald-100"
           >
             {copied === "https" ? "Copiato" : "Copia"}
           </button>

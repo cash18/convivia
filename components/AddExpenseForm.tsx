@@ -206,13 +206,13 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
             type="file"
             name="receipt"
             accept="image/*"
-            className="max-w-full text-xs text-slate-600 file:mr-2 file:rounded-lg file:border-0 file:bg-violet-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-violet-800"
+            className="max-w-full text-xs text-slate-600 file:mr-2 file:rounded-lg file:border-0 file:bg-emerald-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-emerald-800"
           />
           <button
             type="button"
             onClick={() => void scanReceiptTotal()}
             disabled={ocrBusy}
-            className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-900 hover:bg-violet-100 disabled:opacity-50"
+            className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-900 hover:bg-emerald-100 disabled:opacity-50"
           >
             {ocrBusy ? "Lettura…" : "Leggi totale da scontrino"}
           </button>
@@ -235,7 +235,7 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
               name="splitModeUi"
               checked={splitMode === "EQUAL"}
               onChange={() => setSplitMode("EQUAL")}
-              className="border-violet-300 text-violet-600"
+              className="border-emerald-300 text-emerald-600"
             />
             Uguale tra i selezionati
           </label>
@@ -245,7 +245,7 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
               name="splitModeUi"
               checked={splitMode === "PERCENT"}
               onChange={() => setSplitMode("PERCENT")}
-              className="border-violet-300 text-violet-600"
+              className="border-emerald-300 text-emerald-600"
             />
             Percentuali (somma 100%)
           </label>
@@ -262,7 +262,7 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
                   type="checkbox"
                   checked={!!checked[m.id]}
                   onChange={() => setChecked((c) => ({ ...c, [m.id]: !c[m.id] }))}
-                  className="rounded border-violet-300 text-violet-600"
+                  className="rounded border-emerald-300 text-emerald-600"
                 />
                 {m.name}
               </label>
@@ -321,7 +321,7 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
             <button
               type="button"
               onClick={() => checkedIds.length > 0 && setPercents(equalPercentsForIds(checkedIds))}
-              className="text-xs font-medium text-violet-700 hover:text-violet-900"
+              className="text-xs font-medium text-emerald-700 hover:text-emerald-900"
             >
               Ripartisci il 100% in parti uguali tra i selezionati
             </button>

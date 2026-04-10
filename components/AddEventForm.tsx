@@ -44,7 +44,7 @@ export function AddEventForm({ houseId }: { houseId: string }) {
         className="cv-input-sm"
       />
       <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-        <input type="checkbox" name="allDay" className="rounded border-violet-300 text-violet-600" />
+        <input type="checkbox" name="allDay" className="rounded border-emerald-300 text-emerald-600" />
         Tutto il giorno
       </label>
       <div className="grid gap-3 sm:grid-cols-2">

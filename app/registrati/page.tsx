@@ -6,7 +6,7 @@ export default function RegisterPage() {
   return (
     <div className="relative flex min-h-dvh min-h-screen flex-col items-center justify-center px-4 py-12 pt-[env(safe-area-inset-top,0px)]">
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_30%,rgba(244,114,182,0.18),transparent_50%),radial-gradient(ellipse_at_20%_70%,rgba(99,102,241,0.2),transparent_45%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_30%,rgba(52,211,153,0.2),transparent_50%),radial-gradient(ellipse_at_20%_70%,rgba(20,184,166,0.18),transparent_45%)]"
         aria-hidden
       />
       <div className="relative w-full max-w-md">

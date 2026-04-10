@@ -28,11 +28,11 @@ export function CasaSubNav({
     <div className="cv-card-solid mb-8 p-5 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
-          <p className="text-xs font-semibold tracking-wider text-violet-600 uppercase">Casa attiva</p>
+          <p className="text-xs font-semibold tracking-wider text-emerald-600 uppercase">Casa attiva</p>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">{houseName}</h1>
           <p className="text-sm text-slate-600">
             Codice invito:{" "}
-            <code className="rounded-xl border border-violet-200/80 bg-gradient-to-r from-violet-50 to-indigo-50 px-2.5 py-1 font-mono text-sm font-semibold text-indigo-900">
+            <code className="rounded-xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50 to-green-50 px-2.5 py-1 font-mono text-sm font-semibold text-green-900">
               {inviteCode}
             </code>
           </p>
@@ -41,7 +41,7 @@ export function CasaSubNav({
           {!isHouseHome ? (
             <Link
               href={homeHref}
-              className="inline-flex items-center gap-2 rounded-xl border border-violet-300/60 bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition hover:from-violet-500 hover:to-indigo-500"
+              className="inline-flex items-center gap-2 rounded-xl border border-emerald-300/60 bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-green-500/25 transition hover:from-emerald-500 hover:to-green-500"
             >
               <svg className="h-4 w-4 shrink-0 opacity-95" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                 <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z" />
@@ -64,7 +64,7 @@ export function CasaSubNav({
               href={href}
               className={
                 active
-                  ? "rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25"
+                  ? "rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-green-500/25"
                   : "cv-pill-nav"
               }
             >

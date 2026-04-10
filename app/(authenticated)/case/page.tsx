@@ -30,19 +30,19 @@ export default async function CasePage() {
             <li key={m.id}>
               <Link
                 href={`/casa/${m.houseId}`}
-                className="cv-card-solid group block p-6 transition hover:shadow-[0_12px_40px_-12px_rgba(99,102,241,0.22)]"
+                className="cv-card-solid group block p-6 transition hover:shadow-[0_12px_40px_-12px_rgba(5,150,105,0.2)]"
               >
-                <span className="text-lg font-bold text-slate-900 group-hover:text-indigo-900">{m.house.name}</span>
+                <span className="text-lg font-bold text-slate-900 group-hover:text-emerald-900">{m.house.name}</span>
                 <p className="mt-2 text-xs font-medium text-slate-500">
                   {m.role === "OWNER" ? "Amministratore" : "Membro"} · codice{" "}
-                  <span className="font-mono text-violet-700">{m.house.inviteCode}</span>
+                  <span className="font-mono text-emerald-700">{m.house.inviteCode}</span>
                 </p>
               </Link>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="cv-card rounded-2xl border border-dashed border-violet-200/60 bg-violet-50/30 px-6 py-10 text-center text-sm font-medium text-slate-600">
+        <p className="cv-card rounded-2xl border border-dashed border-emerald-200/60 bg-emerald-50/30 px-6 py-10 text-center text-sm font-medium text-slate-600">
           Non sei ancora in nessuna casa. Creane una o unisciti con un codice invito.
         </p>
       )}

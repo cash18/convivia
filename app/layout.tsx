@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#6366f1",
+  themeColor: "#059669",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -24,9 +24,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   applicationName: "Convivia",
-  title: "Convivia — spese, calendario e compiti",
+  title: "Convivia — la casa condivisa organizzata",
   description:
-    "Convivia: portale per coinquilini — spese condivise, calendario casa, liste spesa e compiti assegnati.",
+    "Spese ripartite (anche in %), scontrini, calendario condiviso con Google/Apple, liste spesa e compiti. Gratis per iniziare: coinquilini e famiglie.",
   manifest: "/manifest.webmanifest",
   formatDetection: {
     telephone: false,
@@ -51,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it" className={`${plusJakarta.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="it" className={`${plusJakarta.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}>
       <body className="flex min-h-dvh min-h-full flex-col">
         <Providers>{children}</Providers>
       </body>

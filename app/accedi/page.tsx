@@ -13,7 +13,7 @@ export default async function LoginPage({
   return (
     <div className="relative flex min-h-dvh min-h-screen flex-col items-center justify-center px-4 py-12 pt-[env(safe-area-inset-top,0px)]">
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(139,92,246,0.2),transparent_50%),radial-gradient(ellipse_at_80%_80%,rgba(34,211,238,0.18),transparent_45%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(5,150,105,0.2),transparent_50%),radial-gradient(ellipse_at_80%_80%,rgba(20,184,166,0.18),transparent_45%)]"
         aria-hidden
       />
       <div className="relative w-full max-w-md">

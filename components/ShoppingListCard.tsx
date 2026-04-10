@@ -83,7 +83,7 @@ export function ShoppingListCard({
                   type="checkbox"
                   checked={it.done}
                   onChange={(e) => onToggle(it.id, e.target.checked)}
-                  className="rounded border-violet-300 text-violet-600 focus:ring-violet-500"
+                  className="rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500"
                 />
                 <span className={it.done ? "text-slate-400 line-through" : "text-slate-900"}>{it.name}</span>
               </label>

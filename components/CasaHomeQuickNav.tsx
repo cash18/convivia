@@ -17,7 +17,7 @@ const sections = [
     href: (id: string) => `/casa/${id}/liste`,
     title: "Liste spesa",
     description: "Liste collaborative da spuntare",
-    accent: "from-fuchsia-500/15 to-pink-500/10",
+    accent: "from-lime-500/18 to-emerald-500/10",
   },
   {
     href: (id: string) => `/casa/${id}/compiti`,
@@ -34,15 +34,15 @@ export function CasaHomeQuickNav({ houseId }: { houseId: string }) {
         <Link
           key={s.title}
           href={s.href(houseId)}
-          className="cv-card-solid group flex flex-col gap-1 p-4 transition hover:shadow-[0_12px_40px_-12px_rgba(99,102,241,0.2)]"
+          className="cv-card-solid group flex flex-col gap-1 p-4 transition hover:shadow-[0_12px_40px_-12px_rgba(5,150,105,0.2)]"
         >
           <div
             className={`mb-1 h-1 w-10 rounded-full bg-gradient-to-r ${s.accent} ring-1 ring-white/60`}
             aria-hidden
           />
-          <span className="font-bold text-slate-900 group-hover:text-indigo-900">{s.title}</span>
+          <span className="font-bold text-slate-900 group-hover:text-emerald-900">{s.title}</span>
           <span className="text-xs leading-snug text-slate-600">{s.description}</span>
-          <span className="mt-2 text-xs font-semibold text-violet-700">Apri →</span>
+          <span className="mt-2 text-xs font-semibold text-emerald-700">Apri →</span>
         </Link>
       ))}
     </nav>
