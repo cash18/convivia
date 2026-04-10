@@ -44,6 +44,6 @@ next-env.d.ts
 
 /app/generated/prisma
 
-# local SQLite (development)
+# SQLite legacy / file DB locali (non usati con Postgres)
 /prisma/prisma/*.db
 /prisma/prisma/*.db-journal
