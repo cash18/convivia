@@ -1,12 +1,11 @@
 "use server";
 
 import { auth } from "@/auth";
+import { MAX_RECEIPT_BYTES, MAX_RECEIPT_DATA_URL_CHARS } from "@/lib/expense-receipt-limits";
 import { centsFromIntegerPercents } from "@/lib/percent-split";
 import { prisma } from "@/lib/prisma";
 import { parseEuroToCents } from "@/lib/money";
 import { revalidatePath } from "next/cache";
-
-const MAX_RECEIPT_BYTES = 2_000_000;
 
 async function assertMember(houseId: string, userId: string) {
   const m = await prisma.houseMember.findUnique({
@@ -20,7 +19,10 @@ async function readReceiptUrl(formData: FormData): Promise<{ receiptUrl: string 
   if (!file || typeof file === "string") return { receiptUrl: null };
   if (!(file instanceof Blob) || file.size === 0) return { receiptUrl: null };
   if (file.size > MAX_RECEIPT_BYTES) {
-    return { receiptUrl: null, error: "Lo scontrino supera 2 MB. Riduci la risoluzione o comprimi l’immagine." };
+    return {
+      receiptUrl: null,
+      error: "Lo scontrino supera 20 MB. Riduci la risoluzione o comprimi l’immagine.",
+    };
   }
   const buf = Buffer.from(await file.arrayBuffer());
   const mime = (file as File).type || "image/jpeg";
@@ -29,7 +31,7 @@ async function readReceiptUrl(formData: FormData): Promise<{ receiptUrl: string 
   }
   const b64 = buf.toString("base64");
   const dataUrl = `data:${mime};base64,${b64}`;
-  if (dataUrl.length > 2_800_000) {
+  if (dataUrl.length > MAX_RECEIPT_DATA_URL_CHARS) {
     return { receiptUrl: null, error: "Immagine troppo grande dopo la codifica. Usa una foto più piccola." };
   }
   return { receiptUrl: dataUrl };

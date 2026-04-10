@@ -1,6 +1,7 @@
 "use client";
 
 import { createExpense } from "@/lib/actions/expenses";
+import { MAX_RECEIPT_BYTES } from "@/lib/expense-receipt-limits";
 import { formatEuroNumberForInput } from "@/lib/money";
 import { extractEuroTotalFromReceiptText } from "@/lib/receipt-total-parse";
 import { useRouter } from "next/navigation";
@@ -97,8 +98,8 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
       setError("Seleziona prima un’immagine dello scontrino.");
       return;
     }
-    if (file.size > 2_000_000) {
-      setError("Immagine troppo grande (max 2 MB).");
+    if (file.size > MAX_RECEIPT_BYTES) {
+      setError("Immagine troppo grande (max 20 MB).");
       return;
     }
     setOcrBusy(true);
@@ -198,7 +199,8 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
       <div className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
         <p className="text-xs font-semibold text-slate-600">Scontrino (opzionale)</p>
         <p className="mt-1 text-xs text-slate-500">
-          Allega una foto; puoi usare &quot;Leggi totale&quot; per compilare l&apos;importo (OCR, non sempre perfetto).
+          Allega una foto (immagini fino a 20 MB); puoi usare &quot;Leggi totale&quot; per compilare l&apos;importo
+          (OCR, non sempre perfetto).
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <input

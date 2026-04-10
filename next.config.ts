@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    serverActions: {
+      /** Consente allegati scontrino fino a ~20 MB (multipart + campi form). */
+      bodySizeLimit: "32mb",
+    },
+  },
 };
 
 export default nextConfig;
