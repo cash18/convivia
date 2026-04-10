@@ -1,6 +1,6 @@
 # Convivia
 
-Portale web per coinquilini: **case multi-utente**, **spese condivise** (con ripartizione e saldi), **calendario**, **liste della spesa** e **compiti assegnabili** — in linea con l’idea di app come Flatify o OurHome.
+**Convivia** è il portale web per coinquilini: **case multi-utente**, **spese condivise** (con ripartizione e saldi), **calendario**, **liste della spesa** e **compiti assegnabili** — in linea con l’idea di app come Flatify o OurHome.
 
 ## Stack
 

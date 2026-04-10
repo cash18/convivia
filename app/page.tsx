@@ -24,14 +24,16 @@ export default function HomePage() {
       </header>
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-4 py-16">
         <section className="max-w-2xl">
-          <p className="text-sm font-medium uppercase tracking-wide text-emerald-800">Per la tua casa condivisa</p>
+          <p className="text-sm font-medium uppercase tracking-wide text-emerald-800">
+            Convivia — per chi vive in casa condivisa
+          </p>
           <h1 className="mt-2 text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl">
-            Organizza convivenza, spese e turni in un unico portale.
+            Organizza convivenza, spese e turni con Convivia.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-zinc-600">
-            Ispirato a strumenti come Flatify e OurHome: più coinquilini, un&apos;unica casa digitale. Gestisci
-            le spese condivise con ripartizione, un calendario per eventi e prenotazioni, liste della spesa
-            collaborative e compiti assegnabili a chi preferisci.
+            Convivia è il portale ispirato a strumenti come Flatify e OurHome: più coinquilini, un&apos;unica
+            casa digitale. Gestisci le spese condivise con ripartizione, un calendario per eventi e
+            prenotazioni, liste della spesa collaborative e compiti assegnabili a chi preferisci.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link

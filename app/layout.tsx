@@ -14,9 +14,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  applicationName: "Convivia",
   title: "Convivia — spese, calendario e compiti",
   description:
-    "Portale per coinquilini: spese condivise, calendario casa, liste spesa e compiti assegnati.",
+    "Convivia: portale per coinquilini — spese condivise, calendario casa, liste spesa e compiti assegnati.",
 };
 
 export default function RootLayout({
