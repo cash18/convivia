@@ -11,13 +11,13 @@
 ## Avvio locale
 
 1. Crea un database Postgres (consigliato: progetto gratuito su [Neon](https://neon.tech/)).
-2. Copia le connection string dalla dashboard (usa **pooled** per `DATABASE_URL` e **direct** per `DIRECT_URL` se Neon te le fornisce distinte; altrimenti la stessa stringa *direct* va bene per entrambe in sviluppo).
+2. Copia le connection string dalla dashboard Neon (o da Vercel dopo l’integrazione): **pooled** → `DATABASE_URL`, **direct / unpooled** → `DATABASE_URL_UNPOOLED`. In sviluppo senza pooler puoi usare la stessa stringa per entrambe.
 3. Configura l’ambiente:
 
 ```bash
 # dalla root del repository
 cp .env.example .env
-# Modifica .env: DATABASE_URL, DIRECT_URL, AUTH_SECRET (es. openssl rand -base64 32), AUTH_URL=http://localhost:3000
+# Modifica .env: DATABASE_URL, DATABASE_URL_UNPOOLED, AUTH_SECRET (es. openssl rand -base64 32), AUTH_URL=http://localhost:3000
 npm install
 npx prisma migrate deploy
 npm run dev
@@ -40,7 +40,7 @@ npx vercel link --yes --project convivia
 | Variabile | Note |
 |-----------|------|
 | `DATABASE_URL` | Connection string Postgres (su Neon di solito *pooled* / transaction) |
-| `DIRECT_URL` | Connection string *direct* (per `prisma migrate deploy` in build); in sviluppo può coincidere con `DATABASE_URL` |
+| `DATABASE_URL_UNPOOLED` | Connection string *direct* (per `prisma migrate deploy`); su Vercel+Neon è già creata dall’integrazione |
 | `AUTH_SECRET` | Stesso valore sicuro che usi in locale (`openssl rand -base64 32`) |
 | `AUTH_URL` | URL del sito, es. `https://convivia-xxx.vercel.app` (aggiorna dopo il primo deploy se cambia dominio) |
 
