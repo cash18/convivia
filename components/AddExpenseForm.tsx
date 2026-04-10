@@ -3,7 +3,8 @@
 import { createExpense } from "@/lib/actions/expenses";
 import { MAX_RECEIPT_BYTES } from "@/lib/expense-receipt-limits";
 import { formatEuroNumberForInput } from "@/lib/money";
-import { extractEuroTotalFromReceiptText } from "@/lib/receipt-total-parse";
+import { runReceiptOcr } from "@/lib/receipt-ocr-browser";
+import { extractEuroTotalFromDualOcr } from "@/lib/receipt-total-parse";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -104,13 +105,8 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
     }
     setOcrBusy(true);
     try {
-      const { createWorker } = await import("tesseract.js");
-      const worker = await createWorker("ita+eng");
-      const {
-        data: { text },
-      } = await worker.recognize(file);
-      await worker.terminate();
-      const euro = extractEuroTotalFromReceiptText(text);
+      const { textFull, textBottom } = await runReceiptOcr(file);
+      const euro = extractEuroTotalFromDualOcr(textBottom, textFull);
       if (euro === null) {
         setError("Non è stato possibile leggere un totale dallo scontrino. Inserisci l’importo a mano.");
         return;

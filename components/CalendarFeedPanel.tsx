@@ -32,6 +32,16 @@ function googleCalendarSubscribeUrlHttps(httpsUrl: string): string {
   return `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(httpsUrl)}`;
 }
 
+/**
+ * Prova ad aprire l’app Google Calendar su Android invece del solo browser.
+ * Se l’app non c’è, Chrome usa `browser_fallback_url` (stessa pagina web di prima).
+ */
+function googleCalendarAndroidAppIntent(webcalUrl: string): string {
+  const web = googleCalendarSubscribeUrlWebcal(webcalUrl);
+  const pathAndQuery = `calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(webcalUrl)}`;
+  return `intent://${pathAndQuery}#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=${encodeURIComponent(web)};end`;
+}
+
 function usePhoneKind(): PhoneKind {
   const [kind, setKind] = useState<PhoneKind>("desktop");
   useLayoutEffect(() => {
@@ -93,7 +103,7 @@ export function CalendarFeedPanel({ houseId, houseName, feedHttpsUrl, canRotateT
     phoneKind === "ios"
       ? "Rilevato iPhone o iPad: il tasto verde apre l’app Calendario per l’abbonamento."
       : phoneKind === "android"
-        ? "Rilevato Android: il tasto verde apre Google Calendar per aggiungere il feed."
+        ? "Rilevato Android: il tasto verde apre il feed nel calendario del telefono (scegli l’app). Google sul web resta come opzione separata."
         : "Scegli il pulsante in base al telefono che usi di solito.";
 
   return (
@@ -131,19 +141,30 @@ export function CalendarFeedPanel({ houseId, houseName, feedHttpsUrl, canRotateT
             </>
           ) : phoneKind === "android" ? (
             <>
-              <a href={googleViaWebcal} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
-                <span aria-hidden>📆</span>
-                Aggiungi con Google Calendar (consigliato)
+              <a href={webcalUrl} className={btnPrimary}>
+                <span aria-hidden>📅</span>
+                Aggiungi al calendario del telefono (app)
               </a>
               <p className="text-[11px] text-slate-500">
-                Si apre il browser o l&apos;app Google Calendar. Se non compare il calendario, prova il secondo pulsante
-                o incolla il link HTTPS nelle impostazioni (Da URL).
+                Si apre il menu <strong>Apri con</strong>: scegli Calendario, Google Calendar, Samsung Calendar o
+                l&apos;app che usi di solito. Se non succede nulla, prova il pulsante con link HTTPS qui sotto.
               </p>
-              <a href={googleViaHttps} target="_blank" rel="noopener noreferrer" className={btnSecondary}>
-                Prova con link HTTPS (alternativa)
+              <a href={feedHttpsUrl} className={btnSecondary}>
+                <span aria-hidden>🔗</span>
+                Stesso calendario — link HTTPS (scegli app)
               </a>
-              <a href={webcalUrl} className={btnQuiet}>
-                Apri con webcal (altre app calendario)
+              <a href={googleCalendarAndroidAppIntent(webcalUrl)} className={btnSecondary}>
+                <span aria-hidden>📆</span>
+                Google Calendar (app Android)
+              </a>
+              <p className="text-[10px] leading-relaxed text-slate-500">
+                Se non hai l&apos;app Google Calendar installata, si apre il browser con la stessa iscrizione.
+              </p>
+              <a href={googleViaWebcal} target="_blank" rel="noopener noreferrer" className={btnQuiet}>
+                Google Calendar nel browser (sito web)
+              </a>
+              <a href={googleViaHttps} target="_blank" rel="noopener noreferrer" className={btnQuiet}>
+                Browser — variante URL HTTPS nel link Google
               </a>
             </>
           ) : (
@@ -154,11 +175,15 @@ export function CalendarFeedPanel({ houseId, houseName, feedHttpsUrl, canRotateT
                   <span aria-hidden>📅</span>
                   Per iPhone / iPad (Calendario)
                 </a>
-                <a href={googleViaWebcal} target="_blank" rel="noopener noreferrer" className={btnSecondary}>
-                  <span aria-hidden>📆</span>
-                  Per Android (Google Calendar)
+                <a href={webcalUrl} className={btnSecondary}>
+                  <span aria-hidden>📅</span>
+                  Per Android (calendario sul telefono)
                 </a>
               </div>
+              <a href={googleViaWebcal} target="_blank" rel="noopener noreferrer" className={btnSecondary}>
+                <span aria-hidden>📆</span>
+                Android — Google Calendar nel browser
+              </a>
               <a href={googleViaHttps} target="_blank" rel="noopener noreferrer" className={btnQuiet}>
                 Google Calendar — variante URL HTTPS
               </a>
@@ -227,6 +252,10 @@ export function CalendarFeedPanel({ houseId, houseName, feedHttpsUrl, canRotateT
       </div>
 
       <ol className="list-decimal space-y-2 pl-4 text-xs leading-relaxed text-slate-600">
+        <li>
+          <strong>Android (app Calendario / Samsung / altre)</strong> — usa il pulsante verde <em>calendario del telefono</em> o
+          il link HTTPS; in alternativa nell&apos;app: <em>Aggiungi calendario</em> / <em>Abbonamento</em> → incolla HTTPS.
+        </li>
         <li>
           <strong>Google Calendar</strong> — app o calendar.google.com → <em>Aggiungi calendario</em> →{" "}
           <em>Da URL</em> → incolla HTTPS.
