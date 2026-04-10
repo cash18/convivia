@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const links = [
   { href: (id: string) => `/casa/${id}`, label: "Panoramica" },
@@ -17,33 +20,43 @@ export function CasaSubNav({
   houseName: string;
   inviteCode: string;
 }) {
+  const pathname = usePathname();
+
   return (
-    <div className="mb-8 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-zinc-900">{houseName}</h1>
-          <p className="text-sm text-zinc-600">
+    <div className="cv-card-solid mb-8 p-5 sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold tracking-wider text-violet-600 uppercase">Casa attiva</p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">{houseName}</h1>
+          <p className="text-sm text-slate-600">
             Codice invito:{" "}
-            <code className="rounded bg-zinc-100 px-2 py-0.5 font-mono text-emerald-900">{inviteCode}</code>
+            <code className="rounded-xl border border-violet-200/80 bg-gradient-to-r from-violet-50 to-indigo-50 px-2.5 py-1 font-mono text-sm font-semibold text-indigo-900">
+              {inviteCode}
+            </code>
           </p>
         </div>
-        <Link
-          href="/case"
-          className="text-sm font-medium text-emerald-800 underline decoration-emerald-800/30 hover:decoration-emerald-800"
-        >
+        <Link href="/case" className="cv-link text-sm shrink-0">
           ← Altre case
         </Link>
       </div>
-      <nav className="mt-4 flex flex-wrap gap-2 border-t border-zinc-100 pt-4">
-        {links.map((l) => (
-          <Link
-            key={l.label}
-            href={l.href(houseId)}
-            className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-sm font-medium text-zinc-800 hover:border-emerald-300 hover:bg-emerald-50"
-          >
-            {l.label}
-          </Link>
-        ))}
+      <nav className="mt-5 flex flex-wrap gap-2 border-t border-slate-200/60 pt-5">
+        {links.map((l) => {
+          const href = l.href(houseId);
+          const active = pathname === href;
+          return (
+            <Link
+              key={l.label}
+              href={href}
+              className={
+                active
+                  ? "rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25"
+                  : "cv-pill-nav"
+              }
+            >
+              {l.label}
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );

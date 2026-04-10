@@ -40,13 +40,16 @@ export default async function SpesePage({
     <div className="space-y-10">
       <div className="grid gap-8 lg:grid-cols-2">
         <AddExpenseForm houseId={houseId} members={members} />
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-zinc-900">Saldi per membro</h2>
+        <div className="cv-card-solid p-5 sm:p-6">
+          <h2 className="text-sm font-bold text-slate-900">Saldi per membro</h2>
           <ul className="mt-3 space-y-2 text-sm">
             {balances.map((b) => (
-              <li key={b.userId} className="flex justify-between border-b border-zinc-100 py-2 last:border-0">
-                <span>{b.name}</span>
-                <span className={b.balanceCents >= 0 ? "text-emerald-800" : "text-amber-800"}>
+              <li
+                key={b.userId}
+                className="flex justify-between border-b border-slate-200/70 py-2 last:border-0"
+              >
+                <span className="font-medium text-slate-700">{b.name}</span>
+                <span className={b.balanceCents >= 0 ? "font-semibold text-emerald-600" : "font-semibold text-amber-600"}>
                   {formatEuroFromCents(b.balanceCents)}
                 </span>
               </li>
@@ -56,13 +59,13 @@ export default async function SpesePage({
       </div>
 
       <section>
-        <h2 className="text-lg font-semibold text-zinc-900">Storico spese</h2>
+        <h2 className="text-lg font-bold text-slate-900">Storico spese</h2>
         {expenses.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-500">Nessuna spesa ancora.</p>
+          <p className="mt-2 text-sm text-slate-500">Nessuna spesa ancora.</p>
         ) : (
-          <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+          <div className="cv-card-solid mt-4 overflow-x-auto p-0">
             <table className="w-full min-w-[32rem] text-left text-sm">
-              <thead className="border-b border-zinc-200 bg-zinc-50 text-xs uppercase text-zinc-500">
+              <thead className="border-b border-slate-200/80 bg-slate-50/90 text-xs font-semibold tracking-wide text-slate-500 uppercase">
                 <tr>
                   <th className="px-4 py-3 font-medium">Data</th>
                   <th className="px-4 py-3 font-medium">Descrizione</th>
@@ -71,18 +74,18 @@ export default async function SpesePage({
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-slate-100">
                 {expenses.map((e) => (
-                  <tr key={e.id}>
-                    <td className="whitespace-nowrap px-4 py-3 text-zinc-600">
+                  <tr key={e.id} className="bg-white/50">
+                    <td className="whitespace-nowrap px-4 py-3 text-slate-600">
                       {new Date(e.expenseDate).toLocaleDateString("it-IT")}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="font-medium text-zinc-900">{e.title}</span>
-                      {e.notes ? <p className="text-xs text-zinc-500">{e.notes}</p> : null}
+                      <span className="font-semibold text-slate-900">{e.title}</span>
+                      {e.notes ? <p className="text-xs text-slate-500">{e.notes}</p> : null}
                     </td>
-                    <td className="px-4 py-3 text-zinc-700">{e.paidBy.name}</td>
-                    <td className="px-4 py-3 text-right tabular-nums font-medium text-zinc-900">
+                    <td className="px-4 py-3 text-slate-700">{e.paidBy.name}</td>
+                    <td className="px-4 py-3 text-right tabular-nums font-semibold text-slate-900">
                       {formatEuroFromCents(e.amountCents)}
                     </td>
                     <td className="px-4 py-3 text-right">

@@ -25,25 +25,21 @@ export function CreateHouseForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-zinc-900">Crea una nuova casa</h2>
-      <p className="text-sm text-zinc-600">
+    <form onSubmit={onSubmit} className="cv-card-solid flex flex-col gap-3 p-5 sm:p-6">
+      <h2 className="text-lg font-bold text-slate-900">Crea una nuova casa</h2>
+      <p className="text-sm text-slate-600">
         Diventerai amministratore e riceverai un codice invito da condividere con i coinquilini.
       </p>
       {error ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
+        <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
       ) : null}
       <input
         name="name"
         required
         placeholder="Nome casa (es. Via Roma 12)"
-        className="rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none ring-emerald-600/30 focus:ring-2"
+        className="cv-input-sm"
       />
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-lg bg-emerald-700 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-60"
-      >
+      <button type="submit" disabled={pending} className="cv-btn-primary">
         {pending ? "Creazione…" : "Crea casa"}
       </button>
     </form>

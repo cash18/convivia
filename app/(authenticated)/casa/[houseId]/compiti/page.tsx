@@ -46,35 +46,34 @@ export default async function CompitiPage({
       <AddTaskForm houseId={houseId} members={members} />
 
       <section>
-        <h2 className="text-lg font-semibold text-zinc-900">Elenco compiti</h2>
+        <h2 className="text-lg font-bold text-slate-900">Elenco compiti</h2>
         {tasks.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-500">Nessun compito. Aggiungine uno per organizzare i turni.</p>
+          <p className="mt-2 text-sm text-slate-500">Nessun compito. Aggiungine uno per organizzare i turni.</p>
         ) : (
           <ul className="mt-4 space-y-3">
             {tasks.map((t) => (
               <li
                 key={t.id}
-                className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                className="cv-card-solid flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex-1">
-                  <p className={`font-semibold ${t.status === "DONE" ? "text-zinc-400 line-through" : "text-zinc-900"}`}>
+                  <p
+                    className={`font-bold ${t.status === "DONE" ? "text-slate-400 line-through" : "text-slate-900"}`}
+                  >
                     {t.title}
                   </p>
-                  {t.description ? <p className="mt-1 text-sm text-zinc-600">{t.description}</p> : null}
-                  <p className="mt-2 text-xs text-zinc-500">
+                  {t.description ? <p className="mt-1 text-sm text-slate-600">{t.description}</p> : null}
+                  <p className="mt-2 text-xs text-slate-500">
                     {t.assignee ? `Assegnato a ${t.assignee.name}` : "Non assegnato"}
                     {t.dueDate ? ` · scadenza ${new Date(t.dueDate).toLocaleString("it-IT")}` : ""}
-                    <span className="text-zinc-400"> · creato da {t.createdBy.name}</span>
+                    <span className="text-slate-400"> · creato da {t.createdBy.name}</span>
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <form action={toggleTaskAction}>
                     <input type="hidden" name="taskId" value={t.id} />
                     <input type="hidden" name="nextStatus" value={t.status === "DONE" ? "TODO" : "DONE"} />
-                    <button
-                      type="submit"
-                      className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-sm font-medium text-zinc-800 hover:bg-zinc-100"
-                    >
+                    <button type="submit" className="cv-pill-nav text-sm">
                       {t.status === "DONE" ? "Segna da fare" : "Segna fatto"}
                     </button>
                   </form>

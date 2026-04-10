@@ -32,30 +32,30 @@ export default async function CalendarioPage({
       <AddEventForm houseId={houseId} />
 
       <section>
-        <h2 className="text-lg font-semibold text-zinc-900">Eventi</h2>
+        <h2 className="text-lg font-bold text-slate-900">Eventi</h2>
         {events.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-500">Nessun evento. Aggiungi il primo sopra.</p>
+          <p className="mt-2 text-sm text-slate-500">Nessun evento. Aggiungi il primo sopra.</p>
         ) : (
           <ul className="mt-4 space-y-3">
             {events.map((ev) => (
               <li
                 key={ev.id}
-                className="flex flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row sm:items-start sm:justify-between"
+                className="cv-card-solid flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:justify-between"
               >
                 <div>
-                  <p className="font-semibold text-zinc-900">{ev.title}</p>
-                  {ev.description ? <p className="mt-1 text-sm text-zinc-600">{ev.description}</p> : null}
-                  <p className="mt-2 text-xs text-zinc-500">
+                  <p className="font-bold text-slate-900">{ev.title}</p>
+                  {ev.description ? <p className="mt-1 text-sm text-slate-600">{ev.description}</p> : null}
+                  <p className="mt-2 text-xs text-slate-500">
                     {ev.allDay
                       ? `Giornata intera · ${new Date(ev.startsAt).toLocaleDateString("it-IT")}`
                       : `${new Date(ev.startsAt).toLocaleString("it-IT")}`}
                     {ev.endsAt && !ev.allDay ? ` — ${new Date(ev.endsAt).toLocaleString("it-IT")}` : ""}
                   </p>
-                  <p className="text-xs text-zinc-400">Creato da {ev.createdBy.name}</p>
+                  <p className="text-xs text-slate-400">Creato da {ev.createdBy.name}</p>
                 </div>
                 <form action={removeEventAction}>
                   <input type="hidden" name="eventId" value={ev.id} />
-                  <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-800">
+                  <button type="submit" className="text-sm font-semibold text-red-600 hover:text-red-800">
                     Elimina
                   </button>
                 </form>

@@ -36,8 +36,8 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-zinc-50/80 p-5">
-      <h2 className="text-sm font-semibold text-zinc-900">Nuova spesa</h2>
+    <form onSubmit={onSubmit} className="cv-card-solid flex flex-col gap-3 p-5 sm:p-6">
+      <h2 className="text-sm font-bold text-slate-900">Nuova spesa</h2>
       {error ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
       ) : null}
@@ -45,7 +45,7 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
         name="title"
         required
         placeholder="Descrizione (es. Bolletta luce)"
-        className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
+        className="cv-input-sm"
       />
       <div className="grid gap-3 sm:grid-cols-2">
         <input
@@ -54,12 +54,12 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
           type="text"
           inputMode="decimal"
           placeholder="Importo (es. 45,50)"
-          className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
+          className="cv-input-sm"
         />
         <select
           name="paidById"
           required
-          className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
+          className="cv-input-sm"
           defaultValue={members[0]?.id}
         >
           {members.map((m) => (
@@ -73,14 +73,20 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
         name="notes"
         placeholder="Note (opzionale)"
         rows={2}
-        className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
+        className="cv-input-sm"
       />
-      <fieldset className="rounded-lg border border-zinc-200 bg-white p-3">
-        <legend className="px-1 text-xs font-medium text-zinc-600">Ripartizione tra</legend>
+      <fieldset className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
+        <legend className="px-1 text-xs font-semibold text-slate-600">Ripartizione tra</legend>
         <div className="mt-2 flex flex-col gap-2">
           {members.map((m) => (
             <label key={m.id} className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="participants" value={m.id} defaultChecked className="rounded border-zinc-300" />
+              <input
+                type="checkbox"
+                name="participants"
+                value={m.id}
+                defaultChecked
+                className="rounded border-violet-300 text-violet-600"
+              />
               {m.name}
             </label>
           ))}
@@ -89,7 +95,7 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-emerald-700 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-60"
+        className="cv-btn-primary"
       >
         {pending ? "Salvataggio…" : "Aggiungi spesa"}
       </button>

@@ -40,26 +40,23 @@ export default async function CasaDashboardPage({
   return (
     <div className="space-y-10">
       <section>
-        <h2 className="text-lg font-semibold text-zinc-900">Saldi indicativi</h2>
-        <p className="text-xs text-zinc-500">
+        <h2 className="text-lg font-bold text-slate-900">Saldi indicativi</h2>
+        <p className="text-xs text-slate-500">
           Positivo = hai pagato più della tua quota; negativo = devi ancora &quot;rimetterti in pari&quot; rispetto a
           quanto hai consumato.
         </p>
-        <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
           {balances.map((b) => (
-            <li
-              key={b.userId}
-              className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm"
-            >
-              <span className="font-medium text-zinc-800">{b.name}</span>
-              <span className={b.balanceCents >= 0 ? "text-emerald-800" : "text-amber-800"}>
+            <li key={b.userId} className="cv-card-solid flex items-center justify-between px-4 py-3 text-sm">
+              <span className="font-semibold text-slate-800">{b.name}</span>
+              <span className={b.balanceCents >= 0 ? "font-bold text-emerald-600" : "font-bold text-amber-600"}>
                 {formatEuroFromCents(b.balanceCents)}
               </span>
             </li>
           ))}
         </ul>
-        <p className="mt-2">
-          <Link href={`/casa/${houseId}/spese`} className="text-sm font-medium text-emerald-800 underline">
+        <p className="mt-3">
+          <Link href={`/casa/${houseId}/spese`} className="cv-link text-sm">
             Vai alle spese →
           </Link>
         </p>
@@ -67,15 +64,15 @@ export default async function CasaDashboardPage({
 
       <div className="grid gap-8 lg:grid-cols-2">
         <section>
-          <h2 className="text-lg font-semibold text-zinc-900">Prossimi eventi</h2>
+          <h2 className="text-lg font-bold text-slate-900">Prossimi eventi</h2>
           {upcoming.length === 0 ? (
-            <p className="mt-2 text-sm text-zinc-500">Nessun evento futuro.</p>
+            <p className="mt-2 text-sm text-slate-500">Nessun evento futuro.</p>
           ) : (
             <ul className="mt-3 space-y-2">
               {upcoming.map((ev) => (
-                <li key={ev.id} className="rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm">
-                  <span className="font-medium text-zinc-900">{ev.title}</span>
-                  <p className="text-xs text-zinc-500">
+                <li key={ev.id} className="cv-card-solid px-4 py-3 text-sm">
+                  <span className="font-semibold text-slate-900">{ev.title}</span>
+                  <p className="text-xs text-slate-500">
                     {ev.allDay
                       ? new Date(ev.startsAt).toLocaleDateString("it-IT")
                       : new Date(ev.startsAt).toLocaleString("it-IT")}
@@ -84,23 +81,23 @@ export default async function CasaDashboardPage({
               ))}
             </ul>
           )}
-          <p className="mt-2">
-            <Link href={`/casa/${houseId}/calendario`} className="text-sm font-medium text-emerald-800 underline">
+          <p className="mt-3">
+            <Link href={`/casa/${houseId}/calendario`} className="cv-link text-sm">
               Calendario completo →
             </Link>
           </p>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-zinc-900">Compiti aperti</h2>
+          <h2 className="text-lg font-bold text-slate-900">Compiti aperti</h2>
           {openTasks.length === 0 ? (
-            <p className="mt-2 text-sm text-zinc-500">Nessun compito in sospeso.</p>
+            <p className="mt-2 text-sm text-slate-500">Nessun compito in sospeso.</p>
           ) : (
             <ul className="mt-3 space-y-2">
               {openTasks.map((t) => (
-                <li key={t.id} className="rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm">
-                  <span className="font-medium text-zinc-900">{t.title}</span>
-                  <p className="text-xs text-zinc-500">
+                <li key={t.id} className="cv-card-solid px-4 py-3 text-sm">
+                  <span className="font-semibold text-slate-900">{t.title}</span>
+                  <p className="text-xs text-slate-500">
                     {t.assignee ? `Assegnato a ${t.assignee.name}` : "Non assegnato"}
                     {t.dueDate ? ` · scadenza ${new Date(t.dueDate).toLocaleString("it-IT")}` : ""}
                   </p>
@@ -108,8 +105,8 @@ export default async function CasaDashboardPage({
               ))}
             </ul>
           )}
-          <p className="mt-2">
-            <Link href={`/casa/${houseId}/compiti`} className="text-sm font-medium text-emerald-800 underline">
+          <p className="mt-3">
+            <Link href={`/casa/${houseId}/compiti`} className="cv-link text-sm">
               Tutti i compiti →
             </Link>
           </p>
@@ -117,18 +114,18 @@ export default async function CasaDashboardPage({
       </div>
 
       <section>
-        <h2 className="text-lg font-semibold text-zinc-900">Ultime spese</h2>
+        <h2 className="text-lg font-bold text-slate-900">Ultime spese</h2>
         {recentExpenses.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-500">Nessuna spesa registrata.</p>
+          <p className="mt-2 text-sm text-slate-500">Nessuna spesa registrata.</p>
         ) : (
-          <ul className="mt-3 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
+          <ul className="cv-card-solid mt-3 divide-y divide-slate-100 p-0">
             {recentExpenses.map((e) => (
               <li key={e.id} className="flex justify-between px-4 py-3 text-sm">
                 <span>
-                  <span className="font-medium text-zinc-900">{e.title}</span>
-                  <span className="ml-2 text-zinc-500">· {e.paidBy.name}</span>
+                  <span className="font-semibold text-slate-900">{e.title}</span>
+                  <span className="ml-2 text-slate-500">· {e.paidBy.name}</span>
                 </span>
-                <span className="tabular-nums text-zinc-800">{formatEuroFromCents(e.amountCents)}</span>
+                <span className="tabular-nums font-medium text-slate-800">{formatEuroFromCents(e.amountCents)}</span>
               </li>
             ))}
           </ul>

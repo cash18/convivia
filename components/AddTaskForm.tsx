@@ -28,8 +28,8 @@ export function AddTaskForm({ houseId, members }: { houseId: string; members: Me
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-zinc-50/80 p-5">
-      <h2 className="text-sm font-semibold text-zinc-900">Nuovo compito</h2>
+    <form onSubmit={onSubmit} className="cv-card-solid flex flex-col gap-3 p-5 sm:p-6">
+      <h2 className="text-sm font-bold text-slate-900">Nuovo compito</h2>
       {error ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
       ) : null}
@@ -37,16 +37,16 @@ export function AddTaskForm({ houseId, members }: { houseId: string; members: Me
         name="title"
         required
         placeholder="Cosa va fatto?"
-        className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
+        className="cv-input-sm"
       />
       <textarea
         name="description"
         placeholder="Dettagli (opzionale)"
         rows={2}
-        className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
+        className="cv-input-sm"
       />
       <div className="grid gap-3 sm:grid-cols-2">
-        <select name="assigneeId" className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm">
+        <select name="assigneeId" className="cv-input-sm">
           <option value="">Assegna a… (nessuno)</option>
           {members.map((m) => (
             <option key={m.id} value={m.id}>
@@ -57,13 +57,13 @@ export function AddTaskForm({ houseId, members }: { houseId: string; members: Me
         <input
           name="dueDate"
           type="datetime-local"
-          className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
+          className="cv-input-sm"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-emerald-700 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-60"
+        className="cv-btn-primary"
       >
         {pending ? "Salvataggio…" : "Aggiungi compito"}
       </button>

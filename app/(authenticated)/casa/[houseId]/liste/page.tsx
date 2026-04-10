@@ -23,12 +23,12 @@ export default async function ListePage({
 
   return (
     <div className="space-y-8">
-      <div className="rounded-xl border border-zinc-200 bg-zinc-50/80 p-5">
+      <div className="cv-card-solid p-5 sm:p-6">
         <NewShoppingListForm houseId={houseId} />
       </div>
 
       {lists.length === 0 ? (
-        <p className="text-sm text-zinc-500">Nessuna lista. Creane una per iniziare la spesa condivisa.</p>
+        <p className="text-sm font-medium text-slate-500">Nessuna lista. Creane una per iniziare la spesa condivisa.</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
           {lists.map((list) => (

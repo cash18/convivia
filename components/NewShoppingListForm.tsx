@@ -28,19 +28,19 @@ export function NewShoppingListForm({ houseId }: { houseId: string }) {
     <form onSubmit={onSubmit} className="flex flex-col gap-3">
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-        <label className="flex flex-1 flex-col gap-1 text-xs font-medium text-zinc-600">
+        <label className="flex flex-1 flex-col gap-1 text-xs font-semibold text-slate-600">
           Nuova lista
           <input
             name="name"
             required
             placeholder="es. Spesa settimanale"
-            className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
+            className="cv-input-sm flex-1"
           />
         </label>
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-60 sm:shrink-0"
+          className="cv-btn-primary shrink-0 sm:shrink-0"
         >
           {pending ? "…" : "Crea"}
         </button>
