@@ -2,7 +2,7 @@
 
 import { createExpense } from "@/lib/actions/expenses";
 import { MAX_RECEIPT_BYTES } from "@/lib/expense-receipt-limits";
-import { formatEuroNumberForInput } from "@/lib/money";
+import { formatEuroFromCents, formatEuroNumberForInput } from "@/lib/money";
 import { runReceiptOcr } from "@/lib/receipt-ocr-browser";
 import { extractEuroTotalFromDualOcr } from "@/lib/receipt-total-parse";
 import { useRouter } from "next/navigation";
@@ -27,16 +27,32 @@ function equalPercentsForIds(ids: string[]): Record<string, number> {
   return out;
 }
 
-export function AddExpenseForm({ houseId, members }: { houseId: string; members: Member[] }) {
+function centsToInputEuro(cents: number): string {
+  return formatEuroNumberForInput(cents / 100);
+}
+
+export function AddExpenseForm({
+  houseId,
+  members,
+  variant = "full",
+}: {
+  houseId: string;
+  members: Member[];
+  variant?: "full" | "compact";
+}) {
   const router = useRouter();
+  const compact = variant === "compact";
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const [splitMode, setSplitMode] = useState<"EQUAL" | "PERCENT">("EQUAL");
+  const [splitMode, setSplitMode] = useState<"EQUAL" | "PERCENT" | "CUSTOM">("EQUAL");
   const [checked, setChecked] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(members.map((m) => [m.id, true])),
   );
   const [percents, setPercents] = useState<Record<string, number>>(() =>
     equalPercentsForIds(members.map((m) => m.id)),
+  );
+  const [customEur, setCustomEur] = useState<Record<string, string>>(() =>
+    Object.fromEntries(members.map((m) => [m.id, ""])),
   );
   const [ocrBusy, setOcrBusy] = useState(false);
   const amountInputRef = useRef<HTMLInputElement>(null);
@@ -91,6 +107,27 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
     }));
   }
 
+  function distributeCustomEqually() {
+    const raw = amountInputRef.current?.value ?? "";
+    const normalized = raw.replace(",", ".").trim();
+    const n = parseFloat(normalized);
+    if (Number.isNaN(n) || n <= 0 || checkedIds.length === 0) {
+      setError("Inserisci prima un importo totale valido e seleziona i partecipanti.");
+      return;
+    }
+    const totalCents = Math.round(n * 100);
+    const parts = splitIntegerEqually(totalCents, checkedIds.length);
+    const next: Record<string, string> = { ...customEur };
+    checkedIds.forEach((id, i) => {
+      next[id] = centsToInputEuro(parts[i]!);
+    });
+    members.forEach((m) => {
+      if (!checked[m.id]) next[m.id] = "";
+    });
+    setCustomEur(next);
+    setError(null);
+  }
+
   async function scanReceiptTotal() {
     setError(null);
     const input = receiptInputRef.current;
@@ -123,7 +160,7 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    if (splitMode === "PERCENT") {
+    if (!compact && splitMode === "PERCENT") {
       if (checkedIds.length === 0) {
         setError("Seleziona almeno un partecipante.");
         return;
@@ -133,14 +170,23 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
         return;
       }
     }
+    if (!compact && splitMode === "CUSTOM") {
+      if (checkedIds.length === 0) {
+        setError("Seleziona almeno un partecipante.");
+        return;
+      }
+    }
     setPending(true);
     const form = e.currentTarget;
     const fd = new FormData(form);
-    fd.set("splitMode", splitMode);
+    fd.set("splitMode", compact ? "EQUAL" : splitMode);
     fd.delete("participants");
     checkedIds.forEach((id) => fd.append("participants", id));
-    if (splitMode === "PERCENT") {
+    if (!compact && splitMode === "PERCENT") {
       checkedIds.forEach((id) => fd.set(`pct_${id}`, String(percents[id] ?? 0)));
+    }
+    if (!compact && splitMode === "CUSTOM") {
+      checkedIds.forEach((id) => fd.set(`eur_${id}`, customEur[id] ?? ""));
     }
     const res = await createExpense(houseId, fd);
     setPending(false);
@@ -151,14 +197,15 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
     form.reset();
     setChecked(Object.fromEntries(members.map((m) => [m.id, true])));
     setPercents(equalPercentsForIds(members.map((m) => m.id)));
+    setCustomEur(Object.fromEntries(members.map((m) => [m.id, ""])));
     setSplitMode("EQUAL");
     if (receiptInputRef.current) receiptInputRef.current.value = "";
     router.refresh();
   }
 
   return (
-    <form onSubmit={onSubmit} encType="multipart/form-data" className="cv-card-solid flex flex-col gap-3 p-5 sm:p-6">
-      <h2 className="text-sm font-bold text-slate-900">Nuova spesa</h2>
+    <form onSubmit={onSubmit} encType="multipart/form-data" className="cv-card-solid flex h-full min-h-0 flex-col gap-3 p-5 sm:p-6">
+      <h2 className="text-sm font-bold text-slate-900">{compact ? "Aggiungi spesa (rapido)" : "Nuova spesa"}</h2>
       {error ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
       ) : null}
@@ -192,65 +239,81 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
         </select>
       </div>
 
-      <div className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
-        <p className="text-xs font-semibold text-slate-600">Scontrino (opzionale)</p>
-        <p className="mt-1 text-xs text-slate-500">
-          Allega una foto (immagini fino a 20 MB); puoi usare &quot;Leggi totale&quot; per compilare l&apos;importo
-          (OCR, non sempre perfetto).
-        </p>
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <input
-            ref={receiptInputRef}
-            type="file"
-            name="receipt"
-            accept="image/*"
-            className="max-w-full text-xs text-slate-600 file:mr-2 file:rounded-lg file:border-0 file:bg-emerald-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-emerald-800"
+      {!compact ? (
+        <>
+          <div className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
+            <p className="text-xs font-semibold text-slate-600">Scontrino (opzionale)</p>
+            <p className="mt-1 text-xs text-slate-500">
+              Allega una foto (immagini fino a 20 MB); puoi usare &quot;Leggi totale&quot; per compilare l&apos;importo
+              (OCR, non sempre perfetto).
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <input
+                ref={receiptInputRef}
+                type="file"
+                name="receipt"
+                accept="image/*"
+                className="max-w-full text-xs text-slate-600 file:mr-2 file:rounded-lg file:border-0 file:bg-emerald-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-emerald-800"
+              />
+              <button
+                type="button"
+                onClick={() => void scanReceiptTotal()}
+                disabled={ocrBusy}
+                className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-900 hover:bg-emerald-100 disabled:opacity-50"
+              >
+                {ocrBusy ? "Lettura…" : "Leggi totale da scontrino"}
+              </button>
+            </div>
+          </div>
+
+          <textarea
+            name="notes"
+            placeholder="Note (opzionale)"
+            rows={2}
+            className="cv-input-sm"
           />
-          <button
-            type="button"
-            onClick={() => void scanReceiptTotal()}
-            disabled={ocrBusy}
-            className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-900 hover:bg-emerald-100 disabled:opacity-50"
-          >
-            {ocrBusy ? "Lettura…" : "Leggi totale da scontrino"}
-          </button>
-        </div>
-      </div>
 
-      <textarea
-        name="notes"
-        placeholder="Note (opzionale)"
-        rows={2}
-        className="cv-input-sm"
-      />
+          <fieldset className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
+            <legend className="px-1 text-xs font-semibold text-slate-600">Modalità ripartizione</legend>
+            <div className="mt-2 flex flex-wrap gap-4 text-sm">
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  type="radio"
+                  name="splitModeUi"
+                  checked={splitMode === "EQUAL"}
+                  onChange={() => setSplitMode("EQUAL")}
+                  className="border-emerald-300 text-emerald-600"
+                />
+                Uguale tra i selezionati
+              </label>
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  type="radio"
+                  name="splitModeUi"
+                  checked={splitMode === "PERCENT"}
+                  onChange={() => setSplitMode("PERCENT")}
+                  className="border-emerald-300 text-emerald-600"
+                />
+                Percentuali (somma 100%)
+              </label>
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  type="radio"
+                  name="splitModeUi"
+                  checked={splitMode === "CUSTOM"}
+                  onChange={() => setSplitMode("CUSTOM")}
+                  className="border-emerald-300 text-emerald-600"
+                />
+                Importo per persona
+              </label>
+            </div>
+          </fieldset>
+        </>
+      ) : (
+        <p className="text-xs text-slate-500">Ripartizione uguale tra i partecipanti selezionati. Per percentuali o importi personalizzati usa la pagina Spese.</p>
+      )}
 
-      <fieldset className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
-        <legend className="px-1 text-xs font-semibold text-slate-600">Modalità ripartizione</legend>
-        <div className="mt-2 flex flex-wrap gap-4 text-sm">
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="radio"
-              name="splitModeUi"
-              checked={splitMode === "EQUAL"}
-              onChange={() => setSplitMode("EQUAL")}
-              className="border-emerald-300 text-emerald-600"
-            />
-            Uguale tra i selezionati
-          </label>
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="radio"
-              name="splitModeUi"
-              checked={splitMode === "PERCENT"}
-              onChange={() => setSplitMode("PERCENT")}
-              className="border-emerald-300 text-emerald-600"
-            />
-            Percentuali (somma 100%)
-          </label>
-        </div>
-      </fieldset>
-
-      <fieldset className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
+      <fieldset className="min-h-0 flex-1 rounded-xl border border-slate-200/80 bg-white/80 p-3">
         <legend className="px-1 text-xs font-semibold text-slate-600">Ripartizione tra</legend>
         <div className="mt-2 flex flex-col gap-2">
           {members.map((m) => (
@@ -264,7 +327,7 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
                 />
                 {m.name}
               </label>
-              {splitMode === "PERCENT" && checked[m.id] ? (
+              {!compact && splitMode === "PERCENT" && checked[m.id] ? (
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
@@ -279,10 +342,24 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
                   <span className="text-xs text-slate-500">%</span>
                 </div>
               ) : null}
+              {!compact && splitMode === "CUSTOM" && checked[m.id] ? (
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={customEur[m.id] ?? ""}
+                    onChange={(e) => setCustomEur((prev) => ({ ...prev, [m.id]: e.target.value }))}
+                    placeholder="0,00"
+                    className="cv-input-sm w-24 py-1 text-right tabular-nums"
+                    aria-label={`Quota in euro per ${m.name}`}
+                  />
+                  <span className="text-xs text-slate-500">€</span>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
-        {splitMode === "PERCENT" ? (
+        {!compact && splitMode === "PERCENT" ? (
           <div className="mt-3 space-y-2 border-t border-slate-100 pt-3 text-xs">
             <p
               className={
@@ -297,7 +374,8 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
               {percentSum !== 100 ? (
                 <>
                   {" "}
-                  — rimangono <span className="tabular-nums">{remainingPercent > 0 ? remainingPercent : -remainingPercent}%</span>{" "}
+                  — rimangono{" "}
+                  <span className="tabular-nums">{remainingPercent > 0 ? remainingPercent : -remainingPercent}%</span>{" "}
                   {remainingPercent > 0 ? "da assegnare" : "in eccesso"}
                 </>
               ) : null}
@@ -328,10 +406,25 @@ export function AddExpenseForm({ houseId, members }: { houseId: string; members:
             </p>
           </div>
         ) : null}
+        {!compact && splitMode === "CUSTOM" ? (
+          <div className="mt-3 space-y-2 border-t border-slate-100 pt-3 text-xs text-slate-600">
+            <p>
+              Indica quanto spetta a ciascuno: la somma deve coincidere esattamente con l&apos;importo totale della
+              spesa.
+            </p>
+            <button
+              type="button"
+              onClick={distributeCustomEqually}
+              className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-800 hover:bg-slate-100"
+            >
+              Distribuisci il totale in parti uguali tra i selezionati
+            </button>
+          </div>
+        ) : null}
       </fieldset>
 
-      <button type="submit" disabled={pending} className="cv-btn-primary">
-        {pending ? "Salvataggio…" : "Aggiungi spesa"}
+      <button type="submit" disabled={pending} className="cv-btn-primary mt-auto shrink-0">
+        {pending ? "Salvataggio…" : compact ? "Aggiungi" : "Aggiungi spesa"}
       </button>
     </form>
   );

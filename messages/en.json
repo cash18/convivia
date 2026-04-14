@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "My homes",
+    "settings": "Settings"
+  },
+  "casaNav": {
+    "activeHouse": "Active home",
+    "inviteCode": "Invite code:",
+    "homeButton": "House home",
+    "otherHouses": "← Other homes",
+    "home": "Home",
+    "expenses": "Expenses",
+    "calendar": "Calendar",
+    "lists": "Shopping lists",
+    "tasks": "Tasks"
+  },
+  "pushBell": {
+    "ariaEnable": "Enable push notifications",
+    "ariaDisable": "Disable push notifications",
+    "ariaOpen": "Notification options",
+    "busyOn": "Turning on…",
+    "busyOff": "Turning off…",
+    "encourage": "Turn on notifications to stay updated when housemates add expenses, events, lists and tasks.",
+    "hintDenied": "Permission denied. Allow notifications for this site in your browser settings.",
+    "hintFailed": "Could not update. Check your connection or try from the installed app (PWA).",
+    "hintOffFailed": "Could not turn off notifications.",
+    "categoriesLink": "Notification categories",
+    "blocked": "Notifications blocked by the browser."
+  },
+  "calendarFeed": {
+    "title": "Shared calendar",
+    "subtitle": "Events stay in sync with a subscription to this feed (not a one-off import).",
+    "cta": "Add to my calendar",
+    "ctaIos": "Subscribe in Calendar (iPhone / iPad / Mac)",
+    "ctaGoogle": "Subscribe with Google Calendar",
+    "manualHint": "If the button does not open your calendar app, copy the HTTPS link below and use “Add from URL / subscription” in your calendar settings.",
+    "urlLabel": "Subscription URL (HTTPS)",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyError": "Could not copy. Select the field and copy manually.",
+    "rotate": "Regenerate link (revokes old URL)",
+    "rotateConfirm": "Regenerating invalidates old subscriptions (Google/Apple must be updated with the new URL). Continue?",
+    "security": "Do not share this link outside your household — anyone with it can subscribe to these events.",
+    "rotating": "Regenerating…"
+  },
+  "settings": {
+    "badge": "User portal",
+    "title": "Settings",
+    "intro": "Manage push categories. They apply to all homes you belong to. You never get a push for your own action.",
+    "deviceTitle": "Device and permissions",
+    "deviceBody": "Enable notifications in the browser or installed PWA. The switches below only filter what you receive when others act in a home.",
+    "vapidOn": "To accept notifications on this device use the bell in the top bar. The options below only choose which types of alerts you receive when other members act.",
+    "vapidOff": "Push is not configured on the server (missing VAPID keys). Contact whoever runs the deployment.",
+    "categoriesTitle": "Notification categories",
+    "categoriesBody": "Turn off categories you do not want as push. Changes apply to future events.",
+    "backCases": "← Back to homes",
+    "notifyActive": "On",
+    "notifyCategory": "Enable",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "Your homes",
+    "title": "Sync your spaces",
+    "intro": "Create a new home or join with a code a roommate shared.",
+    "empty": "You are not in any home yet. Create one or join with an invite code.",
+    "roleOwner": "Admin",
+    "roleMember": "Member",
+    "codeLabel": "code"
+  },
+  "common": {
+    "logout": "Log out",
+    "language": "Language"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "我的住所",
+    "settings": "设置"
+  },
+  "casaNav": {
+    "activeHouse": "当前住所",
+    "inviteCode": "邀请码：",
+    "homeButton": "住所首页",
+    "otherHouses": "← 其他住所",
+    "home": "首页",
+    "expenses": "开支",
+    "calendar": "日历",
+    "lists": "购物清单",
+    "tasks": "任务"
+  },
+  "pushBell": {
+    "ariaEnable": "开启推送通知",
+    "ariaDisable": "关闭推送通知",
+    "ariaOpen": "通知选项",
+    "busyOn": "正在开启…",
+    "busyOff": "正在关闭…",
+    "encourage": "开启通知，以便在室友添加支出、活动、清单或任务时及时了解。",
+    "hintDenied": "权限被拒绝。请在浏览器设置中允许此网站的通知。",
+    "hintFailed": "无法更新。请检查网络或从已安装的应用（PWA）重试。",
+    "hintOffFailed": "无法关闭通知。",
+    "categoriesLink": "通知类别",
+    "blocked": "浏览器已阻止通知。"
+  },
+  "calendarFeed": {
+    "title": "共享日历",
+    "subtitle": "通过订阅此源同步活动（非一次性导入）。",
+    "cta": "添加到我的日历",
+    "ctaIos": "在“日历”中订阅（iPhone / iPad / Mac）",
+    "ctaGoogle": "使用 Google 日历订阅",
+    "manualHint": "若按钮无法打开日历应用，请复制下方 HTTPS 链接，在设置中使用“通过 URL 添加/订阅”。",
+    "urlLabel": "订阅 URL（HTTPS）",
+    "copy": "复制",
+    "copied": "已复制",
+    "copyError": "无法复制。请手动选择字段并复制。",
+    "rotate": "重新生成链接（旧链接失效）",
+    "rotateConfirm": "重新生成会使旧订阅失效（需更新 Google/Apple）。继续？",
+    "security": "请勿在住所以外分享链接——持有者可订阅这些活动。",
+    "rotating": "正在重新生成…"
+  },
+  "settings": {
+    "badge": "用户门户",
+    "title": "设置",
+    "intro": "按类别管理推送通知。适用于您加入的所有住所。自己的操作不会推送给您。",
+    "deviceTitle": "设备与权限",
+    "deviceBody": "在浏览器或 PWA 中启用通知。下方选项仅筛选他人操作时的接收内容。",
+    "vapidOn": "要允许通知，请使用顶部的铃铛。复选框仅选择接收的提醒类型。",
+    "vapidOff": "服务器未配置推送（缺少 VAPID 密钥）。请联系管理员。",
+    "categoriesTitle": "通知类别",
+    "categoriesBody": "关闭不需要的类别。更改适用于后续事件。",
+    "backCases": "← 返回住所",
+    "notifyActive": "开启",
+    "notifyCategory": "开启",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "您的住所",
+    "title": "同步空间",
+    "intro": "创建新住所或使用室友分享的代码加入。",
+    "empty": "您尚未加入任何住所。请创建或凭代码加入。",
+    "roleOwner": "管理员",
+    "roleMember": "成员",
+    "codeLabel": "代码"
+  },
+  "common": {
+    "logout": "退出登录",
+    "language": "语言"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

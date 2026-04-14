@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "Moje domy",
+    "settings": "Ustawienia"
+  },
+  "casaNav": {
+    "activeHouse": "Aktywny dom",
+    "inviteCode": "Kod zaproszenia:",
+    "homeButton": "Strona główna domu",
+    "otherHouses": "← Inne domy",
+    "home": "Start",
+    "expenses": "Wydatki",
+    "calendar": "Kalendarz",
+    "lists": "Listy zakupów",
+    "tasks": "Zadania"
+  },
+  "pushBell": {
+    "ariaEnable": "Włącz powiadomienia push",
+    "ariaDisable": "Wyłącz powiadomienia push",
+    "ariaOpen": "Opcje powiadomień",
+    "busyOn": "Włączanie…",
+    "busyOff": "Wyłączanie…",
+    "encourage": "Włącz powiadomienia, aby być na bieżąco, gdy współlokatorzy dodają wydatki, wydarzenia, listy lub zadania.",
+    "hintDenied": "Odmowa uprawnień. Zezwól na powiadomienia dla tej witryny w ustawieniach przeglądarki.",
+    "hintFailed": "Nie udało się zaktualizować. Sprawdź połączenie lub spróbuj w zainstalowanej aplikacji (PWA).",
+    "hintOffFailed": "Nie udało się wyłączyć powiadomień.",
+    "categoriesLink": "Kategorie powiadomień",
+    "blocked": "Powiadomienia zablokowane przez przeglądarkę."
+  },
+  "calendarFeed": {
+    "title": "Wspólny kalendarz",
+    "subtitle": "Wydarzenia pozostają zsynchronizowane dzięki subskrypcji kanału (nie jednorazowy import).",
+    "cta": "Dodaj do mojego kalendarza",
+    "ctaIos": "Subskrybuj w Kalendarzu (iPhone / iPad / Mac)",
+    "ctaGoogle": "Subskrybuj w Google Calendar",
+    "manualHint": "Jeśli przycisk nie otwiera aplikacji kalendarza, skopiuj poniższy link HTTPS i użyj „Dodaj z adresu URL / subskrypcja” w ustawieniach.",
+    "urlLabel": "Adres URL subskrypcji (HTTPS)",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano",
+    "copyError": "Nie udało się skopiować. Zaznacz pole i skopiuj ręcznie.",
+    "rotate": "Wygeneruj link ponownie (unieważnia stary)",
+    "rotateConfirm": "Ponowna generacja unieważnia stare subskrypcje (Google/Apple trzeba zaktualizować). Kontynuować?",
+    "security": "Nie udostępniaj linku poza domem — każdy z nim może subskrybować te wydarzenia.",
+    "rotating": "Generowanie…"
+  },
+  "settings": {
+    "badge": "Portal użytkownika",
+    "title": "Ustawienia",
+    "intro": "Zarządzaj powiadomieniami push według kategorii. Dotyczy wszystkich domów. Nie dostajesz push za własną akcję.",
+    "deviceTitle": "Urządzenie i uprawnienia",
+    "deviceBody": "Włącz powiadomienia w przeglądarce lub PWA. Poniższe opcje filtrują to, co otrzymujesz, gdy działają inni.",
+    "vapidOn": "Aby zaakceptować powiadomienia, użyj dzwonka u góry. Pola wybierają tylko typy alertów.",
+    "vapidOff": "Push nie jest skonfigurowany na serwerze (brak kluczy VAPID). Skontaktuj się z administratorem.",
+    "categoriesTitle": "Kategorie powiadomień",
+    "categoriesBody": "Wyłącz kategorie, których nie chcesz. Zmiany dotyczą przyszłych zdarzeń.",
+    "backCases": "← Powrót do domów",
+    "notifyActive": "Włącz",
+    "notifyCategory": "Włącz",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "Twoje domy",
+    "title": "Synchronizuj przestrzenie",
+    "intro": "Utwórz nowy dom lub dołącz kodem od współlokatora.",
+    "empty": "Nie należysz jeszcze do żadnego domu. Utwórz lub dołącz kodem.",
+    "roleOwner": "Administrator",
+    "roleMember": "Członek",
+    "codeLabel": "kod"
+  },
+  "common": {
+    "logout": "Wyloguj",
+    "language": "Język"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

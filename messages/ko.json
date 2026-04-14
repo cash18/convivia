@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "내 집",
+    "settings": "설정"
+  },
+  "casaNav": {
+    "activeHouse": "활성 집",
+    "inviteCode": "초대 코드:",
+    "homeButton": "집 홈",
+    "otherHouses": "← 다른 집",
+    "home": "홈",
+    "expenses": "지출",
+    "calendar": "캘린더",
+    "lists": "쇼핑 목록",
+    "tasks": "할 일"
+  },
+  "pushBell": {
+    "ariaEnable": "푸시 알림 켜기",
+    "ariaDisable": "푸시 알림 끄기",
+    "ariaOpen": "알림 옵션",
+    "busyOn": "켜는 중…",
+    "busyOff": "끄는 중…",
+    "encourage": "룸메이트가 지출·일정·목록·할 일을 추가할 때 알림을 켜 두면 놓치지 않습니다.",
+    "hintDenied": "권한이 거부되었습니다. 브라우저 설정에서 이 사이트 알림을 허용하세요.",
+    "hintFailed": "업데이트하지 못했습니다. 연결을 확인하거나 설치된 앱(PWA)에서 다시 시도하세요.",
+    "hintOffFailed": "알림을 끌 수 없습니다.",
+    "categoriesLink": "알림 범주",
+    "blocked": "브라우저가 알림을 차단했습니다."
+  },
+  "calendarFeed": {
+    "title": "공유 캘린더",
+    "subtitle": "이 피드를 구독하면 일정이 동기화됩니다(일회성 가져오기 아님).",
+    "cta": "내 캘린더에 추가",
+    "ctaIos": "캘린더에서 구독(iPhone / iPad / Mac)",
+    "ctaGoogle": "Google 캘린더로 구독",
+    "manualHint": "버튼이 앱을 열지 않으면 아래 HTTPS 링크를 복사해 설정의 «URL로 추가/구독»에 붙여넣으세요.",
+    "urlLabel": "구독 URL(HTTPS)",
+    "copy": "복사",
+    "copied": "복사됨",
+    "copyError": "복사할 수 없습니다. 필드를 선택해 수동으로 복사하세요.",
+    "rotate": "링크 재생성(이전 무효)",
+    "rotateConfirm": "재생성 시 이전 구독이 무효화됩니다(Google/Apple 업데이트 필요). 계속할까요?",
+    "security": "집 밖으로 링크를 공유하지 마세요. 링크가 있으면 누구나 이 일정을 구독할 수 있습니다.",
+    "rotating": "재생성 중…"
+  },
+  "settings": {
+    "badge": "사용자 포털",
+    "title": "설정",
+    "intro": "푸시 알림을 범주별로 관리합니다. 참여 중인 모든 집에 적용됩니다. 본인 행동에는 푸시가 가지 않습니다.",
+    "deviceTitle": "기기 및 권한",
+    "deviceBody": "브라우저 또는 PWA에서 알림을 켜세요. 아래는 다른 사람이 행동할 때 받을 내용만 걸러냅니다.",
+    "vapidOn": "허용하려면 상단의 종 아이콘을 사용하세요. 체크는 받을 알림 유형만 고릅니다.",
+    "vapidOff": "서버에 푸시가 설정되지 않았습니다(VAPID 키 없음). 관리자에게 문의하세요.",
+    "categoriesTitle": "알림 범주",
+    "categoriesBody": "원하지 않는 범주를 끕니다. 변경은 이후 이벤트에 적용됩니다.",
+    "backCases": "← 집 목록으로",
+    "notifyActive": "켜기",
+    "notifyCategory": "켜기",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "내 집",
+    "title": "공간 동기화",
+    "intro": "새 집을 만들거나 룸메이트가 공유한 코드로 참여하세요.",
+    "empty": "아직 집에 속해 있지 않습니다. 만들거나 코드로 참여하세요.",
+    "roleOwner": "관리자",
+    "roleMember": "멤버",
+    "codeLabel": "코드"
+  },
+  "common": {
+    "logout": "로그아웃",
+    "language": "언어"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

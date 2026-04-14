@@ -7,15 +7,16 @@ import {
   IconHome,
   IconWallet,
 } from "@/components/CasaSectionIcons";
+import { useI18n } from "@/components/I18nProvider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const links = [
-  { href: (id: string) => `/casa/${id}`, label: "Home", Icon: IconHome },
-  { href: (id: string) => `/casa/${id}/spese`, label: "Spese", Icon: IconWallet },
-  { href: (id: string) => `/casa/${id}/calendario`, label: "Calendario", Icon: IconCalendar },
-  { href: (id: string) => `/casa/${id}/liste`, label: "Liste spesa", Icon: IconCart },
-  { href: (id: string) => `/casa/${id}/compiti`, label: "Compiti", Icon: IconCheck },
+const linkKeys = [
+  { href: (id: string) => `/casa/${id}`, labelKey: "casaNav.home" as const, Icon: IconHome },
+  { href: (id: string) => `/casa/${id}/spese`, labelKey: "casaNav.expenses" as const, Icon: IconWallet },
+  { href: (id: string) => `/casa/${id}/calendario`, labelKey: "casaNav.calendar" as const, Icon: IconCalendar },
+  { href: (id: string) => `/casa/${id}/liste`, labelKey: "casaNav.lists" as const, Icon: IconCart },
+  { href: (id: string) => `/casa/${id}/compiti`, labelKey: "casaNav.tasks" as const, Icon: IconCheck },
 ] as const;
 
 export function CasaSubNav({
@@ -27,18 +28,19 @@ export function CasaSubNav({
   houseName: string;
   inviteCode: string;
 }) {
+  const { t } = useI18n();
   const pathname = usePathname();
   const homeHref = `/casa/${houseId}`;
   const isHouseHome = pathname === homeHref;
 
   return (
-    <div className="cv-card-solid mb-8 p-5 sm:p-6">
+    <div className="cv-card-solid mb-6 p-4 sm:mb-8 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
-          <p className="text-xs font-semibold tracking-wider text-emerald-600 uppercase">Casa attiva</p>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">{houseName}</h1>
+          <p className="text-xs font-semibold tracking-wider text-emerald-600 uppercase">{t("casaNav.activeHouse")}</p>
+          <h1 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">{houseName}</h1>
           <p className="text-sm text-slate-600">
-            Codice invito:{" "}
+            {t("casaNav.inviteCode")}{" "}
             <code className="rounded-xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50 to-green-50 px-2.5 py-1 font-mono text-sm font-semibold text-green-900">
               {inviteCode}
             </code>
@@ -51,31 +53,32 @@ export function CasaSubNav({
               className="inline-flex touch-manipulation items-center gap-2 rounded-xl border border-emerald-300/60 bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-green-500/25 transition hover:from-emerald-500 hover:to-green-500 active:scale-[0.97] active:shadow-inner active:brightness-95"
             >
               <IconHome className="h-4 w-4 shrink-0 opacity-95" />
-              Home della casa
+              {t("casaNav.homeButton")}
             </Link>
           ) : null}
           <Link href="/case" className="cv-link text-sm">
-            ← Altre case
+            {t("casaNav.otherHouses")}
           </Link>
         </div>
       </div>
-      <nav className="mt-5 flex flex-wrap gap-2 border-t border-slate-200/60 pt-5" aria-label="Sottomenu sezioni">
-        {links.map((l) => {
+      <nav className="mt-4 flex flex-wrap gap-2 border-t border-slate-200/60 pt-4 sm:mt-5 sm:pt-5" aria-label="Sottomenu sezioni">
+        {linkKeys.map((l) => {
           const href = l.href(houseId);
           const active = pathname === href;
           const Icon = l.Icon;
+          const label = t(l.labelKey);
           return (
             <Link
-              key={l.label}
+              key={l.labelKey}
               href={href}
               className={
                 active
-                  ? "inline-flex touch-manipulation items-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-green-500/25 transition active:scale-[0.97] active:shadow-inner active:brightness-95"
-                  : "cv-pill-nav inline-flex touch-manipulation items-center gap-2"
+                  ? "inline-flex touch-manipulation items-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-green-500/25 transition active:scale-[0.97] active:shadow-inner active:brightness-95 sm:px-3.5 sm:py-2 sm:text-sm"
+                  : "cv-pill-nav inline-flex touch-manipulation items-center gap-2 px-3 py-1.5 text-xs sm:py-2 sm:text-sm"
               }
             >
-              <Icon className={`h-[1.1rem] w-[1.1rem] shrink-0 ${active ? "text-white" : "text-emerald-700"}`} />
-              {l.label}
+              <Icon className={`h-[1rem] w-[1rem] shrink-0 sm:h-[1.1rem] sm:w-[1.1rem] ${active ? "text-white" : "text-emerald-700"}`} />
+              {label}
             </Link>
           );
         })}

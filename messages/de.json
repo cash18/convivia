@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "Meine Wohngemeinschaften",
+    "settings": "Einstellungen"
+  },
+  "casaNav": {
+    "activeHouse": "Aktive WG",
+    "inviteCode": "Einladungscode:",
+    "homeButton": "WG-Startseite",
+    "otherHouses": "← Andere WGs",
+    "home": "Start",
+    "expenses": "Ausgaben",
+    "calendar": "Kalender",
+    "lists": "Einkaufslisten",
+    "tasks": "Aufgaben"
+  },
+  "pushBell": {
+    "ariaEnable": "Push-Benachrichtigungen aktivieren",
+    "ariaDisable": "Push-Benachrichtigungen deaktivieren",
+    "ariaOpen": "Benachrichtigungsoptionen",
+    "busyOn": "Wird aktiviert…",
+    "busyOff": "Wird deaktiviert…",
+    "encourage": "Aktiviere Benachrichtigungen, um informiert zu bleiben, wenn Mitbewohner Ausgaben, Termine, Listen oder Aufgaben hinzufügen.",
+    "hintDenied": "Berechtigung verweigert. Erlaube Benachrichtigungen für diese Website in den Browser-Einstellungen.",
+    "hintFailed": "Aktualisierung fehlgeschlagen. Prüfe die Verbindung oder versuche die installierte App (PWA).",
+    "hintOffFailed": "Benachrichtigungen konnten nicht deaktiviert werden.",
+    "categoriesLink": "Benachrichtigungskategorien",
+    "blocked": "Benachrichtigungen vom Browser blockiert."
+  },
+  "calendarFeed": {
+    "title": "Geteilter Kalender",
+    "subtitle": "Termine bleiben über ein Abonnement dieses Feeds synchron (kein einmaliger Import).",
+    "cta": "Zu meinem Kalender hinzufügen",
+    "ctaIos": "In Kalender abonnieren (iPhone / iPad / Mac)",
+    "ctaGoogle": "Mit Google Kalender abonnieren",
+    "manualHint": "Wenn der Button deine Kalender-App nicht öffnet, kopiere den HTTPS-Link unten und nutze „Per URL hinzufügen / Abonnement“ in den Einstellungen.",
+    "urlLabel": "Abonnement-URL (HTTPS)",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "copyError": "Kopieren fehlgeschlagen. Feld markieren und manuell kopieren.",
+    "rotate": "Link neu erzeugen (alter wird ungültig)",
+    "rotateConfirm": "Neu erzeugen macht alte Abonnements ungültig (Google/Apple müssen aktualisiert werden). Fortfahren?",
+    "security": "Link nicht außerhalb der WG teilen — wer ihn hat, kann diese Termine abonnieren.",
+    "rotating": "Wird neu erzeugt…"
+  },
+  "settings": {
+    "badge": "Benutzerportal",
+    "title": "Einstellungen",
+    "intro": "Push-Kategorien verwalten. Gilt für alle WGs. Eigene Aktionen lösen keine Push aus.",
+    "deviceTitle": "Gerät und Berechtigungen",
+    "deviceBody": "Benachrichtigungen im Browser oder in der PWA aktivieren. Die Schalter filtern nur, was du bei Aktionen anderer erhältst.",
+    "vapidOn": "Zum Zulassen die Glocke oben nutzen. Die Kästchen wählen nur die Alert-Typen bei Mitbewohner-Aktionen.",
+    "vapidOff": "Push ist auf dem Server nicht konfiguriert (VAPID-Schlüssel fehlen). Administrator kontaktieren.",
+    "categoriesTitle": "Benachrichtigungskategorien",
+    "categoriesBody": "Kategorien deaktivieren, die du nicht als Push willst. Änderungen gelten für künftige Ereignisse.",
+    "backCases": "← Zurück zu den WGs",
+    "notifyActive": "Aktiv",
+    "notifyCategory": "Aktiv",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "Deine WGs",
+    "title": "Räume synchronisieren",
+    "intro": "Neue WG erstellen oder mit Code beitreten, den ein Mitbewohner geteilt hat.",
+    "empty": "Du bist in keiner WG. Erstelle eine oder tritt mit Einladungscode bei.",
+    "roleOwner": "Administrator",
+    "roleMember": "Mitglied",
+    "codeLabel": "Code"
+  },
+  "common": {
+    "logout": "Abmelden",
+    "language": "Sprache"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

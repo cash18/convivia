@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "Mis casas",
+    "settings": "Ajustes"
+  },
+  "casaNav": {
+    "activeHouse": "Casa activa",
+    "inviteCode": "Código de invitación:",
+    "homeButton": "Inicio de la casa",
+    "otherHouses": "← Otras casas",
+    "home": "Inicio",
+    "expenses": "Gastos",
+    "calendar": "Calendario",
+    "lists": "Listas de compra",
+    "tasks": "Tareas"
+  },
+  "pushBell": {
+    "ariaEnable": "Activar notificaciones push",
+    "ariaDisable": "Desactivar notificaciones push",
+    "ariaOpen": "Opciones de notificaciones",
+    "busyOn": "Activando…",
+    "busyOff": "Desactivando…",
+    "encourage": "Activa las notificaciones para enterarte cuando tus compañeros añadan gastos, eventos, listas o tareas.",
+    "hintDenied": "Permiso denegado. Permite las notificaciones para este sitio en la configuración del navegador.",
+    "hintFailed": "No se pudo actualizar. Comprueba la conexión o prueba desde la app instalada (PWA).",
+    "hintOffFailed": "No se pudieron desactivar las notificaciones.",
+    "categoriesLink": "Categorías de notificación",
+    "blocked": "Notificaciones bloqueadas por el navegador."
+  },
+  "calendarFeed": {
+    "title": "Calendario compartido",
+    "subtitle": "Los eventos se mantienen sincronizados con una suscripción a este feed (no una importación única).",
+    "cta": "Añadir a mi calendario",
+    "ctaIos": "Suscribirse en Calendario (iPhone / iPad / Mac)",
+    "ctaGoogle": "Suscribirse con Google Calendar",
+    "manualHint": "Si el botón no abre tu app de calendario, copia el enlace HTTPS abajo y usa «Añadir desde URL / suscripción» en ajustes.",
+    "urlLabel": "URL de suscripción (HTTPS)",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyError": "No se pudo copiar. Selecciona el campo y cópialo manualmente.",
+    "rotate": "Regenerar enlace (revoca el antiguo)",
+    "rotateConfirm": "Al regenerar se invalidan suscripciones antiguas (Google/Apple deben actualizarse). ¿Continuar?",
+    "security": "No compartas el enlace fuera del hogar: quien lo tenga puede suscribirse a estos eventos.",
+    "rotating": "Regenerando…"
+  },
+  "settings": {
+    "badge": "Portal de usuario",
+    "title": "Ajustes",
+    "intro": "Gestiona las notificaciones push por categoría. Aplican a todas las casas en las que participas. No recibes push por tu propia acción.",
+    "deviceTitle": "Dispositivo y permisos",
+    "deviceBody": "Activa las notificaciones en el navegador o PWA. Las opciones de abajo solo filtran lo que recibes cuando otros actúan.",
+    "vapidOn": "Para aceptar notificaciones en este dispositivo usa la campana superior. Las casillas solo eligen qué alertas recibir.",
+    "vapidOff": "Las push no están configuradas en el servidor (faltan claves VAPID). Contacta al administrador.",
+    "categoriesTitle": "Categorías de notificación",
+    "categoriesBody": "Desactiva las categorías que no quieras. Los cambios aplican a eventos futuros.",
+    "backCases": "← Volver a casas",
+    "notifyActive": "Activar",
+    "notifyCategory": "Activar",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "Tus casas",
+    "title": "Sincroniza tus espacios",
+    "intro": "Crea una casa nueva o únete con el código que te compartió un compañero.",
+    "empty": "Aún no estás en ninguna casa. Crea una o únete con un código.",
+    "roleOwner": "Administrador",
+    "roleMember": "Miembro",
+    "codeLabel": "código"
+  },
+  "common": {
+    "logout": "Cerrar sesión",
+    "language": "Idioma"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

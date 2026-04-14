@@ -16,6 +16,13 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* ~80% zoom feel on phones: slightly smaller root rem + tighter rhythm */
+@media (max-width: 768px) {
+  html {
+    font-size: 13px;
+  }
+}
+
 body {
   color: var(--foreground);
   font-family: var(--font-sans);

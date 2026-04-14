@@ -1,4 +1,4 @@
-import { CasaHomeQuickNav } from "@/components/CasaHomeQuickNav";
+import { AddExpenseForm } from "@/components/AddExpenseForm";
 import { auth } from "@/auth";
 import { computeMemberBalances } from "@/lib/balances";
 import { formatEuroFromCents } from "@/lib/money";
@@ -15,7 +15,11 @@ export default async function CasaDashboardPage({
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  await getMembershipOrRedirect(houseId, session.user.id);
+  const membership = await getMembershipOrRedirect(houseId, session.user.id);
+  const members = membership.house.members.map((m) => ({
+    id: m.userId,
+    name: m.user.name,
+  }));
 
   const [balances, upcoming, openTasks, recentExpenses, listsPreview, listUndoneCounts] = await Promise.all([
     computeMemberBalances(houseId),
@@ -60,58 +64,55 @@ export default async function CasaDashboardPage({
   const undoneByListId = new Map(listUndoneCounts.map((r) => [r.listId, r._count._all]));
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <header className="space-y-2">
         <p className="cv-badge w-fit">Home della casa</p>
         <p className="max-w-2xl text-sm leading-relaxed text-slate-600">
-          Qui trovi i collegamenti a tutte le sezioni e un riepilogo di{" "}
-          <strong className="font-semibold text-slate-800">spese</strong>,{" "}
+          Riepilogo di <strong className="font-semibold text-slate-800">spese</strong>,{" "}
+          <strong className="font-semibold text-slate-800">saldi</strong>,{" "}
           <strong className="font-semibold text-slate-800">calendario</strong>,{" "}
           <strong className="font-semibold text-slate-800">liste</strong> e{" "}
-          <strong className="font-semibold text-slate-800">compiti</strong>. Usa il menu in alto o le schede qui
-          sotto.
+          <strong className="font-semibold text-slate-800">compiti</strong>. Usa il menu in alto per le sezioni
+          complete.
         </p>
       </header>
 
-      <section aria-labelledby="quick-nav-heading">
-        <h2 id="quick-nav-heading" className="sr-only">
-          Accesso alle sezioni
-        </h2>
-        <CasaHomeQuickNav houseId={houseId} />
-      </section>
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
+        <section className="flex min-h-[20rem] flex-col">
+          <AddExpenseForm houseId={houseId} members={members} variant="compact" />
+        </section>
+        <section className="cv-card-solid flex min-h-[20rem] flex-col p-5 sm:p-6">
+          <h2 className="text-sm font-bold text-slate-900">Saldi indicativi</h2>
+          <p className="mt-1 text-xs text-slate-500">
+            Positivo = hai pagato più della tua quota; negativo = devi ancora rimetterti in pari.
+          </p>
+          <ul className="mt-3 flex flex-1 flex-col gap-2 overflow-auto text-sm">
+            {balances.map((b) => (
+              <li key={b.userId} className="flex items-center justify-between rounded-lg border border-slate-100 bg-white/80 px-3 py-2.5">
+                <span className="font-semibold text-slate-800">{b.name}</span>
+                <span className={b.balanceCents >= 0 ? "font-bold text-emerald-600" : "font-bold text-amber-600"}>
+                  {formatEuroFromCents(b.balanceCents)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 shrink-0">
+            <Link href={`/casa/${houseId}/spese`} className="cv-link text-sm">
+              Spese e trasferimenti →
+            </Link>
+          </p>
+        </section>
+      </div>
 
-      <section>
-        <h2 className="text-lg font-bold text-slate-900">Saldi indicativi</h2>
-        <p className="text-xs text-slate-500">
-          Positivo = hai pagato più della tua quota; negativo = devi ancora &quot;rimetterti in pari&quot; rispetto a
-          quanto hai consumato.
-        </p>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-          {balances.map((b) => (
-            <li key={b.userId} className="cv-card-solid flex items-center justify-between px-4 py-3 text-sm">
-              <span className="font-semibold text-slate-800">{b.name}</span>
-              <span className={b.balanceCents >= 0 ? "font-bold text-emerald-600" : "font-bold text-amber-600"}>
-                {formatEuroFromCents(b.balanceCents)}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-3">
-          <Link href={`/casa/${houseId}/spese`} className="cv-link text-sm">
-            Gestisci tutte le spese →
-          </Link>
-        </p>
-      </section>
-
-      <div className="grid gap-8 lg:grid-cols-2 xl:grid-cols-3">
-        <section className="xl:col-span-1">
-          <h2 className="text-lg font-bold text-slate-900">Ultime spese</h2>
+      <div className="grid auto-rows-fr gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <section className="flex min-h-[14rem] flex-col rounded-2xl border border-slate-200/80 bg-white/60 p-5 shadow-sm">
+          <h2 className="text-base font-bold text-slate-900">Ultime spese</h2>
           {recentExpenses.length === 0 ? (
-            <p className="mt-2 text-sm text-slate-500">Nessuna spesa registrata.</p>
+            <p className="mt-2 flex-1 text-sm text-slate-500">Nessuna spesa registrata.</p>
           ) : (
-            <ul className="cv-card-solid mt-3 divide-y divide-slate-100 p-0">
+            <ul className="mt-3 flex flex-1 flex-col divide-y divide-slate-100 overflow-auto rounded-xl border border-slate-100 bg-white/90">
               {recentExpenses.map((e) => (
-                <li key={e.id} className="flex justify-between gap-2 px-4 py-3 text-sm">
+                <li key={e.id} className="flex justify-between gap-2 px-3 py-2.5 text-sm">
                   <span className="min-w-0">
                     <span className="font-semibold text-slate-900">{e.title}</span>
                     <span className="mt-0.5 block truncate text-xs text-slate-500">{e.paidBy.name}</span>
@@ -123,21 +124,21 @@ export default async function CasaDashboardPage({
               ))}
             </ul>
           )}
-          <p className="mt-3">
+          <p className="mt-3 shrink-0">
             <Link href={`/casa/${houseId}/spese`} className="cv-link text-sm">
-              Vai allo storico completo →
+              Storico completo →
             </Link>
           </p>
         </section>
 
-        <section>
-          <h2 className="text-lg font-bold text-slate-900">Prossimi eventi</h2>
+        <section className="flex min-h-[14rem] flex-col rounded-2xl border border-slate-200/80 bg-white/60 p-5 shadow-sm">
+          <h2 className="text-base font-bold text-slate-900">Prossimi eventi</h2>
           {upcoming.length === 0 ? (
-            <p className="mt-2 text-sm text-slate-500">Nessun evento futuro.</p>
+            <p className="mt-2 flex-1 text-sm text-slate-500">Nessun evento futuro.</p>
           ) : (
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-3 flex flex-1 flex-col gap-2 overflow-auto">
               {upcoming.map((ev) => (
-                <li key={ev.id} className="cv-card-solid px-4 py-3 text-sm">
+                <li key={ev.id} className="rounded-xl border border-slate-100 bg-white/90 px-3 py-2.5 text-sm">
                   <span className="font-semibold text-slate-900">{ev.title}</span>
                   <p className="text-xs text-slate-500">
                     {ev.allDay
@@ -148,34 +149,34 @@ export default async function CasaDashboardPage({
               ))}
             </ul>
           )}
-          <p className="mt-3">
+          <p className="mt-3 shrink-0">
             <Link href={`/casa/${houseId}/calendario`} className="cv-link text-sm">
-              Apri calendario →
+              Calendario →
             </Link>
           </p>
         </section>
 
-        <section>
-          <h2 className="text-lg font-bold text-slate-900">Liste spesa</h2>
+        <section className="flex min-h-[14rem] flex-col rounded-2xl border border-slate-200/80 bg-white/60 p-5 shadow-sm md:col-span-2 xl:col-span-1">
+          <h2 className="text-base font-bold text-slate-900">Liste spesa</h2>
           {listsPreview.length === 0 ? (
-            <p className="mt-2 text-sm text-slate-500">Nessuna lista. Creane una nella sezione dedicata.</p>
+            <p className="mt-2 flex-1 text-sm text-slate-500">Nessuna lista.</p>
           ) : (
-            <ul className="mt-3 space-y-3">
+            <ul className="mt-3 flex flex-1 flex-col gap-2 overflow-auto">
               {listsPreview.map((list) => {
                 const pendingCount = undoneByListId.get(list.id) ?? 0;
                 const total = list._count.items;
                 return (
-                  <li key={list.id} className="cv-card-solid px-4 py-3 text-sm">
+                  <li key={list.id} className="rounded-xl border border-slate-100 bg-white/90 px-3 py-2.5 text-sm">
                     <p className="font-semibold text-slate-900">{list.name}</p>
                     <p className="text-xs text-slate-500">
                       {total === 0
                         ? "Lista vuota"
                         : pendingCount === 0
                           ? "Tutto spuntato ✓"
-                          : `${pendingCount} da comprare · ${total} voci in lista`}
+                          : `${pendingCount} da comprare · ${total} voci`}
                     </p>
                     {list.items.length > 0 ? (
-                      <ul className="mt-2 space-y-1 border-t border-slate-100/80 pt-2 text-xs text-slate-600">
+                      <ul className="mt-2 space-y-0.5 border-t border-slate-100/80 pt-2 text-xs text-slate-600">
                         {list.items.map((it) => (
                           <li key={it.id} className="truncate">
                             · {it.name}
@@ -188,22 +189,22 @@ export default async function CasaDashboardPage({
               })}
             </ul>
           )}
-          <p className="mt-3">
+          <p className="mt-3 shrink-0">
             <Link href={`/casa/${houseId}/liste`} className="cv-link text-sm">
-              Gestisci tutte le liste →
+              Gestisci liste →
             </Link>
           </p>
         </section>
       </div>
 
-      <section>
-        <h2 className="text-lg font-bold text-slate-900">Compiti aperti</h2>
+      <section className="rounded-2xl border border-slate-200/80 bg-white/60 p-5 shadow-sm sm:p-6">
+        <h2 className="text-base font-bold text-slate-900">Compiti aperti</h2>
         {openTasks.length === 0 ? (
           <p className="mt-2 text-sm text-slate-500">Nessun compito in sospeso.</p>
         ) : (
           <ul className="mt-3 grid gap-2 sm:grid-cols-2">
             {openTasks.map((t) => (
-              <li key={t.id} className="cv-card-solid px-4 py-3 text-sm">
+              <li key={t.id} className="rounded-xl border border-slate-100 bg-white/90 px-3 py-2.5 text-sm">
                 <span className="font-semibold text-slate-900">{t.title}</span>
                 <p className="text-xs text-slate-500">
                   {t.assignee ? `Assegnato a ${t.assignee.name}` : "Non assegnato"}
@@ -215,7 +216,7 @@ export default async function CasaDashboardPage({
         )}
         <p className="mt-3">
           <Link href={`/casa/${houseId}/compiti`} className="cv-link text-sm">
-            Vai a tutti i compiti →
+            Tutti i compiti →
           </Link>
         </p>
       </section>

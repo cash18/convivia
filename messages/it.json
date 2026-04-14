@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "Le mie case",
+    "settings": "Impostazioni"
+  },
+  "casaNav": {
+    "activeHouse": "Casa attiva",
+    "inviteCode": "Codice invito:",
+    "homeButton": "Home della casa",
+    "otherHouses": "← Altre case",
+    "home": "Home",
+    "expenses": "Spese",
+    "calendar": "Calendario",
+    "lists": "Liste spesa",
+    "tasks": "Compiti"
+  },
+  "pushBell": {
+    "ariaEnable": "Attiva notifiche push",
+    "ariaDisable": "Disattiva notifiche push",
+    "ariaOpen": "Opzioni notifiche",
+    "busyOn": "Attivazione…",
+    "busyOff": "Disattivazione…",
+    "encourage": "Attiva le notifiche per restare aggiornato quando i coinquilini aggiungono spese, eventi, liste e compiti.",
+    "hintDenied": "Permesso negato. Abilita le notifiche per questo sito dalle impostazioni del browser.",
+    "hintFailed": "Aggiornamento non riuscito. Controlla la connessione o riprova dall’app installata (PWA).",
+    "hintOffFailed": "Impossibile disattivare le notifiche.",
+    "categoriesLink": "Categorie notifiche",
+    "blocked": "Notifiche bloccate dal browser."
+  },
+  "calendarFeed": {
+    "title": "Calendario condiviso",
+    "subtitle": "Gli eventi restano sincronizzati con un abbonamento al feed (non un’importazione una tantum).",
+    "cta": "Aggiungi al mio calendario",
+    "ctaIos": "Abbonati in Calendario (iPhone / iPad / Mac)",
+    "ctaGoogle": "Abbonati con Google Calendar",
+    "manualHint": "Se il pulsante non apre l’app calendario, copia il link HTTPS qui sotto e usa «Aggiungi da URL / abbonamento» nelle impostazioni.",
+    "urlLabel": "URL abbonamento (HTTPS)",
+    "copy": "Copia",
+    "copied": "Copiato",
+    "copyError": "Impossibile copiare. Seleziona il campo e copia manualmente.",
+    "rotate": "Rigenera link (revoca il vecchio URL)",
+    "rotateConfirm": "Rigenerando si invalidano i vecchi abbonamenti (Google/Apple vanno aggiornati con il nuovo URL). Continuare?",
+    "security": "Non condividere il link fuori dalla casa: chi lo ha può iscriversi a questi eventi.",
+    "rotating": "Rigenerazione…"
+  },
+  "settings": {
+    "badge": "Portale utente",
+    "title": "Impostazioni",
+    "intro": "Gestisci le notifiche push per categoria. Valgono per tutte le case di cui fai parte. Chi compie l’azione non riceve la propria notifica.",
+    "deviceTitle": "Dispositivo e permessi",
+    "deviceBody": "Attiva le notifiche sul browser o sull’app installata (PWA). Le opzioni qui sotto filtrano solo cosa ricevi quando altri agiscono in una casa.",
+    "vapidOn": "Per accettare le notifiche su questo dispositivo usa la campanella in alto. Le caselle sotto scelgono solo quali tipi di avviso ricevere quando agiscono gli altri.",
+    "vapidOff": "Le notifiche push non sono configurate sul server (mancano le chiavi VAPID). Contatta chi gestisce il deploy.",
+    "categoriesTitle": "Categorie di notifica",
+    "categoriesBody": "Disattiva le categorie che non vuoi come push. Le modifiche valgono per i prossimi eventi.",
+    "backCases": "← Torna alle case",
+    "notifyActive": "Attiva",
+    "notifyCategory": "Attiva",
+    "savePrefs": "Salva preferenze",
+    "saving": "Salvataggio…"
+  },
+  "case": {
+    "badge": "Le tue case",
+    "title": "Sincronizza gli spazi",
+    "intro": "Crea una casa nuova o entra con il codice che ti ha condiviso un coinquilino.",
+    "empty": "Non sei ancora in nessuna casa. Creane una o unisciti con un codice invito.",
+    "roleOwner": "Amministratore",
+    "roleMember": "Membro",
+    "codeLabel": "codice"
+  },
+  "common": {
+    "logout": "Esci",
+    "language": "Lingua"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Spese",
+      "desc": "Nuove spese ed eliminazioni nel registro della casa."
+    },
+    "CALENDAR": {
+      "label": "Calendario",
+      "desc": "Eventi aggiunti o rimossi dal calendario condiviso."
+    },
+    "TASKS": {
+      "label": "Compiti",
+      "desc": "Compiti creati, completati o eliminati."
+    },
+    "LISTS": {
+      "label": "Liste spesa",
+      "desc": "Nuove liste e articoli aggiunti alle liste spesa."
+    },
+    "HOUSE": {
+      "label": "Casa e membri",
+      "desc": "Quando qualcuno entra in una casa con il codice invito."
+    }
+  }
+}

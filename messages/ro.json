@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "Casele mele",
+    "settings": "Setări"
+  },
+  "casaNav": {
+    "activeHouse": "Casa activă",
+    "inviteCode": "Cod invitație:",
+    "homeButton": "Acasă la casă",
+    "otherHouses": "← Alte case",
+    "home": "Acasă",
+    "expenses": "Cheltuieli",
+    "calendar": "Calendar",
+    "lists": "Liste de cumpărături",
+    "tasks": "Sarcini"
+  },
+  "pushBell": {
+    "ariaEnable": "Activează notificările push",
+    "ariaDisable": "Dezactivează notificările push",
+    "ariaOpen": "Opțiuni notificări",
+    "busyOn": "Se activează…",
+    "busyOff": "Se dezactivează…",
+    "encourage": "Activează notificările pentru a fi la curent când colegii de apartament adaugă cheltuieli, evenimente, liste sau sarcini.",
+    "hintDenied": "Permisiune refuzată. Permite notificările pentru acest site din setările browserului.",
+    "hintFailed": "Nu s-a putut actualiza. Verifică conexiunea sau încearcă din aplicația instalată (PWA).",
+    "hintOffFailed": "Nu s-au putut dezactiva notificările.",
+    "categoriesLink": "Categorii notificări",
+    "blocked": "Browserul blochează notificările."
+  },
+  "calendarFeed": {
+    "title": "Calendar partajat",
+    "subtitle": "Evenimentele rămân sincronizate prin abonament la flux (nu import unic).",
+    "cta": "Adaugă în calendarul meu",
+    "ctaIos": "Abonare în Calendar (iPhone / iPad / Mac)",
+    "ctaGoogle": "Abonare cu Google Calendar",
+    "manualHint": "Dacă butonul nu deschide aplicația, copiază linkul HTTPS de mai jos și folosește „Adaugă din URL / abonament” în setări.",
+    "urlLabel": "URL abonament (HTTPS)",
+    "copy": "Copiază",
+    "copied": "Copiat",
+    "copyError": "Nu s-a putut copia. Selectează câmpul și copiază manual.",
+    "rotate": "Regenerează linkul (revocă vechiul)",
+    "rotateConfirm": "Regenerarea invalidează abonamentele vechi (Google/Apple trebuie actualizate). Continui?",
+    "security": "Nu partaja linkul în afara casei — cine îl are se poate abona la aceste evenimente.",
+    "rotating": "Se regenerează…"
+  },
+  "settings": {
+    "badge": "Portal utilizator",
+    "title": "Setări",
+    "intro": "Gestionează notificările push pe categorii. Se aplică tuturor caselor. Nu primești push pentru propria acțiune.",
+    "deviceTitle": "Dispozitiv și permisiuni",
+    "deviceBody": "Activează notificările în browser sau PWA. Opțiunile de mai jos filtrează ce primești când alții acționează.",
+    "vapidOn": "Pentru a accepta notificările folosește clopoțelul de sus. Bifele aleg doar tipurile de alertă.",
+    "vapidOff": "Push nu este configurat pe server (lipsesc cheile VAPID). Contactează administratorul.",
+    "categoriesTitle": "Categorii notificări",
+    "categoriesBody": "Dezactivează categoriile nedorite. Modificările se aplică evenimentelor viitoare.",
+    "backCases": "← Înapoi la case",
+    "notifyActive": "Activ",
+    "notifyCategory": "Activ",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "Casele tale",
+    "title": "Sincronizează spațiile",
+    "intro": "Creează o casă nouă sau intră cu codul partajat de un coleg.",
+    "empty": "Nu ești încă în nicio casă. Creează una sau intră cu cod.",
+    "roleOwner": "Administrator",
+    "roleMember": "Membru",
+    "codeLabel": "cod"
+  },
+  "common": {
+    "logout": "Deconectare",
+    "language": "Limbă"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

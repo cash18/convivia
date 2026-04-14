@@ -1,13 +1,33 @@
 "use client";
 
 import { createCalendarEvent } from "@/lib/actions/calendar";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-export function AddEventForm({ houseId }: { houseId: string }) {
+function dayKeyToDatetimeLocal(dayKey: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey)) return null;
+  return `${dayKey}T12:00`;
+}
+
+export function AddEventForm({ houseId, defaultDayKey }: { houseId: string; defaultDayKey?: string | null }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const startsRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  const dayKeyForForm = useMemo(() => {
+    const u = searchParams.get("day");
+    if (u && /^\d{4}-\d{2}-\d{2}$/.test(u)) return u;
+    if (defaultDayKey && /^\d{4}-\d{2}-\d{2}$/.test(defaultDayKey)) return defaultDayKey;
+    return null;
+  }, [searchParams, defaultDayKey]);
+
+  useEffect(() => {
+    const el = startsRef.current;
+    const v = dayKeyForForm ? dayKeyToDatetimeLocal(dayKeyForForm) : null;
+    if (el && v) el.value = v;
+  }, [dayKeyForForm]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,7 +46,7 @@ export function AddEventForm({ houseId }: { houseId: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="cv-card-solid flex flex-col gap-3 p-5 sm:p-6">
+    <form id="nuovo-evento" onSubmit={onSubmit} className="cv-card-solid flex scroll-mt-24 flex-col gap-3 p-5 sm:p-6">
       <h2 className="text-sm font-bold text-slate-900">Nuovo evento</h2>
       {error ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
@@ -51,6 +71,7 @@ export function AddEventForm({ houseId }: { houseId: string }) {
         <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
           Inizio
           <input
+            ref={startsRef}
             name="startsAt"
             required
             type="datetime-local"

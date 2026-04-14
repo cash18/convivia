@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "Minhas casas",
+    "settings": "Definições"
+  },
+  "casaNav": {
+    "activeHouse": "Casa ativa",
+    "inviteCode": "Código de convite:",
+    "homeButton": "Início da casa",
+    "otherHouses": "← Outras casas",
+    "home": "Início",
+    "expenses": "Despesas",
+    "calendar": "Calendário",
+    "lists": "Listas de compras",
+    "tasks": "Tarefas"
+  },
+  "pushBell": {
+    "ariaEnable": "Ativar notificações push",
+    "ariaDisable": "Desativar notificações push",
+    "ariaOpen": "Opções de notificações",
+    "busyOn": "A ativar…",
+    "busyOff": "A desativar…",
+    "encourage": "Ative as notificações para se manter atualizado quando os colegas adicionarem despesas, eventos, listas ou tarefas.",
+    "hintDenied": "Permissão recusada. Permita notificações para este site nas definições do navegador.",
+    "hintFailed": "Não foi possível atualizar. Verifique a ligação ou tente na app instalada (PWA).",
+    "hintOffFailed": "Não foi possível desativar as notificações.",
+    "categoriesLink": "Categorias de notificação",
+    "blocked": "Notificações bloqueadas pelo navegador."
+  },
+  "calendarFeed": {
+    "title": "Calendário partilhado",
+    "subtitle": "Os eventos mantêm-se sincronizados com uma subscrição ao feed (não uma importação única).",
+    "cta": "Adicionar ao meu calendário",
+    "ctaIos": "Subscrever no Calendário (iPhone / iPad / Mac)",
+    "ctaGoogle": "Subscrever com o Google Calendar",
+    "manualHint": "Se o botão não abrir a app de calendário, copie o link HTTPS abaixo e use «Adicionar a partir do URL / subscrição» nas definições.",
+    "urlLabel": "URL de subscrição (HTTPS)",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyError": "Não foi possível copiar. Selecione o campo e copie manualmente.",
+    "rotate": "Regenerar ligação (revoga a antiga)",
+    "rotateConfirm": "Regenerar invalida subscrições antigas (Google/Apple devem ser atualizados). Continuar?",
+    "security": "Não partilhe a ligação fora de casa — quem a tiver pode subscrever estes eventos.",
+    "rotating": "A regenerar…"
+  },
+  "settings": {
+    "badge": "Portal do utilizador",
+    "title": "Definições",
+    "intro": "Gira as notificações push por categoria. Aplica-se a todas as casas. Não recebe push pela sua própria ação.",
+    "deviceTitle": "Dispositivo e permissões",
+    "deviceBody": "Ative notificações no navegador ou PWA. As opções abaixo filtram o que recebe quando outros agem.",
+    "vapidOn": "Para aceitar notificações use o sino no topo. As caixas escolhem apenas os tipos de alerta.",
+    "vapidOff": "As push não estão configuradas no servidor (faltam chaves VAPID). Contacte o administrador.",
+    "categoriesTitle": "Categorias de notificação",
+    "categoriesBody": "Desative categorias que não quer. As alterações aplicam-se a eventos futuros.",
+    "backCases": "← Voltar às casas",
+    "notifyActive": "Ativar",
+    "notifyCategory": "Ativar",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "As suas casas",
+    "title": "Sincronize os espaços",
+    "intro": "Crie uma casa ou entre com o código que um colega partilhou.",
+    "empty": "Ainda não está em nenhuma casa. Crie uma ou entre com um código.",
+    "roleOwner": "Administrador",
+    "roleMember": "Membro",
+    "codeLabel": "código"
+  },
+  "common": {
+    "logout": "Terminar sessão",
+    "language": "Idioma"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

@@ -13,10 +13,13 @@ export async function computeMemberBalances(houseId: string): Promise<MemberBala
     where: { houseId },
     include: { user: { select: { id: true, name: true } } },
   });
-  const expenses = await prisma.expense.findMany({
-    where: { houseId },
-    include: { splits: true },
-  });
+  const [expenses, transfers] = await Promise.all([
+    prisma.expense.findMany({
+      where: { houseId },
+      include: { splits: true },
+    }),
+    prisma.moneyTransfer.findMany({ where: { houseId } }),
+  ]);
 
   const agg: Record<string, { paid: number; owed: number }> = {};
   for (const m of members) {
@@ -30,14 +33,24 @@ export async function computeMemberBalances(houseId: string): Promise<MemberBala
     }
   }
 
+  const transferDelta: Record<string, number> = {};
+  for (const m of members) {
+    transferDelta[m.userId] = 0;
+  }
+  for (const t of transfers) {
+    if (transferDelta[t.fromUserId] !== undefined) transferDelta[t.fromUserId]! -= t.amountCents;
+    if (transferDelta[t.toUserId] !== undefined) transferDelta[t.toUserId]! += t.amountCents;
+  }
+
   return members.map((m) => {
     const a = agg[m.userId]!;
+    const td = transferDelta[m.userId] ?? 0;
     return {
       userId: m.userId,
       name: m.user.name,
       paidCents: a.paid,
       owedCents: a.owed,
-      balanceCents: a.paid - a.owed,
+      balanceCents: a.paid - a.owed + td,
     };
   });
 }

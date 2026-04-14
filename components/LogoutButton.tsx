@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
 import { signOut } from "next-auth/react";
 
 async function removePushSubscription(): Promise<void> {
@@ -21,13 +22,14 @@ async function removePushSubscription(): Promise<void> {
 }
 
 export function LogoutButton() {
+  const { t } = useI18n();
   return (
     <button
       type="button"
       onClick={() => void removePushSubscription().finally(() => signOut({ callbackUrl: "/" }))}
-      className="cv-btn-ghost py-2"
+      className="cv-btn-ghost py-1.5 text-xs sm:py-2 sm:text-sm"
     >
-      Esci
+      {t("common.logout")}
     </button>
   );
 }

@@ -26,6 +26,7 @@ export async function createShoppingList(
     data: { houseId, name: trimmed },
   });
   revalidatePath(`/casa/${houseId}/liste`);
+  revalidatePath(`/casa/${houseId}`);
   const who = session.user.name?.trim() || "Qualcuno";
   void notifyHouseMembersExceptActor({
     houseId,
@@ -59,6 +60,7 @@ export async function addListItem(
     data: { listId, name: trimmed, addedById: session.user.id },
   });
   revalidatePath(`/casa/${houseId}/liste`);
+  revalidatePath(`/casa/${houseId}`);
   const who = session.user.name?.trim() || "Qualcuno";
   void notifyHouseMembersExceptActor({
     houseId,
@@ -87,6 +89,7 @@ export async function toggleListItem(houseId: string, itemId: string, done: bool
     data: { done },
   });
   revalidatePath(`/casa/${houseId}/liste`);
+  revalidatePath(`/casa/${houseId}`);
   return {};
 }
 
@@ -102,5 +105,83 @@ export async function deleteListItem(houseId: string, itemId: string) {
 
   await prisma.shoppingListItem.delete({ where: { id: itemId } });
   revalidatePath(`/casa/${houseId}/liste`);
+  revalidatePath(`/casa/${houseId}`);
+  return {};
+}
+
+export async function updateShoppingList(
+  houseId: string,
+  listId: string,
+  name: string,
+): Promise<{ error?: string }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Non autenticato." };
+  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+
+  const list = await prisma.shoppingList.findFirst({
+    where: { id: listId, houseId },
+  });
+  if (!list) return { error: "Lista non trovata." };
+  const trimmed = name.trim();
+  if (!trimmed) return { error: "Nome obbligatorio." };
+
+  await prisma.shoppingList.update({
+    where: { id: listId },
+    data: { name: trimmed },
+  });
+  revalidatePath(`/casa/${houseId}/liste`);
+  revalidatePath(`/casa/${houseId}`);
+  return {};
+}
+
+export async function deleteShoppingList(houseId: string, listId: string): Promise<{ error?: string }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Non autenticato." };
+  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+
+  const list = await prisma.shoppingList.findFirst({
+    where: { id: listId, houseId },
+  });
+  if (!list) return { error: "Lista non trovata." };
+
+  await prisma.shoppingList.delete({ where: { id: listId } });
+  revalidatePath(`/casa/${houseId}/liste`);
+  revalidatePath(`/casa/${houseId}`);
+  const who = session.user.name?.trim() || "Qualcuno";
+  void notifyHouseMembersExceptActor({
+    houseId,
+    actorUserId: session.user.id,
+    category: "LISTS",
+    title: "Lista eliminata",
+    body: `${who} ha eliminato la lista «${list.name}».`,
+    path: `/casa/${houseId}/liste`,
+    tag: `convivia-list-del-${houseId}`,
+  });
+  return {};
+}
+
+export async function updateShoppingListItem(
+  houseId: string,
+  itemId: string,
+  name: string,
+): Promise<{ error?: string }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Non autenticato." };
+  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+
+  const item = await prisma.shoppingListItem.findFirst({
+    where: { id: itemId, list: { houseId } },
+    include: { list: { select: { name: true } } },
+  });
+  if (!item) return { error: "Articolo non trovato." };
+  const trimmed = name.trim();
+  if (!trimmed) return { error: "Testo obbligatorio." };
+
+  await prisma.shoppingListItem.update({
+    where: { id: itemId },
+    data: { name: trimmed },
+  });
+  revalidatePath(`/casa/${houseId}/liste`);
+  revalidatePath(`/casa/${houseId}`);
   return {};
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { Providers } from "@/app/providers";
+import { getMessages, getRequestLocale } from "@/lib/i18n/server";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -45,15 +46,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getRequestLocale();
+  const messages = await getMessages();
+  const rtl = locale === "ar";
+
   return (
-    <html lang="it" className={`${plusJakarta.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}>
+    <html
+      lang={locale}
+      dir={rtl ? "rtl" : "ltr"}
+      className={`${plusJakarta.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
+    >
       <body className="flex min-h-dvh min-h-full flex-col">
-        <Providers>{children}</Providers>
+        <Providers locale={locale} messages={messages}>
+          {children}
+        </Providers>
       </body>
     </html>
   );

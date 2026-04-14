@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "Мои дома",
+    "settings": "Настройки"
+  },
+  "casaNav": {
+    "activeHouse": "Текущий дом",
+    "inviteCode": "Код приглашения:",
+    "homeButton": "Главная дома",
+    "otherHouses": "← Другие дома",
+    "home": "Главная",
+    "expenses": "Расходы",
+    "calendar": "Календарь",
+    "lists": "Списки покупок",
+    "tasks": "Задачи"
+  },
+  "pushBell": {
+    "ariaEnable": "Включить push-уведомления",
+    "ariaDisable": "Отключить push-уведомления",
+    "ariaOpen": "Настройки уведомлений",
+    "busyOn": "Включение…",
+    "busyOff": "Отключение…",
+    "encourage": "Включите уведомления, чтобы узнавать о расходах, событиях, списках и задачах соседей по дому.",
+    "hintDenied": "Доступ запрещён. Разрешите уведомления для этого сайта в настройках браузера.",
+    "hintFailed": "Не удалось обновить. Проверьте сеть или попробуйте в установленном приложении (PWA).",
+    "hintOffFailed": "Не удалось отключить уведомления.",
+    "categoriesLink": "Категории уведомлений",
+    "blocked": "Браузер блокирует уведомления."
+  },
+  "calendarFeed": {
+    "title": "Общий календарь",
+    "subtitle": "События синхронизируются через подписку на ленту (не разовый импорт).",
+    "cta": "Добавить в мой календарь",
+    "ctaIos": "Подписаться в Календаре (iPhone / iPad / Mac)",
+    "ctaGoogle": "Подписаться через Google Календарь",
+    "manualHint": "Если кнопка не открывает календарь, скопируйте HTTPS-ссылку ниже и выберите «Добавить по URL / подписка» в настройках.",
+    "urlLabel": "URL подписки (HTTPS)",
+    "copy": "Копировать",
+    "copied": "Скопировано",
+    "copyError": "Не удалось скопировать. Выделите поле и скопируйте вручную.",
+    "rotate": "Создать ссылку заново (старая перестанет работать)",
+    "rotateConfirm": "Новая ссылка отменит старые подписки (Google/Apple нужно обновить). Продолжить?",
+    "security": "Не передавайте ссылку посторонним — по ней можно подписаться на эти события.",
+    "rotating": "Создание…"
+  },
+  "settings": {
+    "badge": "Портал",
+    "title": "Настройки",
+    "intro": "Управление push по категориям. Для всех домов. Своё действие не присылается вам.",
+    "deviceTitle": "Устройство и разрешения",
+    "deviceBody": "Включите уведомления в браузере или PWA. Ниже — только фильтр того, что приходит от других.",
+    "vapidOn": "Чтобы разрешить уведомления, нажмите колокольчик сверху. Флажки выбирают только типы оповещений.",
+    "vapidOff": "Push не настроен на сервере (нет ключей VAPID). Свяжитесь с администратором.",
+    "categoriesTitle": "Категории уведомлений",
+    "categoriesBody": "Отключите ненужные категории. Изменения для будущих событий.",
+    "backCases": "← К домам",
+    "notifyActive": "Вкл.",
+    "notifyCategory": "Вкл.",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "Ваши дома",
+    "title": "Синхронизация пространств",
+    "intro": "Создайте дом или вступите по коду от соседа.",
+    "empty": "Вы ни в одном доме. Создайте или вступите по коду.",
+    "roleOwner": "Администратор",
+    "roleMember": "Участник",
+    "codeLabel": "код"
+  },
+  "common": {
+    "logout": "Выйти",
+    "language": "Язык"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

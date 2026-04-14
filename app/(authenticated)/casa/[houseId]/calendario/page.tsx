@@ -6,13 +6,17 @@ import { deleteCalendarEvent } from "@/lib/actions/calendar";
 import { getMembershipOrRedirect } from "@/lib/house-access";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
+import { Suspense } from "react";
 
 export default async function CalendarioPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ houseId: string }>;
+  searchParams: Promise<{ day?: string }>;
 }) {
   const { houseId } = await params;
+  const { day } = await searchParams;
   const session = await auth();
   if (!session?.user?.id) return null;
 
@@ -50,10 +54,16 @@ export default async function CalendarioPage({
     await deleteCalendarEvent(houseId, id);
   }
 
+  const calPath = `/casa/${houseId}/calendario`;
+
   return (
     <div className="space-y-8">
       <div className="grid gap-8 lg:grid-cols-2">
-        <AddEventForm houseId={houseId} />
+        <Suspense
+          fallback={<div className="cv-card-solid h-48 animate-pulse rounded-2xl bg-slate-100/80" aria-hidden />}
+        >
+          <AddEventForm houseId={houseId} defaultDayKey={day ?? null} />
+        </Suspense>
         {feedHttpsUrl ? (
           <CalendarFeedPanel
             houseId={houseId}
@@ -69,7 +79,16 @@ export default async function CalendarioPage({
         )}
       </div>
 
-      <HouseCalendarGrid events={gridEvents} />
+      <Suspense
+        fallback={<div className="cv-card-solid h-80 animate-pulse rounded-2xl bg-slate-100/80" aria-hidden />}
+      >
+        <HouseCalendarGrid
+          events={gridEvents}
+          calendarioPath={calPath}
+          removeEventAction={removeEventAction}
+          initialDayKey={day ?? null}
+        />
+      </Suspense>
 
       <section>
         <h2 className="text-lg font-bold text-slate-900">Elenco eventi</h2>

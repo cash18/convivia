@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "मेरे घर",
+    "settings": "सेटिंग्स"
+  },
+  "casaNav": {
+    "activeHouse": "सक्रिय घर",
+    "inviteCode": "आमंत्रण कोड:",
+    "homeButton": "घर होम",
+    "otherHouses": "← अन्य घर",
+    "home": "होम",
+    "expenses": "खर्च",
+    "calendar": "कैलेंडर",
+    "lists": "खरीदारी सूचियाँ",
+    "tasks": "कार्य"
+  },
+  "pushBell": {
+    "ariaEnable": "पुश सूचनाएँ चालू करें",
+    "ariaDisable": "पुश सूचनाएँ बंद करें",
+    "ariaOpen": "सूचना विकल्प",
+    "busyOn": "चालू हो रहा है…",
+    "busyOff": "बंद हो रहा है…",
+    "encourage": "जब सहकर्मी खर्च, इवेंट, सूचियाँ या कार्य जोड़ें तो अपडेट रहने के लिए सूचनाएँ चालू रखें।",
+    "hintDenied": "अनुमति अस्वीकृत। ब्राउज़र सेटिंग्स में इस साइट के लिए सूचनाएँ अनुमति दें।",
+    "hintFailed": "अपडेट नहीं हो सका। कनेक्शन जाँचें या इंस्टॉल ऐप (PWA) से कोशिश करें।",
+    "hintOffFailed": "सूचनाएँ बंद नहीं की जा सकीं।",
+    "categoriesLink": "सूचना श्रेणियाँ",
+    "blocked": "ब्राउज़र ने सूचनाएँ अवरुद्ध की हैं।"
+  },
+  "calendarFeed": {
+    "title": "साझा कैलेंडर",
+    "subtitle": "इवेंट इस फ़ीड की सदस्यता से सिंक रहते हैं (एक बार आयात नहीं)।",
+    "cta": "मेरे कैलेंडर में जोड़ें",
+    "ctaIos": "कैलेंडर में सदस्यता (iPhone / iPad / Mac)",
+    "ctaGoogle": "Google कैलेंडर से सदस्यता",
+    "manualHint": "यदि बटन ऐप नहीं खोलता, नीचे HTTPS लिंक कॉपी करें और सेटिंग्स में «URL से जोड़ें / सदस्यता» चुनें।",
+    "urlLabel": "सदस्यता URL (HTTPS)",
+    "copy": "कॉपी करें",
+    "copied": "कॉपी हो गया",
+    "copyError": "कॉपी नहीं हो सका। फ़ील्ड चुनकर मैन्युअल कॉपी करें।",
+    "rotate": "लिंक पुनः बनाएँ (पुराना रद्द)",
+    "rotateConfirm": "पुनः बनाने से पुरानी सदस्यताएँ अमान्य होंगी (Google/Apple अपडेट करें)। जारी रखें?",
+    "security": "घर के बाहर लिंक साझा न करें — जिसके पास है वह इन इवेंट की सदस्यता ले सकता है।",
+    "rotating": "पुनः बनाया जा रहा है…"
+  },
+  "settings": {
+    "badge": "उपयोगकर्ता पोर्टल",
+    "title": "सेटिंग्स",
+    "intro": "श्रेणी के अनुसार पुश प्रबंधित करें। सभी घरों पर लागू। अपने कार्य पर आपको पुश नहीं मिलता।",
+    "deviceTitle": "डिवाइस और अनुमतियाँ",
+    "deviceBody": "ब्राउज़र या PWA में सूचनाएँ चालू करें। नीचे के विकल्प केवल दूसरों के कार्य पर मिलने वाला फ़िल्टर करते हैं।",
+    "vapidOn": "स्वीकार करने के लिए ऊपर की घंटी का उपयोग करें। चेकबॉक्स केवल अलर्ट प्रकार चुनते हैं।",
+    "vapidOff": "सर्वर पर पुश कॉन्फ़िगर नहीं (VAPID कुंजियाँ गायब)। व्यवस्थापक से संपर्क करें।",
+    "categoriesTitle": "सूचना श्रेणियाँ",
+    "categoriesBody": "अवांछित श्रेणियाँ बंद करें। परिवर्तन भविष्य की घटनाओं पर लागू।",
+    "backCases": "← घरों पर वापस",
+    "notifyActive": "चालू",
+    "notifyCategory": "चालू",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "आपके घर",
+    "title": "स्थान सिंक करें",
+    "intro": "नया घर बनाएँ या सहकर्मी के कोड से जुड़ें।",
+    "empty": "आप अभी किसी घर में नहीं हैं। बनाएँ या कोड से जुड़ें।",
+    "roleOwner": "प्रशासक",
+    "roleMember": "सदस्य",
+    "codeLabel": "कोड"
+  },
+  "common": {
+    "logout": "लॉग आउट",
+    "language": "भाषा"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

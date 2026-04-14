@@ -19,6 +19,9 @@ model User {
   memberships          HouseMember[]
   expensesPaid         Expense[]              @relation("ExpensePayer")
   expenseSplits        ExpenseSplit[]
+  transfersSent        MoneyTransfer[]        @relation("TransferFrom")
+  transfersReceived    MoneyTransfer[]        @relation("TransferTo")
+  transfersRecorded    MoneyTransfer[]        @relation("TransferRecorder")
   eventsCreated        CalendarEvent[]        @relation("EventCreator")
   tasksAssigned        Task[]                 @relation("TaskAssignee")
   tasksCreated         Task[]                 @relation("TaskCreator")
@@ -52,6 +55,7 @@ model House {
   createdAt          DateTime @default(now())
   members    HouseMember[]
   expenses   Expense[]
+  moneyTransfers MoneyTransfer[]
   events     CalendarEvent[]
   lists      ShoppingList[]
   tasks      Task[]
@@ -77,7 +81,7 @@ model Expense {
   paidById    String
   expenseDate DateTime       @default(now())
   notes       String?
-  /// EQUAL = riparto uguale; PERCENT = riparto per percentuali (somma 100)
+  /// EQUAL | PERCENT (somma 100%) | CUSTOM (importi € per persona, somma = totale)
   splitMode   String         @default("EQUAL")
   /// Data URL (es. image/jpeg;base64,...) o URL HTTPS (es. Blob)
   receiptUrl  String?
@@ -98,6 +102,25 @@ model ExpenseSplit {
   user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([expenseId, userId])
+}
+
+/// Trasferimento di denaro tra membri (non è una spesa): utile per pareggiare i conti.
+model MoneyTransfer {
+  id            String   @id @default(cuid())
+  houseId       String
+  fromUserId    String
+  toUserId      String
+  amountCents   Int
+  note          String?
+  transferDate  DateTime @default(now())
+  createdById   String
+  createdAt     DateTime @default(now())
+  house         House    @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  fromUser      User     @relation("TransferFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser        User     @relation("TransferTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  createdBy     User     @relation("TransferRecorder", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([houseId])
 }
 
 model CalendarEvent {

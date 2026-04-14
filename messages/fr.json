@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "Mes foyers",
+    "settings": "Paramètres"
+  },
+  "casaNav": {
+    "activeHouse": "Foyer actif",
+    "inviteCode": "Code d’invitation :",
+    "homeButton": "Accueil du foyer",
+    "otherHouses": "← Autres foyers",
+    "home": "Accueil",
+    "expenses": "Dépenses",
+    "calendar": "Calendrier",
+    "lists": "Listes de courses",
+    "tasks": "Tâches"
+  },
+  "pushBell": {
+    "ariaEnable": "Activer les notifications push",
+    "ariaDisable": "Désactiver les notifications push",
+    "ariaOpen": "Options de notifications",
+    "busyOn": "Activation…",
+    "busyOff": "Désactivation…",
+    "encourage": "Activez les notifications pour rester informé quand vos colocataires ajoutent des dépenses, événements, listes ou tâches.",
+    "hintDenied": "Permission refusée. Autorisez les notifications pour ce site dans les paramètres du navigateur.",
+    "hintFailed": "Mise à jour impossible. Vérifiez la connexion ou réessayez depuis l’app installée (PWA).",
+    "hintOffFailed": "Impossible de désactiver les notifications.",
+    "categoriesLink": "Catégories de notifications",
+    "blocked": "Notifications bloquées par le navigateur."
+  },
+  "calendarFeed": {
+    "title": "Calendrier partagé",
+    "subtitle": "Les événements restent synchronisés via un abonnement au flux (pas une importation unique).",
+    "cta": "Ajouter à mon calendrier",
+    "ctaIos": "S’abonner dans Calendrier (iPhone / iPad / Mac)",
+    "ctaGoogle": "S’abonner avec Google Calendar",
+    "manualHint": "Si le bouton n’ouvre pas votre appli calendrier, copiez le lien HTTPS ci-dessous et utilisez « Ajouter depuis l’URL » dans les réglages.",
+    "urlLabel": "URL d’abonnement (HTTPS)",
+    "copy": "Copier",
+    "copied": "Copié",
+    "copyError": "Copie impossible. Sélectionnez le champ et copiez manuellement.",
+    "rotate": "Régénérer le lien (révoque l’ancien)",
+    "rotateConfirm": "La régénération invalide les anciens abonnements (Google/Apple doivent être mis à jour). Continuer ?",
+    "security": "Ne partagez pas le lien hors du foyer : toute personne peut s’abonner à ces événements.",
+    "rotating": "Régénération…"
+  },
+  "settings": {
+    "badge": "Portail utilisateur",
+    "title": "Paramètres",
+    "intro": "Gérez les notifications push par catégorie. S’applique à tous vos foyers. Vous ne recevez pas de push pour votre propre action.",
+    "deviceTitle": "Appareil et autorisations",
+    "deviceBody": "Activez les notifications dans le navigateur ou la PWA. Les options ci-dessous filtrent ce que vous recevez quand d’autres agissent.",
+    "vapidOn": "Pour accepter les notifications, utilisez la cloche en haut. Les cases choisissent seulement les types d’alertes.",
+    "vapidOff": "Les push ne sont pas configurées sur le serveur (clés VAPID manquantes). Contactez l’administrateur.",
+    "categoriesTitle": "Catégories de notifications",
+    "categoriesBody": "Désactivez les catégories indésirables. Les changements s’appliquent aux prochains événements.",
+    "backCases": "← Retour aux foyers",
+    "notifyActive": "Activer",
+    "notifyCategory": "Activer",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "Vos foyers",
+    "title": "Synchronisez vos espaces",
+    "intro": "Créez un foyer ou rejoignez-le avec un code partagé par un colocataire.",
+    "empty": "Vous n’êtes dans aucun foyer. Créez-en un ou rejoignez avec un code.",
+    "roleOwner": "Administrateur",
+    "roleMember": "Membre",
+    "codeLabel": "code"
+  },
+  "common": {
+    "logout": "Se déconnecter",
+    "language": "Langue"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

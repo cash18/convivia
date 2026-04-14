@@ -1,20 +1,34 @@
 /**
  * Estrae l'importo in euro dal testo OCR di uno scontrino.
- * Priorità: righe in basso, parole tipo TOTALE / DA PAGARE, importo in coda alla riga (tipico del totale in grassetto in fondo).
+ * Priorità: righe in basso, parole tipo TOTALE / DA PAGARE, importo in coda alla riga.
  */
 
 /** Righe da escludere (subtotali, tasse, intestazioni). */
 const EXCLUDE_LINE =
-  /subtotale|sub-totale|imponibile|iva\s*(inc|ded|€|%|ordinaria)|sconto\s|sconti\s|documento|nr\.?\s*doc|cod\.?\s*fisc|partita\s*iva|tel\.|www\.|iban|banca|bancomat|operatore|cassa\s*\d/i;
+  /subtotale|sub-totale|imponibile|iva\s*(inc|ded|€|%|ordinaria)|sconto\s|sconti\s|documento|nr\.?\s*doc|cod\.?\s*fisc|partita\s*iva|tel\.|www\.|iban|banca|bancomat|operatore|cassa\s*\d|resto|pagamento\s*elettronico|transazione|auth\.?\s*code/i;
 
 /** Forte indicazione di riga del totale da pagare (non subtotale). */
 const STRONG_TOTAL_LINE =
-  /\btotale\s*(eur|€|euro)?\b|\btot\.\s*(eur|€)?\b|importo\s*(a\s+)?pagare|da\s+pagare|ammontare|pagamento|importo\s+dovuto|totale\s+dovuto|balance\s+due|amount\s+due|vuelto|contanti|pagato\b/i;
+  /\btotale\s*(eur|€|euro)?\b|\btot\.\s*(eur|€)?\b|importo\s*(a\s+)?pagare|da\s+pagare|ammontare|pagamento|importo\s+dovuto|totale\s+dovuto|balance\s+due|amount\s+due|vuelto|contanti|pagato\b|totale\s+a\s+pagare|tot\.\s+a\s+pagare|sum\s*total|grand\s*total|total\s*amount|you\s*pay|to\s*pay|amount\s*due/i;
+
+/** Indicazione media (OCR spesso corrompe “totale”). */
+const WEAK_TOTAL_LINE = /\b(tot|t0tale|tota1e|total|tatal)\b/i;
 
 /** Evidenziazione tipografica spesso usata per il totale (grassetto simulato con simboli). */
 const EMPHASIS_MARKS = /\*{2,}|#{2,}|={2,}|_{2,}/;
 
-const EURO_NUMBER = /\b(\d{1,5}(?:[.,]\d{1,2})?)\b/g;
+/** Importo a fine riga o dopo simbolo €. */
+const NUM_WITH_OPTIONAL_SUFFIX = /\b(\d{1,5}(?:[.,]\d{1,2})?)\s*(?:€|eur|euro)?\b/gi;
+const EURO_PREFIX_AMOUNT = /(?:€|eur|euro)\s*(\d{1,5}(?:[.,]\d{1,2})?)/gi;
+
+function normalizeOcrDigitLine(line: string): string {
+  return line.replace(/[Oo]/g, (ch, i, s) => {
+    const prev = s[i - 1] ?? "";
+    const next = s[i + 1] ?? "";
+    if (/\d/.test(prev) || /\d/.test(next)) return "0";
+    return ch;
+  });
+}
 
 function parseEuroToken(raw: string): number | null {
   const t = raw.replace(",", ".").trim();
@@ -25,11 +39,21 @@ function parseEuroToken(raw: string): number | null {
 }
 
 function collectNumbersInLine(line: string): number[] {
+  const normalized = normalizeOcrDigitLine(line);
   const found: number[] = [];
-  const re = new RegExp(EURO_NUMBER.source, "gi");
   let m: RegExpExecArray | null;
-  while ((m = re.exec(line)) !== null) {
-    const v = parseEuroToken(m[1] ?? "");
+  const re1 = new RegExp(NUM_WITH_OPTIONAL_SUFFIX.source, "gi");
+  while ((m = re1.exec(normalized)) !== null) {
+    const raw = (m[1] ?? "").trim();
+    if (!raw) continue;
+    const v = parseEuroToken(raw);
+    if (v !== null) found.push(v);
+  }
+  const re2 = new RegExp(EURO_PREFIX_AMOUNT.source, "gi");
+  while ((m = re2.exec(normalized)) !== null) {
+    const raw = (m[1] ?? "").trim();
+    if (!raw) continue;
+    const v = parseEuroToken(raw);
     if (v !== null) found.push(v);
   }
   return found;
@@ -78,6 +102,14 @@ export function extractEuroTotalFromReceiptText(text: string): number | null {
           score: 1000 + bottomWeight + emphasis * 5,
         });
       }
+    } else if (WEAK_TOTAL_LINE.test(line)) {
+      const v = pickAmountOnTotalLine(line);
+      if (v !== null && v >= 0.05) {
+        candidates.push({
+          value: v,
+          score: 400 + bottomWeight + lineEmphasisBonus(line) * 3,
+        });
+      }
     }
   }
 
@@ -86,7 +118,7 @@ export function extractEuroTotalFromReceiptText(text: string): number | null {
     return candidates[0]!.value;
   }
 
-  const bottomStart = Math.max(0, n - Math.min(22, Math.ceil(n * 0.45)));
+  const bottomStart = Math.max(0, n - Math.min(28, Math.ceil(n * 0.5)));
   const bottomNums: number[] = [];
   for (let i = bottomStart; i < n; i++) {
     const line = rawLines[i]!;
@@ -107,14 +139,13 @@ export function extractEuroTotalFromReceiptText(text: string): number | null {
 }
 
 /**
- * Combina OCR del solo fondo immagine e dell'intera immagine: preferisce il fondo se coerente con il totale.
+ * True se nel testo compare almeno una riga che sembra il totale (OCR del fondo scontrino).
  */
-/** True se nel testo compare almeno una riga che sembra il totale (OCR del fondo scontrino). */
 export function hasLikelyTotalLine(text: string): boolean {
   return text.split(/\r?\n/).some((line) => {
     const l = line.trim();
     if (!l || EXCLUDE_LINE.test(l)) return false;
-    return STRONG_TOTAL_LINE.test(l);
+    return STRONG_TOTAL_LINE.test(l) || WEAK_TOTAL_LINE.test(l);
   });
 }
 
@@ -132,8 +163,8 @@ export function extractEuroTotalFromDualOcr(bottomStripText: string, fullPageTex
   const scale = Math.max(b, f, 1);
   if (diff / scale <= 0.02) return b;
 
-  const bottomHasStrong = STRONG_TOTAL_LINE.test(bottomStripText);
-  const fullHasStrong = STRONG_TOTAL_LINE.test(fullPageText);
+  const bottomHasStrong = STRONG_TOTAL_LINE.test(bottomStripText) || WEAK_TOTAL_LINE.test(bottomStripText);
+  const fullHasStrong = STRONG_TOTAL_LINE.test(fullPageText) || WEAK_TOTAL_LINE.test(fullPageText);
   if (bottomHasStrong && !fullHasStrong) return b;
   if (fullHasStrong && !bottomHasStrong) return f;
 

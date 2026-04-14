@@ -1,3 +1,4 @@
+import { CasaLastHouseSync } from "@/components/CasaLastHouseSync";
 import { CasaSubNav } from "@/components/CasaSubNav";
 import { auth } from "@/auth";
 import { getMembershipOrRedirect } from "@/lib/house-access";
@@ -17,6 +18,7 @@ export default async function CasaLayout({
 
   return (
     <>
+      <CasaLastHouseSync houseId={houseId} />
       <CasaSubNav
         houseId={houseId}
         houseName={membership.house.name}

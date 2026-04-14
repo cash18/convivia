@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "منازلي",
+    "settings": "الإعدادات"
+  },
+  "casaNav": {
+    "activeHouse": "المنزل النشط",
+    "inviteCode": "رمز الدعوة:",
+    "homeButton": "الصفحة الرئيسية للمنزل",
+    "otherHouses": "← منازل أخرى",
+    "home": "الرئيسية",
+    "expenses": "المصروفات",
+    "calendar": "التقويم",
+    "lists": "قوائم التسوق",
+    "tasks": "المهام"
+  },
+  "pushBell": {
+    "ariaEnable": "تفعيل الإشعارات الفورية",
+    "ariaDisable": "إيقاف الإشعارات الفورية",
+    "ariaOpen": "خيارات الإشعارات",
+    "busyOn": "جارٍ التفعيل…",
+    "busyOff": "جارٍ الإيقاف…",
+    "encourage": "فعّل الإشعارات لتبقى على اطلاع عندما يضيف رفقاء السكن مصاريف أو أحداثًا أو قوائم أو مهامًا.",
+    "hintDenied": "تم رفض الإذن. اسمح بالإشعارات لهذا الموقع من إعدادات المتصفح.",
+    "hintFailed": "تعذر التحديث. تحقق من الاتصال أو جرّب من التطبيق المثبت (PWA).",
+    "hintOffFailed": "تعذر إيقاف الإشعارات.",
+    "categoriesLink": "فئات الإشعارات",
+    "blocked": "المتصفح يحظر الإشعارات."
+  },
+  "calendarFeed": {
+    "title": "تقويم مشترك",
+    "subtitle": "تبقى الأحداث متزامنة عبر اشتراك في هذا التدفق (وليس استيرادًا لمرة واحدة).",
+    "cta": "أضف إلى تقويمي",
+    "ctaIos": "اشترك في التقويم (iPhone / iPad / Mac)",
+    "ctaGoogle": "اشترك عبر Google Calendar",
+    "manualHint": "إذا لم يفتح الزر تطبيق التقويم، انسخ رابط HTTPS أدناه واستخدم «إضافة من عنوان URL / اشتراك» في الإعدادات.",
+    "urlLabel": "رابط الاشتراك (HTTPS)",
+    "copy": "نسخ",
+    "copied": "تم النسخ",
+    "copyError": "تعذر النسخ. حدد الحقل وانسخ يدويًا.",
+    "rotate": "إعادة إنشاء الرابط (يلغي القديم)",
+    "rotateConfirm": "إعادة الإنشاء تلغي الاشتراكات القديمة (يلزم تحديث Google/Apple). هل تتابع؟",
+    "security": "لا تشارك الرابط خارج المنزل — من يملكه يمكنه الاشتراك بهذه الأحداث.",
+    "rotating": "جارٍ الإنشاء…"
+  },
+  "settings": {
+    "badge": "بوابة المستخدم",
+    "title": "الإعدادات",
+    "intro": "إدارة الإشعارات الفورية حسب الفئة. تنطبق على جميع المنازل. لن تصلك إشعار لعملك أنت.",
+    "deviceTitle": "الجهاز والأذونات",
+    "deviceBody": "فعّل الإشعارات في المتصفح أو PWA. الخيارات أدناه تصفّي ما تتلقاه عندما يتصرف الآخرون.",
+    "vapidOn": "لقبول الإشعارات استخدم الجرس أعلى الصفحة. المربعات تختار أنواع التنبيهات فقط.",
+    "vapidOff": "الإشعارات غير مهيأة على الخادم (مفاتيح VAPID ناقصة). اتصل بالمسؤول.",
+    "categoriesTitle": "فئات الإشعارات",
+    "categoriesBody": "عطّل الفئات غير المرغوبة. التغييرات للأحداث القادمة.",
+    "backCases": "← العودة إلى المنازل",
+    "notifyActive": "تشغيل",
+    "notifyCategory": "تشغيل",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "منازلك",
+    "title": "زامن مساحاتك",
+    "intro": "أنشئ منزلًا جديدًا أو انضم برمز من رفيق سكن.",
+    "empty": "أنت لست في أي منزل بعد. أنشئ منزلًا أو انضم برمز.",
+    "roleOwner": "مسؤول",
+    "roleMember": "عضو",
+    "codeLabel": "رمز"
+  },
+  "common": {
+    "logout": "تسجيل الخروج",
+    "language": "اللغة"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

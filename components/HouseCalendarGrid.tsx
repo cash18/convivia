@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export type CalendarEventDTO = {
   id: string;
@@ -98,15 +99,64 @@ function isToday(d: Date): boolean {
   return dateKeyLocal(d) === dateKeyLocal(t);
 }
 
+function parseDayKey(key: string | null): string | null {
+  if (!key || !/^\d{4}-\d{2}-\d{2}$/.test(key)) return null;
+  return key;
+}
+
 type ViewMode = "month" | "week";
 
-export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
+type HouseCalendarGridProps = {
+  events: CalendarEventDTO[];
+  calendarioPath: string;
+  removeEventAction: (formData: FormData) => Promise<void>;
+  initialDayKey?: string | null;
+};
+
+export function HouseCalendarGrid({
+  events,
+  calendarioPath,
+  removeEventAction,
+  initialDayKey,
+}: HouseCalendarGridProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const dayFromUrl = parseDayKey(searchParams.get("day"));
+
   const [cursor, setCursor] = useState(() => new Date());
   const [view, setView] = useState<ViewMode>("month");
+  const [selectedDayKey, setSelectedDayKey] = useState<string | null>(() =>
+    parseDayKey(initialDayKey ?? null) ?? dayFromUrl ?? dateKeyLocal(new Date()),
+  );
+
+  useEffect(() => {
+    const d = parseDayKey(initialDayKey ?? null) ?? dayFromUrl;
+    if (d) setSelectedDayKey(d);
+  }, [initialDayKey, dayFromUrl]);
+
+  const selectDay = useCallback(
+    (key: string) => {
+      setSelectedDayKey(key);
+      router.replace(`${calendarioPath}?day=${key}`, { scroll: false });
+    },
+    [router, calendarioPath],
+  );
 
   const monthFirst = useMemo(() => new Date(cursor.getFullYear(), cursor.getMonth(), 1), [cursor]);
   const monthGrid = useMemo(() => getMonthGrid(monthFirst), [monthFirst]);
   const weekDays = useMemo(() => getWeekDays(cursor), [cursor]);
+
+  const selectedDate = useMemo(() => {
+    if (!selectedDayKey) return null;
+    const [y, m, d] = selectedDayKey.split("-").map(Number);
+    if (!y || !m || !d) return null;
+    return new Date(y, m - 1, d);
+  }, [selectedDayKey]);
+
+  const selectedDayEvents = useMemo(() => {
+    if (!selectedDate) return [];
+    return eventsForDay(events, selectedDate);
+  }, [events, selectedDate]);
 
   const weekLabel = useMemo(() => {
     const a = weekDays[0]!;
@@ -120,7 +170,9 @@ export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
   }, [weekDays]);
 
   function goToday() {
-    setCursor(new Date());
+    const t = new Date();
+    setCursor(t);
+    selectDay(dateKeyLocal(t));
   }
 
   function navPrev() {
@@ -221,12 +273,18 @@ export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
               const inMonth = isSameMonth(day, monthFirst);
               const dayEvts = eventsForDay(events, day);
               const today = isToday(day);
+              const key = dateKeyLocal(day);
+              const selected = selectedDayKey === key;
               return (
-                <div
-                  key={`m-${dateKeyLocal(day)}`}
-                  className={`min-h-[5.5rem] bg-white p-1.5 sm:min-h-[6.5rem] sm:p-2 ${
+                <button
+                  type="button"
+                  key={`m-${key}`}
+                  onClick={() => selectDay(key)}
+                  className={`min-h-[5rem] w-full bg-white p-1.5 text-left sm:min-h-[6rem] sm:p-2 ${
                     inMonth ? "" : "opacity-45"
-                  } ${today ? "ring-1 ring-inset ring-emerald-400" : ""}`}
+                  } ${today ? "ring-1 ring-inset ring-emerald-400" : ""} ${
+                    selected ? "ring-2 ring-inset ring-emerald-500" : ""
+                  }`}
                 >
                   <div
                     className={`text-xs font-semibold tabular-nums ${
@@ -236,7 +294,7 @@ export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
                     {day.getDate()}
                   </div>
                   <ul className="mt-1 space-y-0.5">
-                    {dayEvts.slice(0, 4).map((ev) => (
+                    {dayEvts.slice(0, 3).map((ev) => (
                       <li
                         key={ev.id}
                         className="truncate rounded bg-emerald-50 px-1 py-0.5 text-[10px] font-medium text-emerald-900 sm:text-[11px]"
@@ -253,69 +311,114 @@ export function HouseCalendarGrid({ events }: { events: CalendarEventDTO[] }) {
                         {ev.title}
                       </li>
                     ))}
-                    {dayEvts.length > 4 ? (
-                      <li className="text-[10px] text-slate-500">+{dayEvts.length - 4}</li>
+                    {dayEvts.length > 3 ? (
+                      <li className="text-[10px] text-slate-500">+{dayEvts.length - 3}</li>
                     ) : null}
                   </ul>
-                </div>
+                </button>
               );
             })}
           </div>
         </div>
       ) : (
         <div className="overflow-x-auto border-t border-slate-200/80">
-          <div className="grid min-w-[640px] grid-cols-7 gap-px bg-slate-200/80 p-0 sm:min-w-0 sm:gap-0">
-          {weekDays.map((day) => {
-            const dayEvts = eventsForDay(events, day);
-            const today = isToday(day);
-            return (
-              <div
-                key={`w-${dateKeyLocal(day)}`}
-                className={`flex min-h-[14rem] flex-col border-slate-100 bg-white sm:min-h-[18rem] ${
-                  today ? "ring-1 ring-inset ring-emerald-400" : ""
-                }`}
-              >
+          <div className="grid min-w-0 grid-cols-7 gap-px bg-slate-200/80 p-0">
+            {weekDays.map((day) => {
+              const dayEvts = eventsForDay(events, day);
+              const today = isToday(day);
+              const key = dateKeyLocal(day);
+              const selected = selectedDayKey === key;
+              return (
                 <div
-                  className={`border-b border-slate-100 px-2 py-2 text-center text-xs font-semibold ${
-                    today ? "bg-emerald-50 text-emerald-800" : "bg-slate-50/90 text-slate-700"
-                  }`}
+                  key={`w-${key}`}
+                  className={`flex min-h-[12rem] flex-col border-slate-100 bg-white sm:min-h-[16rem] ${
+                    today ? "ring-1 ring-inset ring-emerald-400" : ""
+                  } ${selected ? "ring-2 ring-inset ring-emerald-500" : ""}`}
                 >
-                  {formatDayHeader(day)}
+                  <button
+                    type="button"
+                    onClick={() => selectDay(key)}
+                    className={`border-b border-slate-100 px-2 py-2 text-center text-xs font-semibold ${
+                      today ? "bg-emerald-50 text-emerald-800" : "bg-slate-50/90 text-slate-700"
+                    }`}
+                  >
+                    {formatDayHeader(day)}
+                  </button>
+                  <ul className="flex flex-1 flex-col gap-1.5 p-2">
+                    {dayEvts.map((ev) => (
+                      <li
+                        key={ev.id}
+                        className="rounded-lg border border-emerald-100 bg-emerald-50/90 px-2 py-1.5 text-xs text-emerald-950"
+                      >
+                        <p className="font-semibold leading-tight">{ev.title}</p>
+                        <p className="mt-0.5 text-[10px] text-emerald-800/90">
+                          {ev.allDay
+                            ? "Tutto il giorno"
+                            : new Date(ev.startsAt).toLocaleTimeString("it-IT", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                          {ev.endsAt && !ev.allDay
+                            ? ` — ${new Date(ev.endsAt).toLocaleTimeString("it-IT", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}`
+                            : null}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="flex flex-1 flex-col gap-1.5 p-2">
-                  {dayEvts.map((ev) => (
-                    <li
-                      key={ev.id}
-                      className="rounded-lg border border-emerald-100 bg-emerald-50/90 px-2 py-1.5 text-xs text-emerald-950"
-                    >
-                      <p className="font-semibold leading-tight">{ev.title}</p>
-                      <p className="mt-0.5 text-[10px] text-emerald-800/90">
-                        {ev.allDay
-                          ? "Tutto il giorno"
-                          : new Date(ev.startsAt).toLocaleTimeString("it-IT", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                        {ev.endsAt && !ev.allDay
-                          ? ` — ${new Date(ev.endsAt).toLocaleTimeString("it-IT", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}`
-                          : null}
-                      </p>
-                      {ev.description ? (
-                        <p className="mt-1 line-clamp-2 text-[10px] text-slate-600">{ev.description}</p>
-                      ) : null}
-                      <p className="mt-1 text-[10px] text-slate-400">{ev.createdByName}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
+              );
+            })}
           </div>
         </div>
       )}
+
+      {selectedDate && selectedDayKey ? (
+        <div className="border-t border-slate-200/80 bg-white px-4 py-4 sm:px-5">
+          <h3 className="text-sm font-bold text-slate-900">
+            Eventi del {selectedDate.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" })}
+          </h3>
+          <p className="mt-1 text-xs text-slate-500">
+            Il giorno selezionato aggiorna la data nel modulo{" "}
+            <a href="#nuovo-evento" className="cv-link font-medium">
+              Nuovo evento
+            </a>{" "}
+            in alto. Qui puoi consultare e rimuovere.
+          </p>
+          {selectedDayEvents.length === 0 ? (
+            <p className="mt-3 text-sm text-slate-500">Nessun evento in questo giorno.</p>
+          ) : (
+            <ul className="mt-3 space-y-3">
+              {selectedDayEvents.map((ev) => (
+                <li
+                  key={ev.id}
+                  className="flex flex-col gap-2 rounded-xl border border-slate-100 bg-slate-50/80 p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="font-semibold text-slate-900">{ev.title}</p>
+                    {ev.description ? <p className="mt-1 text-xs text-slate-600">{ev.description}</p> : null}
+                    <p className="mt-1 text-xs text-slate-500">
+                      {ev.allDay
+                        ? "Tutto il giorno"
+                        : new Date(ev.startsAt).toLocaleString("it-IT")}
+                      {ev.endsAt && !ev.allDay ? ` — ${new Date(ev.endsAt).toLocaleTimeString("it-IT")}` : ""}
+                    </p>
+                    <p className="text-[10px] text-slate-400">Creato da {ev.createdByName}</p>
+                  </div>
+                  <form action={removeEventAction}>
+                    <input type="hidden" name="eventId" value={ev.id} />
+                    <button type="submit" className="text-sm font-semibold text-red-600 hover:text-red-800">
+                      Elimina
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "Mijn huizen",
+    "settings": "Instellingen"
+  },
+  "casaNav": {
+    "activeHouse": "Actief huis",
+    "inviteCode": "Uitnodigingscode:",
+    "homeButton": "Huis startpagina",
+    "otherHouses": "← Andere huizen",
+    "home": "Start",
+    "expenses": "Uitgaven",
+    "calendar": "Agenda",
+    "lists": "Boodschappenlijsten",
+    "tasks": "Taken"
+  },
+  "pushBell": {
+    "ariaEnable": "Pushmeldingen inschakelen",
+    "ariaDisable": "Pushmeldingen uitschakelen",
+    "ariaOpen": "Meldingsopties",
+    "busyOn": "Inschakelen…",
+    "busyOff": "Uitschakelen…",
+    "encourage": "Schakel meldingen in om op de hoogte te blijven wanneer huisgenoten uitgaven, agenda-items, lijsten of taken toevoegen.",
+    "hintDenied": "Toestemming geweigerd. Sta meldingen toe voor deze site in de browserinstellingen.",
+    "hintFailed": "Bijwerken mislukt. Controleer de verbinding of probeer de geïnstalleerde app (PWA).",
+    "hintOffFailed": "Meldingen konden niet worden uitgeschakeld.",
+    "categoriesLink": "Meldingscategorieën",
+    "blocked": "Meldingen geblokkeerd door de browser."
+  },
+  "calendarFeed": {
+    "title": "Gedeelde agenda",
+    "subtitle": "Afspraken blijven gesynchroniseerd via een abonnement op deze feed (geen eenmalige import).",
+    "cta": "Toevoegen aan mijn agenda",
+    "ctaIos": "Abonneren in Agenda (iPhone / iPad / Mac)",
+    "ctaGoogle": "Abonneren met Google Agenda",
+    "manualHint": "Als de knop uw agenda-app niet opent, kopieer de HTTPS-link hieronder en gebruik «Toevoegen via URL / abonnement» in de instellingen.",
+    "urlLabel": "Abonnements-URL (HTTPS)",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd",
+    "copyError": "Kopiëren mislukt. Selecteer het veld en kopieer handmatig.",
+    "rotate": "Link opnieuw genereren (oude intrekken)",
+    "rotateConfirm": "Opnieuw genereren maakt oude abonnementen ongeldig (Google/Apple moeten worden bijgewerkt). Doorgaan?",
+    "security": "Deel de link niet buiten het huis — wie hem heeft kan zich op deze events abonneren.",
+    "rotating": "Bezig met regenereren…"
+  },
+  "settings": {
+    "badge": "Gebruikersportaal",
+    "title": "Instellingen",
+    "intro": "Beheer pushmeldingen per categorie. Geldt voor alle huizen. Je krijgt geen push voor je eigen actie.",
+    "deviceTitle": "Apparaat en machtigingen",
+    "deviceBody": "Schakel meldingen in de browser of PWA in. De opties hieronder filteren wat je ontvangt als anderen iets doen.",
+    "vapidOn": "Gebruik het belletje bovenaan om meldingen toe te staan. De vakjes kiezen alleen welke soorten waarschuwingen.",
+    "vapidOff": "Push is niet geconfigureerd op de server (VAPID-sleutels ontbreken). Neem contact op met de beheerder.",
+    "categoriesTitle": "Meldingscategorieën",
+    "categoriesBody": "Schakel categorieën uit die je niet als push wilt. Wijzigingen gelden voor toekomstige gebeurtenissen.",
+    "backCases": "← Terug naar huizen",
+    "notifyActive": "Aan",
+    "notifyCategory": "Aan",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "Jouw huizen",
+    "title": "Synchroniseer je ruimtes",
+    "intro": "Maak een nieuw huis of word lid met een code van een huisgenoot.",
+    "empty": "Je zit nog in geen huis. Maak er een of word lid met een code.",
+    "roleOwner": "Beheerder",
+    "roleMember": "Lid",
+    "codeLabel": "code"
+  },
+  "common": {
+    "logout": "Afmelden",
+    "language": "Taal"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

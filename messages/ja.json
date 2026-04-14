@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "マイホーム",
+    "settings": "設定"
+  },
+  "casaNav": {
+    "activeHouse": "アクティブな家",
+    "inviteCode": "招待コード:",
+    "homeButton": "ホームのトップ",
+    "otherHouses": "← 他の家",
+    "home": "ホーム",
+    "expenses": "支出",
+    "calendar": "カレンダー",
+    "lists": "買い物リスト",
+    "tasks": "タスク"
+  },
+  "pushBell": {
+    "ariaEnable": "プッシュ通知をオン",
+    "ariaDisable": "プッシュ通知をオフ",
+    "ariaOpen": "通知のオプション",
+    "busyOn": "有効化中…",
+    "busyOff": "無効化中…",
+    "encourage": "ルームメイトが支出・予定・リスト・タスクを追加したときに備え、通知をオンにしてください。",
+    "hintDenied": "許可されませんでした。ブラウザの設定でこのサイトの通知を許可してください。",
+    "hintFailed": "更新できませんでした。接続を確認するか、インストール済みアプリ（PWA）でお試しください。",
+    "hintOffFailed": "通知をオフにできませんでした。",
+    "categoriesLink": "通知カテゴリ",
+    "blocked": "ブラウザが通知をブロックしています。"
+  },
+  "calendarFeed": {
+    "title": "共有カレンダー",
+    "subtitle": "予定はフィード購読で同期されます（一度きりの取り込みではありません）。",
+    "cta": "自分のカレンダーに追加",
+    "ctaIos": "カレンダーで購読（iPhone / iPad / Mac）",
+    "ctaGoogle": "Google カレンダーで購読",
+    "manualHint": "ボタンで開かない場合は下の HTTPS リンクをコピーし、設定の「URL から追加／購読」で貼り付けてください。",
+    "urlLabel": "購読 URL（HTTPS）",
+    "copy": "コピー",
+    "copied": "コピーしました",
+    "copyError": "コピーできませんでした。フィールドを選択して手動でコピーしてください。",
+    "rotate": "リンクを再発行（旧 URL は無効）",
+    "rotateConfirm": "再発行すると古い購読は無効になります（Google/Apple 側の更新が必要）。続行しますか？",
+    "security": "家の外ではリンクを共有しないでください。保持者はこの予定に購読できます。",
+    "rotating": "再発行中…"
+  },
+  "settings": {
+    "badge": "ユーザーポータル",
+    "title": "設定",
+    "intro": "プッシュ通知をカテゴリ別に管理します。参加中のすべてのホームに適用。自分の操作には届きません。",
+    "deviceTitle": "端末と権限",
+    "deviceBody": "ブラウザまたは PWA で通知を許可してください。以下は他人が操作したときの受信のみを絞り込みます。",
+    "vapidOn": "許可には上部のベルを使用してください。チェックは受け取るアラートの種類だけを選びます。",
+    "vapidOff": "サーバーにプッシュが設定されていません（VAPID キー不足）。管理者に連絡してください。",
+    "categoriesTitle": "通知カテゴリ",
+    "categoriesBody": "不要なカテゴリをオフにします。変更は今後のイベントに適用されます。",
+    "backCases": "← ホーム一覧へ",
+    "notifyActive": "オン",
+    "notifyCategory": "オン",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "あなたのホーム",
+    "title": "空間を同期",
+    "intro": "新しいホームを作成するか、ルームメイトのコードで参加します。",
+    "empty": "まだホームに参加していません。作成するかコードで参加してください。",
+    "roleOwner": "管理者",
+    "roleMember": "メンバー",
+    "codeLabel": "コード"
+  },
+  "common": {
+    "logout": "ログアウト",
+    "language": "言語"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "myHouses": "Evlerim",
+    "settings": "Ayarlar"
+  },
+  "casaNav": {
+    "activeHouse": "Aktif ev",
+    "inviteCode": "Davet kodu:",
+    "homeButton": "Ev ana sayfası",
+    "otherHouses": "← Diğer evler",
+    "home": "Ana sayfa",
+    "expenses": "Harcamalar",
+    "calendar": "Takvim",
+    "lists": "Alışveriş listeleri",
+    "tasks": "Görevler"
+  },
+  "pushBell": {
+    "ariaEnable": "Anlık bildirimleri aç",
+    "ariaDisable": "Anlık bildirimleri kapat",
+    "ariaOpen": "Bildirim seçenekleri",
+    "busyOn": "Açılıyor…",
+    "busyOff": "Kapatılıyor…",
+    "encourage": "Ev arkadaşlarınız harcama, etkinlik, liste veya görev eklediğinde haberdar olmak için bildirimleri açın.",
+    "hintDenied": "İzin reddedildi. Tarayıcı ayarlarından bu site için bildirimlere izin verin.",
+    "hintFailed": "Güncellenemedi. Bağlantıyı kontrol edin veya yüklü uygulamadan (PWA) deneyin.",
+    "hintOffFailed": "Bildirimler kapatılamadı.",
+    "categoriesLink": "Bildirim kategorileri",
+    "blocked": "Tarayıcı bildirimleri engelliyor."
+  },
+  "calendarFeed": {
+    "title": "Paylaşılan takvim",
+    "subtitle": "Etkinlikler bu akışa abone olarak senkron kalır (tek seferlik içe aktarma değil).",
+    "cta": "Takvimime ekle",
+    "ctaIos": "Takvim’de abone ol (iPhone / iPad / Mac)",
+    "ctaGoogle": "Google Takvim ile abone ol",
+    "manualHint": "Düğme uygulamayı açmazsa aşağıdaki HTTPS bağlantısını kopyalayıp ayarlarda «URL’den ekle / abonelik» kullanın.",
+    "urlLabel": "Abonelik URL’si (HTTPS)",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı",
+    "copyError": "Kopyalanamadı. Alanı seçip elle kopyalayın.",
+    "rotate": "Bağlantıyı yenile (eskiyi iptal eder)",
+    "rotateConfirm": "Yenileme eski abonelikleri geçersiz kılar (Google/Apple güncellenmeli). Devam?",
+    "security": "Bağlantıyı ev dışında paylaşmayın — sahibi bu etkinliklere abone olabilir.",
+    "rotating": "Yenileniyor…"
+  },
+  "settings": {
+    "badge": "Kullanıcı portalı",
+    "title": "Ayarlar",
+    "intro": "Anlık bildirimleri kategoriye göre yönetin. Tüm evlere uygulanır. Kendi eyleminiz size push göndermez.",
+    "deviceTitle": "Cihaz ve izinler",
+    "deviceBody": "Tarayıcı veya PWA’da bildirimleri açın. Aşağıdakiler yalnızca başkaları işlem yaptığında aldıklarınızı süzer.",
+    "vapidOn": "Kabul etmek için üstteki zili kullanın. Kutular yalnızca uyarı türlerini seçer.",
+    "vapidOff": "Sunucuda push yapılandırılmamış (VAPID anahtarları eksik). Yöneticiyle iletişime geçin.",
+    "categoriesTitle": "Bildirim kategorileri",
+    "categoriesBody": "İstemediğiniz kategorileri kapatın. Değişiklikler gelecek olaylara uygulanır.",
+    "backCases": "← Evlerlere dön",
+    "notifyActive": "Aç",
+    "notifyCategory": "Aç",
+    "savePrefs": "Save preferences",
+    "saving": "Saving…"
+  },
+  "case": {
+    "badge": "Evleriniz",
+    "title": "Alanları senkronize edin",
+    "intro": "Yeni ev oluşturun veya ev arkadaşınızın paylaştığı kodla katılın.",
+    "empty": "Henüz hiçbir evde değilsiniz. Oluşturun veya kodla katılın.",
+    "roleOwner": "Yönetici",
+    "roleMember": "Üye",
+    "codeLabel": "kod"
+  },
+  "common": {
+    "logout": "Çıkış",
+    "language": "Dil"
+  },
+  "pushCat": {
+    "EXPENSES": {
+      "label": "Expenses",
+      "desc": "New expenses and removals in the house ledger."
+    },
+    "CALENDAR": {
+      "label": "Calendar",
+      "desc": "Events added or removed from the shared calendar."
+    },
+    "TASKS": {
+      "label": "Tasks",
+      "desc": "Tasks created, completed or deleted."
+    },
+    "LISTS": {
+      "label": "Shopping lists",
+      "desc": "New lists and items added to shopping lists."
+    },
+    "HOUSE": {
+      "label": "Home & members",
+      "desc": "When someone joins a home with the invite code."
+    }
+  }
+}
