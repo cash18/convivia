@@ -1,5 +1,8 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { intlLocaleTag } from "@/lib/i18n/intl-locale";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -82,14 +85,6 @@ function eventsForDay(evts: CalendarEventDTO[], day: Date): CalendarEventDTO[] {
     .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
 }
 
-function formatDayHeader(d: Date): string {
-  return d.toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short" });
-}
-
-function formatMonthTitle(d: Date): string {
-  return d.toLocaleDateString("it-IT", { month: "long", year: "numeric" });
-}
-
 function isSameMonth(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
 }
@@ -119,6 +114,8 @@ export function HouseCalendarGrid({
   removeEventAction,
   initialDayKey,
 }: HouseCalendarGridProps) {
+  const { t, locale } = useI18n();
+  const intlTag = intlLocaleTag(locale);
   const router = useRouter();
   const searchParams = useSearchParams();
   const dayFromUrl = parseDayKey(searchParams.get("day"));
@@ -127,6 +124,25 @@ export function HouseCalendarGrid({
   const [view, setView] = useState<ViewMode>("month");
   const [selectedDayKey, setSelectedDayKey] = useState<string | null>(() =>
     parseDayKey(initialDayKey ?? null) ?? dayFromUrl ?? dateKeyLocal(new Date()),
+  );
+
+  const weekdayShortLabels = useMemo(() => {
+    const anchor = new Date(2024, 0, 1);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(anchor);
+      d.setDate(anchor.getDate() + i);
+      return d.toLocaleDateString(intlTag, { weekday: "short" });
+    });
+  }, [intlTag]);
+
+  const formatDayHeader = useCallback(
+    (d: Date) => d.toLocaleDateString(intlTag, { weekday: "short", day: "numeric", month: "short" }),
+    [intlTag],
+  );
+
+  const formatMonthTitle = useCallback(
+    (d: Date) => d.toLocaleDateString(intlTag, { month: "long", year: "numeric" }),
+    [intlTag],
   );
 
   useEffect(() => {
@@ -162,17 +178,17 @@ export function HouseCalendarGrid({
     const a = weekDays[0]!;
     const b = weekDays[6]!;
     const sameMonth = a.getMonth() === b.getMonth();
-    const left = a.toLocaleDateString("it-IT", { day: "numeric", month: "short" });
+    const left = a.toLocaleDateString(intlTag, { day: "numeric", month: "short" });
     const right = sameMonth
-      ? b.toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" })
-      : b.toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" });
+      ? b.toLocaleDateString(intlTag, { day: "numeric", month: "short", year: "numeric" })
+      : b.toLocaleDateString(intlTag, { day: "numeric", month: "short", year: "numeric" });
     return `${left} — ${right}`;
-  }, [weekDays]);
+  }, [weekDays, intlTag]);
 
   function goToday() {
-    const t = new Date();
-    setCursor(t);
-    selectDay(dateKeyLocal(t));
+    const td = new Date();
+    setCursor(td);
+    selectDay(dateKeyLocal(td));
   }
 
   function navPrev() {
@@ -201,7 +217,7 @@ export function HouseCalendarGrid({
     <section className="cv-card-solid overflow-hidden p-0">
       <div className="flex flex-col gap-3 border-b border-slate-200/80 bg-slate-50/90 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div>
-          <h2 className="text-sm font-bold text-slate-900">Vista calendario</h2>
+          <h2 className="text-sm font-bold text-slate-900">{t("calendarGrid.viewTitle")}</h2>
           <p className="mt-0.5 text-xs text-slate-500">
             {view === "month" ? formatMonthTitle(monthFirst) : weekLabel}
           </p>
@@ -217,7 +233,7 @@ export function HouseCalendarGrid({
                   : "rounded-md px-2.5 py-1 text-slate-600 hover:bg-slate-50"
               }
             >
-              Mese
+              {t("calendarGrid.month")}
             </button>
             <button
               type="button"
@@ -228,7 +244,7 @@ export function HouseCalendarGrid({
                   : "rounded-md px-2.5 py-1 text-slate-600 hover:bg-slate-50"
               }
             >
-              Settimana
+              {t("calendarGrid.week")}
             </button>
           </div>
           <button
@@ -236,14 +252,14 @@ export function HouseCalendarGrid({
             onClick={goToday}
             className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
           >
-            Oggi
+            {t("calendarGrid.today")}
           </button>
           <div className="flex gap-1">
             <button
               type="button"
               onClick={navPrev}
               className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 hover:bg-slate-50"
-              aria-label="Periodo precedente"
+              aria-label={t("calendarGrid.prevPeriod")}
             >
               ‹
             </button>
@@ -251,7 +267,7 @@ export function HouseCalendarGrid({
               type="button"
               onClick={navNext}
               className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 hover:bg-slate-50"
-              aria-label="Periodo successivo"
+              aria-label={t("calendarGrid.nextPeriod")}
             >
               ›
             </button>
@@ -262,7 +278,7 @@ export function HouseCalendarGrid({
       {view === "month" ? (
         <div className="p-3 sm:p-4">
           <div className="grid grid-cols-7 gap-px rounded-xl border border-slate-200/80 bg-slate-200/80 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-            {["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].map((d) => (
+            {weekdayShortLabels.map((d) => (
               <div key={d} className="bg-slate-50 py-2">
                 {d}
               </div>
@@ -298,11 +314,11 @@ export function HouseCalendarGrid({
                       <li
                         key={ev.id}
                         className="truncate rounded bg-emerald-50 px-1 py-0.5 text-[10px] font-medium text-emerald-900 sm:text-[11px]"
-                        title={`${ev.title}${ev.allDay ? "" : ` · ${new Date(ev.startsAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`}`}
+                        title={`${ev.title}${ev.allDay ? "" : ` · ${new Date(ev.startsAt).toLocaleTimeString(intlTag, { hour: "2-digit", minute: "2-digit" })}`}`}
                       >
                         {!ev.allDay ? (
                           <span className="tabular-nums text-emerald-600">
-                            {new Date(ev.startsAt).toLocaleTimeString("it-IT", {
+                            {new Date(ev.startsAt).toLocaleTimeString(intlTag, {
                               hour: "2-digit",
                               minute: "2-digit",
                             })}{" "}
@@ -312,7 +328,9 @@ export function HouseCalendarGrid({
                       </li>
                     ))}
                     {dayEvts.length > 3 ? (
-                      <li className="text-[10px] text-slate-500">+{dayEvts.length - 3}</li>
+                      <li className="text-[10px] text-slate-500">
+                        {formatMessage(t("calendarGrid.moreEvents"), { n: dayEvts.length - 3 })}
+                      </li>
                     ) : null}
                   </ul>
                 </button>
@@ -353,13 +371,13 @@ export function HouseCalendarGrid({
                         <p className="font-semibold leading-tight">{ev.title}</p>
                         <p className="mt-0.5 text-[10px] text-emerald-800/90">
                           {ev.allDay
-                            ? "Tutto il giorno"
-                            : new Date(ev.startsAt).toLocaleTimeString("it-IT", {
+                            ? t("calendarGrid.allDay")
+                            : new Date(ev.startsAt).toLocaleTimeString(intlTag, {
                                 hour: "2-digit",
                                 minute: "2-digit",
                               })}
                           {ev.endsAt && !ev.allDay
-                            ? ` — ${new Date(ev.endsAt).toLocaleTimeString("it-IT", {
+                            ? ` — ${new Date(ev.endsAt).toLocaleTimeString(intlTag, {
                                 hour: "2-digit",
                                 minute: "2-digit",
                               })}`
@@ -378,17 +396,18 @@ export function HouseCalendarGrid({
       {selectedDate && selectedDayKey ? (
         <div className="border-t border-slate-200/80 bg-white px-4 py-4 sm:px-5">
           <h3 className="text-sm font-bold text-slate-900">
-            Eventi del {selectedDate.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" })}
+            {t("calendarGrid.eventsOn")}{" "}
+            {selectedDate.toLocaleDateString(intlTag, { weekday: "long", day: "numeric", month: "long" })}
           </h3>
           <p className="mt-1 text-xs text-slate-500">
-            Il giorno selezionato aggiorna la data nel modulo{" "}
+            {t("calendarGrid.dayPanelHint")}{" "}
             <a href="#nuovo-evento" className="cv-link font-medium">
-              Nuovo evento
+              {t("calendarForm.title")}
             </a>{" "}
-            in alto. Qui puoi consultare e rimuovere.
+            {t("calendarGrid.dayPanelHintEnd")}
           </p>
           {selectedDayEvents.length === 0 ? (
-            <p className="mt-3 text-sm text-slate-500">Nessun evento in questo giorno.</p>
+            <p className="mt-3 text-sm text-slate-500">{t("calendarGrid.noEventsDay")}</p>
           ) : (
             <ul className="mt-3 space-y-3">
               {selectedDayEvents.map((ev) => (
@@ -401,16 +420,20 @@ export function HouseCalendarGrid({
                     {ev.description ? <p className="mt-1 text-xs text-slate-600">{ev.description}</p> : null}
                     <p className="mt-1 text-xs text-slate-500">
                       {ev.allDay
-                        ? "Tutto il giorno"
-                        : new Date(ev.startsAt).toLocaleString("it-IT")}
-                      {ev.endsAt && !ev.allDay ? ` — ${new Date(ev.endsAt).toLocaleTimeString("it-IT")}` : ""}
+                        ? t("calendarGrid.allDay")
+                        : new Date(ev.startsAt).toLocaleString(intlTag)}
+                      {ev.endsAt && !ev.allDay
+                        ? ` — ${new Date(ev.endsAt).toLocaleTimeString(intlTag)}`
+                        : ""}
                     </p>
-                    <p className="text-[10px] text-slate-400">Creato da {ev.createdByName}</p>
+                    <p className="text-[10px] text-slate-400">
+                      {t("calendarGrid.createdBy")} {ev.createdByName}
+                    </p>
                   </div>
                   <form action={removeEventAction}>
                     <input type="hidden" name="eventId" value={ev.id} />
                     <button type="submit" className="text-sm font-semibold text-red-600 hover:text-red-800">
-                      Elimina
+                      {t("calendarGrid.delete")}
                     </button>
                   </form>
                 </li>

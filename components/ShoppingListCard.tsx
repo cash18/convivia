@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
 import {
   addListItem,
   deleteListItem,
@@ -8,6 +9,7 @@ import {
   updateShoppingList,
   updateShoppingListItem,
 } from "@/lib/actions/lists";
+import { formatMessage } from "@/lib/i18n/format-message";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -28,6 +30,7 @@ export function ShoppingListCard({
   name: string;
   items: Item[];
 }) {
+  const { t } = useI18n();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -77,7 +80,7 @@ export function ShoppingListCard({
   }
 
   async function onDeleteList() {
-    if (!confirm(`Eliminare la lista «${name}» e tutte le voci?`)) return;
+    if (!confirm(formatMessage(t("listsPage.deleteListConfirm"), { name }))) return;
     setError(null);
     const res = await deleteShoppingList(houseId, listId);
     if (res.error) setError(res.error);
@@ -107,14 +110,14 @@ export function ShoppingListCard({
               className="cv-input-sm min-w-0 flex-1"
             />
             <button type="submit" className="cv-btn-primary shrink-0 px-3 py-1.5 text-xs">
-              Salva
+              {t("listsPage.save")}
             </button>
             <button
               type="button"
               onClick={() => setRenameOpen(false)}
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-700"
             >
-              Annulla
+              {t("listsPage.cancel")}
             </button>
           </form>
         ) : (
@@ -127,14 +130,14 @@ export function ShoppingListCard({
               onClick={() => setRenameOpen(true)}
               className="text-xs font-medium text-slate-600 hover:text-slate-900"
             >
-              Rinomina
+              {t("listsPage.rename")}
             </button>
             <button
               type="button"
               onClick={() => void onDeleteList()}
               className="text-xs font-medium text-red-600 hover:text-red-800"
             >
-              Elimina lista
+              {t("listsPage.deleteList")}
             </button>
           </div>
         ) : null}
@@ -144,16 +147,16 @@ export function ShoppingListCard({
         <input
           name="item"
           required
-          placeholder="Aggiungi articolo…"
+          placeholder={t("listsPage.addItemPlaceholder")}
           className="cv-input-sm flex-1"
         />
         <button type="submit" disabled={pending} className="cv-btn-primary shrink-0 px-4 py-2 text-sm">
-          Aggiungi
+          {t("listsPage.add")}
         </button>
       </form>
       <ul className="mt-4 space-y-2">
         {items.length === 0 ? (
-          <li className="text-sm text-slate-500">Lista vuota.</li>
+          <li className="text-sm text-slate-500">{t("listsPage.listEmpty")}</li>
         ) : (
           items.map((it) => (
             <li
@@ -167,7 +170,7 @@ export function ShoppingListCard({
                   checked={it.done}
                   onChange={(e) => onToggle(it.id, e.target.checked)}
                   className="shrink-0 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500"
-                  aria-label={it.done ? "Segna da fare" : "Segna fatto"}
+                  aria-label={it.done ? t("listsPage.markTodoAria") : t("listsPage.markDoneAria")}
                 />
                 {editingId === it.id ? (
                   <ItemNameEditor
@@ -191,14 +194,14 @@ export function ShoppingListCard({
                     onClick={() => setEditingId(it.id)}
                     className="text-xs font-medium text-emerald-700 hover:text-emerald-900"
                   >
-                    Modifica
+                    {t("listsPage.edit")}
                   </button>
                   <button
                     type="button"
                     onClick={() => onDeleteItem(it.id)}
                     className="text-xs font-medium text-red-600 hover:text-red-800"
                   >
-                    Rimuovi
+                    {t("listsPage.removeItem")}
                   </button>
                 </div>
               ) : null}
@@ -219,6 +222,7 @@ function ItemNameEditor({
   onSave: (v: string) => void;
   onCancel: () => void;
 }) {
+  const { t } = useI18n();
   const [val, setVal] = useState(initial);
   return (
     <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
@@ -229,10 +233,10 @@ function ItemNameEditor({
         autoFocus
       />
       <button type="button" onClick={() => onSave(val)} className="text-xs font-medium text-emerald-700">
-        OK
+        {t("listsPage.ok")}
       </button>
       <button type="button" onClick={onCancel} className="text-xs text-slate-500">
-        Annulla
+        {t("listsPage.cancel")}
       </button>
     </span>
   );

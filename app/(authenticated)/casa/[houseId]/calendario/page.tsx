@@ -3,6 +3,9 @@ import { CalendarFeedPanel } from "@/components/CalendarFeedPanel";
 import { HouseCalendarGrid, type CalendarEventDTO } from "@/components/HouseCalendarGrid";
 import { auth } from "@/auth";
 import { deleteCalendarEvent } from "@/lib/actions/calendar";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { intlLocaleTag } from "@/lib/i18n/intl-locale";
+import { createTranslator } from "@/lib/i18n/server";
 import { getMembershipOrRedirect } from "@/lib/house-access";
 import { canRotateCalendarFeed } from "@/lib/house-roles";
 import { prisma } from "@/lib/prisma";
@@ -21,10 +24,13 @@ export default async function CalendarioPage({
   const session = await auth();
   if (!session?.user?.id) return null;
 
+  const { t, locale } = await createTranslator();
+  const intlTag = intlLocaleTag(locale);
+
   const membership = await getMembershipOrRedirect(houseId, session.user.id);
 
   const events = await prisma.calendarEvent.findMany({
-    where: { houseId },
+    where: { houseId, cancelledAt: null },
     orderBy: { startsAt: "asc" },
     include: { createdBy: { select: { name: true } } },
   });
@@ -74,8 +80,8 @@ export default async function CalendarioPage({
           />
         ) : (
           <div className="cv-card-solid p-5 text-sm text-slate-600">
-            Impossibile costruire il link del calendario (host sconosciuto). In produzione usa un dominio pubblico o
-            imposta <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_APP_URL</code> e ricarica.
+            {t("calendarPage.feedUrlError")}{" "}
+            <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_APP_URL</code> {t("calendarPage.feedUrlErrorSuffix")}
           </div>
         )}
       </div>
@@ -92,9 +98,9 @@ export default async function CalendarioPage({
       </Suspense>
 
       <section>
-        <h2 className="text-lg font-bold text-slate-900">Elenco eventi</h2>
+        <h2 className="text-lg font-bold text-slate-900">{t("calendarPage.eventListTitle")}</h2>
         {events.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">Nessun evento. Aggiungi il primo sopra.</p>
+          <p className="mt-2 text-sm text-slate-500">{t("calendarPage.eventListEmpty")}</p>
         ) : (
           <ul className="mt-4 space-y-3">
             {events.map((ev) => (
@@ -107,16 +113,20 @@ export default async function CalendarioPage({
                   {ev.description ? <p className="mt-1 text-sm text-slate-600">{ev.description}</p> : null}
                   <p className="mt-2 text-xs text-slate-500">
                     {ev.allDay
-                      ? `Giornata intera · ${new Date(ev.startsAt).toLocaleDateString("it-IT")}`
-                      : `${new Date(ev.startsAt).toLocaleString("it-IT")}`}
-                    {ev.endsAt && !ev.allDay ? ` — ${new Date(ev.endsAt).toLocaleString("it-IT")}` : ""}
+                      ? formatMessage(t("calendarPage.allDayLine"), {
+                          date: new Date(ev.startsAt).toLocaleDateString(intlTag),
+                        })
+                      : `${new Date(ev.startsAt).toLocaleString(intlTag)}`}
+                    {ev.endsAt && !ev.allDay ? ` — ${new Date(ev.endsAt).toLocaleString(intlTag)}` : ""}
                   </p>
-                  <p className="text-xs text-slate-400">Creato da {ev.createdBy.name}</p>
+                  <p className="text-xs text-slate-400">
+                    {t("calendarPage.createdBy")} {ev.createdBy.name}
+                  </p>
                 </div>
                 <form action={removeEventAction}>
                   <input type="hidden" name="eventId" value={ev.id} />
                   <button type="submit" className="text-sm font-semibold text-red-600 hover:text-red-800">
-                    Elimina
+                    {t("calendarGrid.delete")}
                   </button>
                 </form>
               </li>

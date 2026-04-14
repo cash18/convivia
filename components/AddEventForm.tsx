@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
 import { createCalendarEvent } from "@/lib/actions/calendar";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -10,6 +11,7 @@ function dayKeyToDatetimeLocal(dayKey: string): string | null {
 }
 
 export function AddEventForm({ houseId, defaultDayKey }: { houseId: string; defaultDayKey?: string | null }) {
+  const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
   const startsRef = useRef<HTMLInputElement>(null);
@@ -47,29 +49,29 @@ export function AddEventForm({ houseId, defaultDayKey }: { houseId: string; defa
 
   return (
     <form id="nuovo-evento" onSubmit={onSubmit} className="cv-card-solid flex scroll-mt-24 flex-col gap-3 p-5 sm:p-6">
-      <h2 className="text-sm font-bold text-slate-900">Nuovo evento</h2>
+      <h2 className="text-sm font-bold text-slate-900">{t("calendarForm.title")}</h2>
       {error ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
       ) : null}
       <input
         name="title"
         required
-        placeholder="Titolo"
+        placeholder={t("calendarForm.titlePlaceholder")}
         className="cv-input-sm"
       />
       <textarea
         name="description"
-        placeholder="Descrizione (opzionale)"
+        placeholder={t("calendarForm.descriptionPlaceholder")}
         rows={2}
         className="cv-input-sm"
       />
       <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
         <input type="checkbox" name="allDay" className="rounded border-emerald-300 text-emerald-600" />
-        Tutto il giorno
+        {t("calendarForm.allDay")}
       </label>
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
-          Inizio
+          {t("calendarForm.startsAt")}
           <input
             ref={startsRef}
             name="startsAt"
@@ -79,7 +81,7 @@ export function AddEventForm({ houseId, defaultDayKey }: { houseId: string; defa
           />
         </label>
         <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
-          Fine (opzionale)
+          {t("calendarForm.endsAt")}
           <input name="endsAt" type="datetime-local" className="cv-input-sm" />
         </label>
       </div>
@@ -88,7 +90,7 @@ export function AddEventForm({ houseId, defaultDayKey }: { houseId: string; defa
         disabled={pending}
         className="cv-btn-primary"
       >
-        {pending ? "Salvataggio…" : "Aggiungi evento"}
+        {pending ? t("calendarForm.submitting") : t("calendarForm.submit")}
       </button>
     </form>
   );

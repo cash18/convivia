@@ -1,3 +1,7 @@
+"use client";
+
+import { useI18n } from "@/components/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 import type { SettlementStep } from "@/lib/settlement-plan";
 import { formatEuroFromCents } from "@/lib/money";
 
@@ -8,19 +12,20 @@ export function SettlementPlanPanel({
   steps: SettlementStep[];
   compact?: boolean;
 }) {
+  const { t } = useI18n();
+
   if (steps.length === 0) {
     return (
       <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/50 px-4 py-3">
-        <p className="text-sm font-semibold text-emerald-900">Saldi già in equilibrio</p>
-        <p className="mt-1 text-xs leading-relaxed text-emerald-800/90">
-          Non servono trasferimenti aggiuntivi per azzerare i conti rispetto a spese e trasferimenti già registrati.
-        </p>
+        <p className="text-sm font-semibold text-emerald-900">{t("settlement.balancedTitle")}</p>
+        <p className="mt-1 text-xs leading-relaxed text-emerald-800/90">{t("settlement.balancedBody")}</p>
       </div>
     );
   }
 
   const list = compact ? steps.slice(0, 4) : steps;
   const more = compact && steps.length > list.length;
+  const moreCount = steps.length - list.length;
 
   return (
     <div className="space-y-3">
@@ -46,15 +51,11 @@ export function SettlementPlanPanel({
       </ol>
       {more ? (
         <p className="text-center text-xs text-slate-500">
-          + {steps.length - list.length === 1 ? "un altro passaggio" : `altri ${steps.length - list.length} passaggi`}{" "}
-          nella pagina Spese
+          {moreCount === 1 ? t("settlement.moreOne") : formatMessage(t("settlement.moreMany"), { n: moreCount })}
         </p>
       ) : null}
       {!compact ? (
-        <p className="text-[11px] leading-relaxed text-slate-500">
-          Registra ogni movimento nella sezione &quot;Trasferimento tra coinquilini&quot; qui sotto: così i saldi si
-          aggiornano e la proposta si ricalcola.
-        </p>
+        <p className="text-[11px] leading-relaxed text-slate-500">{t("settlement.registerHint")}</p>
       ) : null}
     </div>
   );

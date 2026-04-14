@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { HouseMembersPanel } from "@/components/HouseMembersPanel";
+import { createTranslator } from "@/lib/i18n/server";
 import { getMembershipOrRedirect } from "@/lib/house-access";
 import { prisma } from "@/lib/prisma";
 
@@ -8,6 +9,7 @@ export default async function CasaMembriPage({ params }: { params: Promise<{ hou
   const session = await auth();
   if (!session?.user?.id) return null;
 
+  const { t } = await createTranslator();
   const membership = await getMembershipOrRedirect(houseId, session.user.id);
 
   const pendingTransfers = await prisma.houseOwnershipTransfer.findMany({
@@ -38,13 +40,9 @@ export default async function CasaMembriPage({ params }: { params: Promise<{ hou
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <p className="cv-badge w-fit">Membri e accessi</p>
-        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">Gestione membri</h1>
-        <p className="max-w-2xl text-sm leading-relaxed text-slate-600">
-          Il <strong className="font-semibold text-slate-800">proprietario</strong> gestisce il trasferimento del ruolo.
-          I <strong className="font-semibold text-slate-800">supervisionatori</strong> possono invitare e rimuovere i
-          membri standard. Gli inviti e i trasferimenti passano da email.
-        </p>
+        <p className="cv-badge w-fit">{t("membersPage.badge")}</p>
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{t("membersPage.title")}</h1>
+        <p className="max-w-2xl text-sm leading-relaxed text-slate-600">{t("membersPage.intro")}</p>
       </header>
 
       <HouseMembersPanel

@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
 import {
   cancelHouseOwnershipTransfer,
   demoteHouseSupervisor,
@@ -8,6 +9,8 @@ import {
   removeHouseMember,
   requestHouseOwnershipTransfer,
 } from "@/lib/actions/members";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { intlLocaleTag } from "@/lib/i18n/intl-locale";
 import {
   canManageHouseMembers,
   canPromoteSupervisor,
@@ -16,7 +19,7 @@ import {
   isOwnerRole,
 } from "@/lib/house-roles";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type MemberRow = { userId: string; name: string; email: string; role: string };
 
@@ -42,6 +45,8 @@ export function HouseMembersPanel({
   members: MemberRow[];
   pendingTransfers: PendingTransfer[];
 }) {
+  const { t, locale } = useI18n();
+  const intlTag = useMemo(() => intlLocaleTag(locale), [locale]);
   const router = useRouter();
   const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -49,8 +54,8 @@ export function HouseMembersPanel({
   const [transferTo, setTransferTo] = useState("");
   const [transferBusy, setTransferBusy] = useState(false);
 
-  function flash(t: { type: "ok" | "err"; text: string }) {
-    setMsg(t);
+  function showFlash(payload: { type: "ok" | "err"; text: string }) {
+    setMsg(payload);
     setTimeout(() => setMsg(null), 6000);
   }
 
@@ -60,11 +65,11 @@ export function HouseMembersPanel({
     const r = await inviteHouseMemberByEmail(houseId, inviteEmail);
     setInviteBusy(false);
     if ("error" in r) {
-      flash({ type: "err", text: r.error });
+      showFlash({ type: "err", text: r.error });
       return;
     }
     setInviteEmail("");
-    flash({ type: "ok", text: "Invito inviato per email." });
+    showFlash({ type: "ok", text: t("membersPage.msgInviteSent") });
     router.refresh();
   }
 
@@ -75,52 +80,52 @@ export function HouseMembersPanel({
     const r = await requestHouseOwnershipTransfer(houseId, transferTo);
     setTransferBusy(false);
     if ("error" in r) {
-      flash({ type: "err", text: r.error });
+      showFlash({ type: "err", text: r.error });
       return;
     }
     setTransferTo("");
-    flash({ type: "ok", text: "Richiesta inviata: il destinatario riceverà un’email per confermare." });
+    showFlash({ type: "ok", text: t("membersPage.msgTransferSent") });
     router.refresh();
   }
 
   async function cancelTransfer(id: string) {
     const r = await cancelHouseOwnershipTransfer(houseId, id);
     if ("error" in r) {
-      flash({ type: "err", text: r.error });
+      showFlash({ type: "err", text: r.error });
       return;
     }
-    flash({ type: "ok", text: "Richiesta annullata." });
+    showFlash({ type: "ok", text: t("membersPage.msgCancelled") });
     router.refresh();
   }
 
   async function remove(targetUserId: string, targetName: string) {
-    if (!confirm(`Rimuovere ${targetName} dalla casa?`)) return;
+    if (!confirm(formatMessage(t("membersPage.removeConfirm"), { name: targetName }))) return;
     const r = await removeHouseMember(houseId, targetUserId);
     if ("error" in r) {
-      flash({ type: "err", text: r.error });
+      showFlash({ type: "err", text: r.error });
       return;
     }
-    flash({ type: "ok", text: "Membro rimosso." });
+    showFlash({ type: "ok", text: t("membersPage.msgRemoved") });
     router.refresh();
   }
 
   async function promote(targetUserId: string) {
     const r = await promoteHouseSupervisor(houseId, targetUserId);
     if ("error" in r) {
-      flash({ type: "err", text: r.error });
+      showFlash({ type: "err", text: r.error });
       return;
     }
-    flash({ type: "ok", text: "Supervisionatore nominato." });
+    showFlash({ type: "ok", text: t("membersPage.msgPromoted") });
     router.refresh();
   }
 
   async function demote(targetUserId: string) {
     const r = await demoteHouseSupervisor(houseId, targetUserId);
     if ("error" in r) {
-      flash({ type: "err", text: r.error });
+      showFlash({ type: "err", text: r.error });
       return;
     }
-    flash({ type: "ok", text: "Ruolo aggiornato a membro." });
+    showFlash({ type: "ok", text: t("membersPage.msgDemoted") });
     router.refresh();
   }
 
@@ -142,14 +147,14 @@ export function HouseMembersPanel({
 
       {pendingTransfers.length > 0 ? (
         <section className="cv-card-solid space-y-3 p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-slate-900">Trasferimenti in sospeso</h2>
+          <h2 className="text-lg font-bold text-slate-900">{t("membersPage.pendingTitle")}</h2>
           <ul className="space-y-3 text-sm text-slate-600">
             {pendingTransfers.map((p) => (
               <li key={p.id} className="flex flex-col gap-2 rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 sm:flex-row sm:items-center sm:justify-between">
                 <span>
                   <strong className="text-slate-800">{p.fromLabel}</strong> →{" "}
                   <strong className="text-slate-800">{p.toName}</strong> ({p.toEmail}) —{" "}
-                  {new Date(p.createdAt).toLocaleString("it-IT")}
+                  {new Date(p.createdAt).toLocaleString(intlTag)}
                 </span>
                 {p.fromUserId === actorUserId ? (
                   <button
@@ -157,7 +162,7 @@ export function HouseMembersPanel({
                     onClick={() => void cancelTransfer(p.id)}
                     className="cv-btn-outline shrink-0 px-3 py-1.5 text-xs"
                   >
-                    Annulla richiesta
+                    {t("membersPage.cancelRequest")}
                   </button>
                 ) : null}
               </li>
@@ -168,24 +173,22 @@ export function HouseMembersPanel({
 
       {canManageHouseMembers(actorRole) ? (
         <section className="cv-card-solid space-y-4 p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-slate-900">Invita per email</h2>
-          <p className="text-sm text-slate-600">
-            Invia un link di invito valido 7 giorni. La persona dovrà accedere con la stessa email.
-          </p>
+          <h2 className="text-lg font-bold text-slate-900">{t("membersPage.inviteTitle")}</h2>
+          <p className="text-sm text-slate-600">{t("membersPage.inviteHint")}</p>
           <form onSubmit={(e) => void onInvite(e)} className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm font-semibold text-slate-700">
-              Email
+              {t("membersPage.inviteEmail")}
               <input
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 type="email"
                 required
                 className="cv-input"
-                placeholder="nome@esempio.it"
+                placeholder={t("membersPage.inviteEmailPlaceholder")}
               />
             </label>
             <button type="submit" disabled={inviteBusy} className="cv-btn-primary shrink-0 px-5 py-2.5">
-              {inviteBusy ? "Invio…" : "Invia invito"}
+              {inviteBusy ? t("membersPage.inviteSending") : t("membersPage.inviteSend")}
             </button>
           </form>
         </section>
@@ -193,21 +196,18 @@ export function HouseMembersPanel({
 
       {isOwnerRole(actorRole) ? (
         <section className="cv-card-solid space-y-4 p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-slate-900">Trasferisci proprietà</h2>
-          <p className="text-sm text-slate-600">
-            Scegli un membro già presente in casa. Riceverà un’email per accettare o rifiutare. Finché non accetta, resti
-            amministratore.
-          </p>
+          <h2 className="text-lg font-bold text-slate-900">{t("membersPage.transferTitle")}</h2>
+          <p className="text-sm text-slate-600">{t("membersPage.transferHint")}</p>
           <form onSubmit={(e) => void onTransfer(e)} className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm font-semibold text-slate-700">
-              Nuovo proprietario
+              {t("membersPage.transferSelect")}
               <select
                 value={transferTo}
                 onChange={(e) => setTransferTo(e.target.value)}
                 required
                 className="cv-input"
               >
-                <option value="">— Seleziona —</option>
+                <option value="">{t("membersPage.transferSelectPlaceholder")}</option>
                 {transferTargets.map((m) => (
                   <option key={m.userId} value={m.userId}>
                     {m.name} ({m.email})
@@ -216,7 +216,7 @@ export function HouseMembersPanel({
               </select>
             </label>
             <button type="submit" disabled={transferBusy || transferTargets.length === 0} className="cv-btn-outline shrink-0 px-5 py-2.5">
-              {transferBusy ? "Invio…" : "Invia richiesta"}
+              {transferBusy ? t("membersPage.transferSending") : t("membersPage.transferSend")}
             </button>
           </form>
         </section>
@@ -224,12 +224,16 @@ export function HouseMembersPanel({
 
       <section className="cv-card-solid overflow-hidden">
         <div className="border-b border-slate-200/80 bg-slate-50/80 px-5 py-3 sm:px-6">
-          <h2 className="text-lg font-bold text-slate-900">Membri</h2>
+          <h2 className="text-lg font-bold text-slate-900">{t("membersPage.membersTitle")}</h2>
         </div>
         <ul className="divide-y divide-slate-100">
           {members.map((m) => {
             const roleLabel =
-              m.role === HouseRole.OWNER ? "Proprietario" : m.role === HouseRole.SUPERVISOR ? "Supervisionatore" : "Membro";
+              m.role === HouseRole.OWNER
+                ? t("membersPage.roleOwner")
+                : m.role === HouseRole.SUPERVISOR
+                  ? t("membersPage.roleSupervisor")
+                  : t("membersPage.roleMember");
             const showRemove =
               m.userId !== actorUserId && canRemoveMember(actorRole, m.role) && !isOwnerRole(m.role);
             const showPromote =
@@ -251,7 +255,7 @@ export function HouseMembersPanel({
                       onClick={() => void promote(m.userId)}
                       className="cv-btn-outline px-3 py-1.5 text-xs"
                     >
-                      Nomina supervisionatore
+                      {t("membersPage.promote")}
                     </button>
                   ) : null}
                   {showDemote ? (
@@ -260,7 +264,7 @@ export function HouseMembersPanel({
                       onClick={() => void demote(m.userId)}
                       className="cv-btn-outline px-3 py-1.5 text-xs"
                     >
-                      Togli supervisionatore
+                      {t("membersPage.demote")}
                     </button>
                   ) : null}
                   {showRemove ? (
@@ -269,7 +273,7 @@ export function HouseMembersPanel({
                       onClick={() => void remove(m.userId, m.name)}
                       className="rounded-xl border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-800 transition hover:bg-red-100"
                     >
-                      Rimuovi
+                      {t("membersPage.remove")}
                     </button>
                   ) : null}
                 </div>

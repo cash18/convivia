@@ -3,6 +3,7 @@
 import { randomBytes } from "node:crypto";
 
 import { auth } from "@/auth";
+import { canRotateCalendarFeed } from "@/lib/house-roles";
 import { notifyHouseMembersExceptActor } from "@/lib/push-notify";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -68,18 +69,25 @@ export async function createCalendarEvent(
   return {};
 }
 
+/** Soft-delete: il feed ICS emette STATUS:CANCELLED così Google/Apple rimuovono l’evento dall’abbonamento. */
 export async function deleteCalendarEvent(houseId: string, eventId: string) {
   const session = await auth();
   if (!session?.user?.id) return { error: "Non autenticato." };
   if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
 
   const ev = await prisma.calendarEvent.findFirst({
-    where: { id: eventId, houseId },
+    where: { id: eventId, houseId, cancelledAt: null },
   });
   if (!ev) return { error: "Evento non trovato." };
 
   const title = ev.title;
-  await prisma.calendarEvent.delete({ where: { id: eventId } });
+  await prisma.calendarEvent.update({
+    where: { id: eventId },
+    data: {
+      cancelledAt: new Date(),
+      calendarSequence: { increment: 1 },
+    },
+  });
   revalidatePath(`/casa/${houseId}/calendario`);
   revalidatePath(`/casa/${houseId}`);
   const who = session.user.name?.trim() || "Qualcuno";
@@ -104,7 +112,7 @@ export async function rotateHouseCalendarFeed(houseId: string): Promise<{ error?
     where: { userId_houseId: { userId: session.user.id, houseId } },
   });
   if (!member) return { error: "Accesso negato." };
-  if (member.role !== "OWNER") {
+  if (!canRotateCalendarFeed(member.role)) {
     return { error: "Solo l’amministratore della casa può rigenerare il link del calendario." };
   }
 

@@ -1,6 +1,7 @@
 import { NewShoppingListForm } from "@/components/NewShoppingListForm";
 import { ShoppingListCard } from "@/components/ShoppingListCard";
 import { auth } from "@/auth";
+import { createTranslator } from "@/lib/i18n/server";
 import { getMembershipOrRedirect } from "@/lib/house-access";
 import { prisma } from "@/lib/prisma";
 
@@ -12,6 +13,8 @@ export default async function ListePage({
   const { houseId } = await params;
   const session = await auth();
   if (!session?.user?.id) return null;
+
+  const { t } = await createTranslator();
 
   await getMembershipOrRedirect(houseId, session.user.id);
 
@@ -28,7 +31,7 @@ export default async function ListePage({
       </div>
 
       {lists.length === 0 ? (
-        <p className="text-sm font-medium text-slate-500">Nessuna lista. Creane una per iniziare la spesa condivisa.</p>
+        <p className="text-sm font-medium text-slate-500">{t("listsPage.empty")}</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
           {lists.map((list) => (

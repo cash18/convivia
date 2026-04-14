@@ -8,6 +8,9 @@ import { computeMinimalSettlementPlan } from "@/lib/settlement-plan";
 import { deleteExpense } from "@/lib/actions/expenses";
 import { deleteMoneyTransfer } from "@/lib/actions/transfers";
 import { formatEuroFromCents } from "@/lib/money";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { intlLocaleTag } from "@/lib/i18n/intl-locale";
+import { createTranslator } from "@/lib/i18n/server";
 import { getMembershipOrRedirect } from "@/lib/house-access";
 import { prisma } from "@/lib/prisma";
 
@@ -19,6 +22,9 @@ export default async function SpesePage({
   const { houseId } = await params;
   const session = await auth();
   if (!session?.user?.id) return null;
+
+  const { t, locale } = await createTranslator();
+  const intlTag = intlLocaleTag(locale);
 
   const membership = await getMembershipOrRedirect(houseId, session.user.id);
   const members = membership.house.members.map((m) => ({
@@ -71,7 +77,7 @@ export default async function SpesePage({
     if (e.splitMode === "CUSTOM") {
       return e.splits.map((s) => `${s.user.name}: ${formatEuroFromCents(s.shareCents)}`).join(" · ");
     }
-    return `Uguale · ${e.splits.length} partecipanti`;
+    return formatMessage(t("expensesPage.splitEqual"), { n: e.splits.length });
   }
 
   return (
@@ -82,10 +88,8 @@ export default async function SpesePage({
         </div>
         <div className="flex min-h-0 flex-col gap-6">
           <div className="cv-card-solid flex flex-1 flex-col p-5 sm:p-6">
-            <h2 className="text-sm font-bold text-slate-900">Saldi per membro</h2>
-            <p className="mt-1 text-xs text-slate-500">
-              I trasferimenti registrati aggiornano il saldo (non sono spese condivise).
-            </p>
+            <h2 className="text-sm font-bold text-slate-900">{t("expensesPage.balancesTitle")}</h2>
+            <p className="mt-1 text-xs text-slate-500">{t("expensesPage.balancesTransfersHint")}</p>
             <ul className="mt-3 flex-1 space-y-2 overflow-auto text-sm">
               {balances.map((b) => (
                 <li
@@ -101,27 +105,16 @@ export default async function SpesePage({
             </ul>
           </div>
           <div className="cv-card-solid border-emerald-200/50 bg-gradient-to-b from-emerald-50/35 to-white p-5 sm:p-6">
-            <h2 className="text-sm font-bold text-slate-900">Come pareggiare (proposta)</h2>
-            <p className="mt-1 text-xs leading-relaxed text-slate-600">
-              In base ai saldi attuali, questa è una sequenza con il{" "}
-              <strong className="font-semibold text-slate-800">minor numero possibile di trasferimenti</strong> per
-              riportare tutti verso zero: con <em>n</em> persone con saldo non nullo bastano al massimo <em>n</em> − 1
-              movimenti.
-            </p>
-            <p className="mt-2 text-[11px] text-slate-500">
-              Saldo positivo = ha pagato più della propria quota e va ricevuto; negativo = deve ancora contribuire. Ogni
-              riga indica da chi a chi inviare denaro.
-            </p>
+            <h2 className="text-sm font-bold text-slate-900">{t("expensesPage.settleHowTitle")}</h2>
+            <p className="mt-1 text-xs leading-relaxed text-slate-600">{t("expensesPage.settleHowBody")}</p>
+            <p className="mt-2 text-[11px] text-slate-500">{t("expensesPage.settleHowHint")}</p>
             <div className="mt-4">
               <SettlementPlanPanel steps={settlementSteps} />
             </div>
           </div>
           <div className="cv-card-solid p-5 sm:p-6">
-            <h2 className="text-sm font-bold text-slate-900">Trasferimento tra coinquilini</h2>
-            <p className="mt-1 text-xs text-slate-500">
-              Registra un bonifico o un contante da una persona all&apos;altra per pareggiare, senza creare una spesa
-              condivisa.
-            </p>
+            <h2 className="text-sm font-bold text-slate-900">{t("expensesPage.transferSectionTitle")}</h2>
+            <p className="mt-1 text-xs text-slate-500">{t("expensesPage.transferSectionHint")}</p>
             <div className="mt-4">
               <AddMoneyTransferForm houseId={houseId} members={members} />
             </div>
@@ -131,22 +124,22 @@ export default async function SpesePage({
 
       {transfers.length > 0 ? (
         <section>
-          <h2 className="text-lg font-bold text-slate-900">Trasferimenti recenti</h2>
+          <h2 className="text-lg font-bold text-slate-900">{t("expensesPage.recentTransfersTitle")}</h2>
           <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-            {transfers.map((t) => (
-              <li key={t.id} className="cv-card-solid flex flex-col gap-2 p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+            {transfers.map((tr) => (
+              <li key={tr.id} className="cv-card-solid flex flex-col gap-2 p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="font-semibold text-slate-900">
-                    {t.fromUser.name} → {t.toUser.name}
+                    {tr.fromUser.name} → {tr.toUser.name}
                   </p>
-                  <p className="tabular-nums text-slate-800">{formatEuroFromCents(t.amountCents)}</p>
-                  {t.note ? <p className="text-xs text-slate-500">{t.note}</p> : null}
-                  <p className="text-xs text-slate-400">{new Date(t.transferDate).toLocaleString("it-IT")}</p>
+                  <p className="tabular-nums text-slate-800">{formatEuroFromCents(tr.amountCents)}</p>
+                  {tr.note ? <p className="text-xs text-slate-500">{tr.note}</p> : null}
+                  <p className="text-xs text-slate-400">{new Date(tr.transferDate).toLocaleString(intlTag)}</p>
                 </div>
                 <form action={removeTransferAction}>
-                  <input type="hidden" name="transferId" value={t.id} />
+                  <input type="hidden" name="transferId" value={tr.id} />
                   <button type="submit" className="text-xs font-medium text-red-600 hover:text-red-800">
-                    Elimina
+                    {t("expensesPage.transferDelete")}
                   </button>
                 </form>
               </li>
@@ -156,9 +149,9 @@ export default async function SpesePage({
       ) : null}
 
       <section>
-        <h2 className="text-lg font-bold text-slate-900">Storico spese</h2>
+        <h2 className="text-lg font-bold text-slate-900">{t("expensesPage.expenseHistoryTitle")}</h2>
         {expenses.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">Nessuna spesa ancora.</p>
+          <p className="mt-2 text-sm text-slate-500">{t("expensesPage.expenseHistoryEmpty")}</p>
         ) : (
           <ul className="mt-4 grid gap-4">
             {expenses.map((e) => {
@@ -189,19 +182,19 @@ export default async function SpesePage({
                   </div>
                   <dl className="grid gap-2 text-xs text-slate-600 sm:grid-cols-2">
                     <div>
-                      <dt className="font-semibold text-slate-500">Data</dt>
-                      <dd>{new Date(e.expenseDate).toLocaleDateString("it-IT")}</dd>
+                      <dt className="font-semibold text-slate-500">{t("expensesPage.labelDate")}</dt>
+                      <dd>{new Date(e.expenseDate).toLocaleDateString(intlTag)}</dd>
                     </div>
                     <div>
-                      <dt className="font-semibold text-slate-500">Pagato da</dt>
+                      <dt className="font-semibold text-slate-500">{t("expensesPage.labelPaidBy")}</dt>
                       <dd>{e.paidBy.name}</dd>
                     </div>
                     <div className="sm:col-span-2">
-                      <dt className="font-semibold text-slate-500">Ripartizione</dt>
+                      <dt className="font-semibold text-slate-500">{t("expensesPage.labelSplit")}</dt>
                       <dd className="mt-0.5 break-words">{splitLabel(e)}</dd>
                     </div>
                     <div>
-                      <dt className="font-semibold text-slate-500">Scontrino</dt>
+                      <dt className="font-semibold text-slate-500">{t("expensesPage.labelReceipt")}</dt>
                       <dd>
                         {e.receiptUrl ? (
                           <a
@@ -210,7 +203,7 @@ export default async function SpesePage({
                             rel="noopener noreferrer"
                             className="font-medium text-emerald-700 hover:text-emerald-900"
                           >
-                            Apri
+                            {t("expensesPage.receiptOpen")}
                           </a>
                         ) : (
                           "—"
@@ -223,7 +216,7 @@ export default async function SpesePage({
                     <form action={removeExpenseAction}>
                       <input type="hidden" name="expenseId" value={e.id} />
                       <button type="submit" className="text-xs font-medium text-red-600 hover:text-red-800">
-                        Elimina
+                        {t("expensesPage.delete")}
                       </button>
                     </form>
                   </div>

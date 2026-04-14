@@ -1,10 +1,12 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
 import { joinHouse } from "@/lib/actions/houses";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function JoinHouseForm() {
+  const { t } = useI18n();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -26,20 +28,20 @@ export function JoinHouseForm() {
 
   return (
     <form onSubmit={onSubmit} className="cv-card-solid flex flex-col gap-3 p-5 sm:p-6">
-      <h2 className="text-lg font-bold text-slate-900">Entra con codice invito</h2>
-      <p className="text-sm text-slate-600">Chiedi il codice a chi ha creato la casa sul portale.</p>
+      <h2 className="text-lg font-bold text-slate-900">{t("forms.joinTitle")}</h2>
+      <p className="text-sm text-slate-600">{t("forms.joinIntro")}</p>
       {error ? (
         <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
       ) : null}
       <input
         name="code"
         required
-        placeholder="Codice (es. ABC123)"
+        placeholder={t("forms.joinPlaceholder")}
         className="cv-input-sm uppercase"
         autoCapitalize="characters"
       />
       <button type="submit" disabled={pending} className="cv-btn-outline w-full">
-        {pending ? "Verifica…" : "Unisciti"}
+        {pending ? t("forms.joinVerifying") : t("forms.joinSubmit")}
       </button>
     </form>
   );

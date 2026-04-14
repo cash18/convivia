@@ -1,14 +1,18 @@
 /**
- * Genera un calendario iCalendar (RFC 5545) minimale per abbonamenti Google / Apple.
+ * Genera un calendario iCalendar (RFC 5545) per abbonamenti Google / Apple.
+ * UID stabile + DTSTAMP da ultima modifica + SEQUENCE + STATUS:CANCELLED per sync corretta.
  */
 
-type IcsEventInput = {
+export type IcsEventInput = {
   id: string;
   title: string;
   description: string | null;
   startsAt: Date;
   endsAt: Date | null;
   allDay: boolean;
+  cancelledAt: Date | null;
+  calendarSequence: number;
+  updatedAt: Date;
 };
 
 function icsEscape(text: string): string {
@@ -47,7 +51,6 @@ function formatDateValueRome(d: Date): string {
   return s.replace(/-/g, "");
 }
 
-/** Fine esclusiva iCal: giorno civile successivo (fuso Europe/Rome sullo stesso istante). */
 function formatDateValuePlusDays(d: Date, days: number): string {
   const x = new Date(d.getTime() + days * 86_400_000);
   return formatDateValueRome(x);
@@ -56,13 +59,23 @@ function formatDateValuePlusDays(d: Date, days: number): string {
 function buildVEvent(ev: IcsEventInput, calName: string): string[] {
   const lines: string[] = [];
   const uid = `${ev.id}@convivia-calendar`;
-  const dtStamp = formatUtcStamp(new Date());
-  const summary = icsEscape(ev.title);
-  const desc = ev.description ? icsEscape(ev.description) : "";
+  const dtStamp = formatUtcStamp(ev.updatedAt);
+  const seq = Math.max(0, ev.calendarSequence);
 
   lines.push("BEGIN:VEVENT");
   lines.push(icsFold(`UID:${uid}`));
   lines.push(`DTSTAMP:${dtStamp}`);
+  lines.push(`SEQUENCE:${seq}`);
+
+  if (ev.cancelledAt) {
+    lines.push("STATUS:CANCELLED");
+    lines.push("END:VEVENT");
+    return lines;
+  }
+
+  lines.push("STATUS:CONFIRMED");
+  const summary = icsEscape(ev.title);
+  const desc = ev.description ? icsEscape(ev.description) : "";
   lines.push(icsFold(`SUMMARY:${summary}`));
   if (desc) lines.push(icsFold(`DESCRIPTION:${desc}`));
   lines.push(icsFold(`LOCATION:${icsEscape(calName)}`));
@@ -93,23 +106,29 @@ function buildVEvent(ev: IcsEventInput, calName: string): string[] {
 export function buildHouseCalendarIcs(
   calName: string,
   events: IcsEventInput[],
-  opts?: { /** Identità stabile del calendario per client in abbonamento */ relCalId?: string },
+  opts?: { relCalId?: string },
 ): string {
   const header = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Convivia//Calendario casa//IT",
+    "PRODID:-//Convivia//House calendar//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     icsFold(`X-WR-CALNAME:${icsEscape(calName)}`),
-    "REFRESH-INTERVAL;VALUE=DURATION:PT4H",
+    /** Suggerisce ai client di ripollare il feed più spesso (Google/Apple variano comunque). */
+    "REFRESH-INTERVAL;VALUE=DURATION:PT1H",
   ];
   if (opts?.relCalId) {
     header.push(icsFold(`X-WR-RELCALID:${icsEscape(opts.relCalId)}`));
   }
 
+  const active = events.filter((e) => !e.cancelledAt);
+  const tombstones = events.filter((e) => !!e.cancelledAt);
   const body: string[] = [];
-  for (const ev of events) {
+  for (const ev of active) {
+    body.push(...buildVEvent(ev, calName));
+  }
+  for (const ev of tombstones) {
     body.push(...buildVEvent(ev, calName));
   }
 

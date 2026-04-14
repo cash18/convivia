@@ -2,6 +2,9 @@ import { AddExpenseForm } from "@/components/AddExpenseForm";
 import { SettlementPlanPanel } from "@/components/SettlementPlanPanel";
 import { auth } from "@/auth";
 import { computeMemberBalances } from "@/lib/balances";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { intlLocaleTag } from "@/lib/i18n/intl-locale";
+import { createTranslator } from "@/lib/i18n/server";
 import { computeMinimalSettlementPlan } from "@/lib/settlement-plan";
 import { formatEuroFromCents } from "@/lib/money";
 import { getMembershipOrRedirect } from "@/lib/house-access";
@@ -17,6 +20,9 @@ export default async function CasaDashboardPage({
   const session = await auth();
   if (!session?.user?.id) return null;
 
+  const { t, locale } = await createTranslator();
+  const intlTag = intlLocaleTag(locale);
+
   const membership = await getMembershipOrRedirect(houseId, session.user.id);
   const members = membership.house.members.map((m) => ({
     id: m.userId,
@@ -26,7 +32,7 @@ export default async function CasaDashboardPage({
   const [balances, upcoming, openTasks, recentExpenses, listsPreview, listUndoneCounts] = await Promise.all([
     computeMemberBalances(houseId),
     prisma.calendarEvent.findMany({
-      where: { houseId, startsAt: { gte: new Date() } },
+      where: { houseId, cancelledAt: null, startsAt: { gte: new Date() } },
       orderBy: { startsAt: "asc" },
       take: 5,
     }),
@@ -69,15 +75,8 @@ export default async function CasaDashboardPage({
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <p className="cv-badge w-fit">Home della casa</p>
-        <p className="max-w-2xl text-sm leading-relaxed text-slate-600">
-          Riepilogo di <strong className="font-semibold text-slate-800">spese</strong>,{" "}
-          <strong className="font-semibold text-slate-800">saldi</strong>,{" "}
-          <strong className="font-semibold text-slate-800">calendario</strong>,{" "}
-          <strong className="font-semibold text-slate-800">liste</strong> e{" "}
-          <strong className="font-semibold text-slate-800">compiti</strong>. Usa il menu in alto per le sezioni
-          complete.
-        </p>
+        <p className="cv-badge w-fit">{t("casaHome.badge")}</p>
+        <p className="max-w-2xl text-sm leading-relaxed text-slate-600">{t("casaHome.intro")}</p>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
@@ -85,10 +84,8 @@ export default async function CasaDashboardPage({
           <AddExpenseForm houseId={houseId} members={members} variant="compact" />
         </section>
         <section className="cv-card-solid flex min-h-[20rem] flex-col p-5 sm:p-6">
-          <h2 className="text-sm font-bold text-slate-900">Saldi indicativi</h2>
-          <p className="mt-1 text-xs text-slate-500">
-            Positivo = hai pagato più della tua quota; negativo = devi ancora rimetterti in pari.
-          </p>
+          <h2 className="text-sm font-bold text-slate-900">{t("casaHome.balancesTitle")}</h2>
+          <p className="mt-1 text-xs text-slate-500">{t("casaHome.balancesHint")}</p>
           <ul className="mt-3 flex flex-1 flex-col gap-2 overflow-auto text-sm">
             {balances.map((b) => (
               <li key={b.userId} className="flex items-center justify-between rounded-lg border border-slate-100 bg-white/80 px-3 py-2.5">
@@ -101,22 +98,20 @@ export default async function CasaDashboardPage({
           </ul>
           {settlementSteps.length > 0 ? (
             <div className="mt-4 border-t border-slate-100 pt-4">
-              <p className="text-xs font-bold text-slate-800">Piano di pareggio (proposta)</p>
-              <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
-                Meno trasferimenti possibili tra coinquilini; dettaglio e registrazione in Spese.
-              </p>
+              <p className="text-xs font-bold text-slate-800">{t("casaHome.settlementTitle")}</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-slate-500">{t("casaHome.settlementHint")}</p>
               <div className="mt-3">
                 <SettlementPlanPanel steps={settlementSteps} compact />
               </div>
             </div>
           ) : (
             <p className="mt-4 border-t border-slate-100 pt-4 text-[11px] font-medium text-emerald-800">
-              Saldi in equilibrio: nessun trasferimento necessario.
+              {t("casaHome.balanced")}
             </p>
           )}
           <p className="mt-4 shrink-0">
             <Link href={`/casa/${houseId}/spese`} className="cv-link text-sm">
-              Spese e trasferimenti →
+              {t("casaHome.linkExpenses")}
             </Link>
           </p>
         </section>
@@ -124,9 +119,9 @@ export default async function CasaDashboardPage({
 
       <div className="grid auto-rows-fr gap-6 md:grid-cols-2 xl:grid-cols-3">
         <section className="flex min-h-[14rem] flex-col rounded-2xl border border-slate-200/80 bg-white/60 p-5 shadow-sm">
-          <h2 className="text-base font-bold text-slate-900">Ultime spese</h2>
+          <h2 className="text-base font-bold text-slate-900">{t("casaHome.recentExpenses")}</h2>
           {recentExpenses.length === 0 ? (
-            <p className="mt-2 flex-1 text-sm text-slate-500">Nessuna spesa registrata.</p>
+            <p className="mt-2 flex-1 text-sm text-slate-500">{t("casaHome.noExpenses")}</p>
           ) : (
             <ul className="mt-3 flex flex-1 flex-col divide-y divide-slate-100 overflow-auto rounded-xl border border-slate-100 bg-white/90">
               {recentExpenses.map((e) => (
@@ -144,15 +139,15 @@ export default async function CasaDashboardPage({
           )}
           <p className="mt-3 shrink-0">
             <Link href={`/casa/${houseId}/spese`} className="cv-link text-sm">
-              Storico completo →
+              {t("casaHome.linkFullHistory")}
             </Link>
           </p>
         </section>
 
         <section className="flex min-h-[14rem] flex-col rounded-2xl border border-slate-200/80 bg-white/60 p-5 shadow-sm">
-          <h2 className="text-base font-bold text-slate-900">Prossimi eventi</h2>
+          <h2 className="text-base font-bold text-slate-900">{t("casaHome.upcoming")}</h2>
           {upcoming.length === 0 ? (
-            <p className="mt-2 flex-1 text-sm text-slate-500">Nessun evento futuro.</p>
+            <p className="mt-2 flex-1 text-sm text-slate-500">{t("casaHome.noUpcoming")}</p>
           ) : (
             <ul className="mt-3 flex flex-1 flex-col gap-2 overflow-auto">
               {upcoming.map((ev) => (
@@ -160,8 +155,8 @@ export default async function CasaDashboardPage({
                   <span className="font-semibold text-slate-900">{ev.title}</span>
                   <p className="text-xs text-slate-500">
                     {ev.allDay
-                      ? new Date(ev.startsAt).toLocaleDateString("it-IT")
-                      : new Date(ev.startsAt).toLocaleString("it-IT")}
+                      ? new Date(ev.startsAt).toLocaleDateString(intlTag)
+                      : new Date(ev.startsAt).toLocaleString(intlTag)}
                   </p>
                 </li>
               ))}
@@ -169,15 +164,15 @@ export default async function CasaDashboardPage({
           )}
           <p className="mt-3 shrink-0">
             <Link href={`/casa/${houseId}/calendario`} className="cv-link text-sm">
-              Calendario →
+              {t("casaHome.linkCalendar")}
             </Link>
           </p>
         </section>
 
         <section className="flex min-h-[14rem] flex-col rounded-2xl border border-slate-200/80 bg-white/60 p-5 shadow-sm md:col-span-2 xl:col-span-1">
-          <h2 className="text-base font-bold text-slate-900">Liste spesa</h2>
+          <h2 className="text-base font-bold text-slate-900">{t("casaHome.listsTitle")}</h2>
           {listsPreview.length === 0 ? (
-            <p className="mt-2 flex-1 text-sm text-slate-500">Nessuna lista.</p>
+            <p className="mt-2 flex-1 text-sm text-slate-500">{t("casaHome.noLists")}</p>
           ) : (
             <ul className="mt-3 flex flex-1 flex-col gap-2 overflow-auto">
               {listsPreview.map((list) => {
@@ -188,10 +183,10 @@ export default async function CasaDashboardPage({
                     <p className="font-semibold text-slate-900">{list.name}</p>
                     <p className="text-xs text-slate-500">
                       {total === 0
-                        ? "Lista vuota"
+                        ? t("casaHome.listEmpty")
                         : pendingCount === 0
-                          ? "Tutto spuntato ✓"
-                          : `${pendingCount} da comprare · ${total} voci`}
+                          ? t("casaHome.listAllDone")
+                          : formatMessage(t("casaHome.listPending"), { pending: pendingCount, total })}
                     </p>
                     {list.items.length > 0 ? (
                       <ul className="mt-2 space-y-0.5 border-t border-slate-100/80 pt-2 text-xs text-slate-600">
@@ -209,24 +204,26 @@ export default async function CasaDashboardPage({
           )}
           <p className="mt-3 shrink-0">
             <Link href={`/casa/${houseId}/liste`} className="cv-link text-sm">
-              Gestisci liste →
+              {t("casaHome.linkLists")}
             </Link>
           </p>
         </section>
       </div>
 
       <section className="rounded-2xl border border-slate-200/80 bg-white/60 p-5 shadow-sm sm:p-6">
-        <h2 className="text-base font-bold text-slate-900">Compiti aperti</h2>
+        <h2 className="text-base font-bold text-slate-900">{t("casaHome.tasksTitle")}</h2>
         {openTasks.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">Nessun compito in sospeso.</p>
+          <p className="mt-2 text-sm text-slate-500">{t("casaHome.noTasks")}</p>
         ) : (
           <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-            {openTasks.map((t) => (
-              <li key={t.id} className="rounded-xl border border-slate-100 bg-white/90 px-3 py-2.5 text-sm">
-                <span className="font-semibold text-slate-900">{t.title}</span>
+            {openTasks.map((task) => (
+              <li key={task.id} className="rounded-xl border border-slate-100 bg-white/90 px-3 py-2.5 text-sm">
+                <span className="font-semibold text-slate-900">{task.title}</span>
                 <p className="text-xs text-slate-500">
-                  {t.assignee ? `Assegnato a ${t.assignee.name}` : "Non assegnato"}
-                  {t.dueDate ? ` · ${new Date(t.dueDate).toLocaleString("it-IT")}` : ""}
+                  {task.assignee
+                    ? formatMessage(t("casaHome.assignee"), { name: task.assignee.name })
+                    : t("casaHome.unassigned")}
+                  {task.dueDate ? ` · ${new Date(task.dueDate).toLocaleString(intlTag)}` : ""}
                 </p>
               </li>
             ))}
@@ -234,7 +231,7 @@ export default async function CasaDashboardPage({
         )}
         <p className="mt-3">
           <Link href={`/casa/${houseId}/compiti`} className="cv-link text-sm">
-            Tutti i compiti →
+            {t("casaHome.linkTasks")}
           </Link>
         </p>
       </section>

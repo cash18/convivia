@@ -1,6 +1,9 @@
 import { AddTaskForm } from "@/components/AddTaskForm";
 import { auth } from "@/auth";
 import { deleteTask, setTaskStatus } from "@/lib/actions/tasks";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { intlLocaleTag } from "@/lib/i18n/intl-locale";
+import { createTranslator } from "@/lib/i18n/server";
 import { getMembershipOrRedirect } from "@/lib/house-access";
 import { prisma } from "@/lib/prisma";
 
@@ -12,6 +15,9 @@ export default async function CompitiPage({
   const { houseId } = await params;
   const session = await auth();
   if (!session?.user?.id) return null;
+
+  const { t, locale } = await createTranslator();
+  const intlTag = intlLocaleTag(locale);
 
   const membership = await getMembershipOrRedirect(houseId, session.user.id);
   const members = membership.house.members.map((m) => ({
@@ -46,41 +52,48 @@ export default async function CompitiPage({
       <AddTaskForm houseId={houseId} members={members} />
 
       <section>
-        <h2 className="text-lg font-bold text-slate-900">Elenco compiti</h2>
+        <h2 className="text-lg font-bold text-slate-900">{t("tasksPage.listTitle")}</h2>
         {tasks.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">Nessun compito. Aggiungine uno per organizzare i turni.</p>
+          <p className="mt-2 text-sm text-slate-500">{t("tasksPage.empty")}</p>
         ) : (
           <ul className="mt-4 space-y-3">
-            {tasks.map((t) => (
+            {tasks.map((task) => (
               <li
-                key={t.id}
+                key={task.id}
                 className="cv-card-solid flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex-1">
                   <p
-                    className={`font-bold ${t.status === "DONE" ? "text-slate-400 line-through" : "text-slate-900"}`}
+                    className={`font-bold ${task.status === "DONE" ? "text-slate-400 line-through" : "text-slate-900"}`}
                   >
-                    {t.title}
+                    {task.title}
                   </p>
-                  {t.description ? <p className="mt-1 text-sm text-slate-600">{t.description}</p> : null}
+                  {task.description ? <p className="mt-1 text-sm text-slate-600">{task.description}</p> : null}
                   <p className="mt-2 text-xs text-slate-500">
-                    {t.assignee ? `Assegnato a ${t.assignee.name}` : "Non assegnato"}
-                    {t.dueDate ? ` · scadenza ${new Date(t.dueDate).toLocaleString("it-IT")}` : ""}
-                    <span className="text-slate-400"> · creato da {t.createdBy.name}</span>
+                    {task.assignee
+                      ? formatMessage(t("tasksPage.assignee"), { name: task.assignee.name })
+                      : t("tasksPage.unassigned")}
+                    {task.dueDate
+                      ? ` · ${formatMessage(t("tasksPage.due"), { date: new Date(task.dueDate).toLocaleString(intlTag) })}`
+                      : ""}
+                    <span className="text-slate-400">
+                      {" "}
+                      {formatMessage(t("tasksPage.createdBy"), { name: task.createdBy.name })}
+                    </span>
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <form action={toggleTaskAction}>
-                    <input type="hidden" name="taskId" value={t.id} />
-                    <input type="hidden" name="nextStatus" value={t.status === "DONE" ? "TODO" : "DONE"} />
+                    <input type="hidden" name="taskId" value={task.id} />
+                    <input type="hidden" name="nextStatus" value={task.status === "DONE" ? "TODO" : "DONE"} />
                     <button type="submit" className="cv-pill-nav text-sm">
-                      {t.status === "DONE" ? "Segna da fare" : "Segna fatto"}
+                      {task.status === "DONE" ? t("tasksPage.markTodo") : t("tasksPage.markDone")}
                     </button>
                   </form>
                   <form action={removeTaskAction}>
-                    <input type="hidden" name="taskId" value={t.id} />
+                    <input type="hidden" name="taskId" value={task.id} />
                     <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-800">
-                      Elimina
+                      {t("tasksPage.delete")}
                     </button>
                   </form>
                 </div>

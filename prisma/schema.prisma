@@ -201,6 +201,11 @@ model CalendarEvent {
   allDay      Boolean   @default(false)
   createdById String
   createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  /// Se valorizzato, l’evento non appare nel portale ma resta nel feed ICS come CANCELLED (sync Google/Apple).
+  cancelledAt DateTime?
+  /// RFC 5545 SEQUENCE per aggiornamenti nel feed abbonato.
+  calendarSequence Int @default(0)
   house       House     @relation(fields: [houseId], references: [id], onDelete: Cascade)
   createdBy   User      @relation("EventCreator", fields: [createdById], references: [id])
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
 import { createTask } from "@/lib/actions/tasks";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -7,6 +8,7 @@ import { useState } from "react";
 type Member = { id: string; name: string };
 
 export function AddTaskForm({ houseId, members }: { houseId: string; members: Member[] }) {
+  const { t } = useI18n();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -29,25 +31,25 @@ export function AddTaskForm({ houseId, members }: { houseId: string; members: Me
 
   return (
     <form onSubmit={onSubmit} className="cv-card-solid flex flex-col gap-3 p-5 sm:p-6">
-      <h2 className="text-sm font-bold text-slate-900">Nuovo compito</h2>
+      <h2 className="text-sm font-bold text-slate-900">{t("tasksForm.title")}</h2>
       {error ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
       ) : null}
       <input
         name="title"
         required
-        placeholder="Cosa va fatto?"
+        placeholder={t("tasksForm.titlePlaceholder")}
         className="cv-input-sm"
       />
       <textarea
         name="description"
-        placeholder="Dettagli (opzionale)"
+        placeholder={t("tasksForm.descriptionPlaceholder")}
         rows={2}
         className="cv-input-sm"
       />
       <div className="grid gap-3 sm:grid-cols-2">
         <select name="assigneeId" className="cv-input-sm">
-          <option value="">Assegna a… (nessuno)</option>
+          <option value="">{t("tasksForm.assigneeNone")}</option>
           {members.map((m) => (
             <option key={m.id} value={m.id}>
               {m.name}
@@ -65,7 +67,7 @@ export function AddTaskForm({ houseId, members }: { houseId: string; members: Me
         disabled={pending}
         className="cv-btn-primary"
       >
-        {pending ? "Salvataggio…" : "Aggiungi compito"}
+        {pending ? t("tasksForm.submitting") : t("tasksForm.submit")}
       </button>
     </form>
   );
