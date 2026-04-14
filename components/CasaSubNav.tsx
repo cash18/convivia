@@ -5,6 +5,7 @@ import {
   IconCart,
   IconCheck,
   IconHome,
+  IconUsers,
   IconWallet,
 } from "@/components/CasaSectionIcons";
 import { useI18n } from "@/components/I18nProvider";
@@ -17,6 +18,7 @@ const linkKeys = [
   { href: (id: string) => `/casa/${id}/calendario`, labelKey: "casaNav.calendar" as const, Icon: IconCalendar },
   { href: (id: string) => `/casa/${id}/liste`, labelKey: "casaNav.lists" as const, Icon: IconCart },
   { href: (id: string) => `/casa/${id}/compiti`, labelKey: "casaNav.tasks" as const, Icon: IconCheck },
+  { href: (id: string) => `/casa/${id}/membri`, labelKey: "casaNav.members" as const, Icon: IconUsers },
 ] as const;
 
 export function CasaSubNav({

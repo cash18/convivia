@@ -20,6 +20,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { email: email.toLowerCase().trim() },
         });
         if (!user || !(await compare(password, user.passwordHash))) return null;
+        if (!user.emailVerifiedAt) return null;
         return { id: user.id, email: user.email, name: user.name };
       },
     }),

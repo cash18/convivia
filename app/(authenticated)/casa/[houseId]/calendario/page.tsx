@@ -4,6 +4,7 @@ import { HouseCalendarGrid, type CalendarEventDTO } from "@/components/HouseCale
 import { auth } from "@/auth";
 import { deleteCalendarEvent } from "@/lib/actions/calendar";
 import { getMembershipOrRedirect } from "@/lib/house-access";
+import { canRotateCalendarFeed } from "@/lib/house-roles";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { Suspense } from "react";
@@ -69,7 +70,7 @@ export default async function CalendarioPage({
             houseId={houseId}
             houseName={membership.house.name}
             feedHttpsUrl={feedHttpsUrl}
-            canRotateToken={membership.role === "OWNER"}
+            canRotateToken={canRotateCalendarFeed(membership.role)}
           />
         ) : (
           <div className="cv-card-solid p-5 text-sm text-slate-600">

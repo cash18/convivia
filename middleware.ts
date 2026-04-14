@@ -27,6 +27,10 @@ export default auth((req) => {
     pathname === "/" ||
     pathname.startsWith("/accedi") ||
     pathname.startsWith("/registrati") ||
+    pathname.startsWith("/verifica-email") ||
+    pathname.startsWith("/reimposta-password") ||
+    pathname.startsWith("/invito-casa") ||
+    pathname.startsWith("/trasferimento-proprieta") ||
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/calendar/feed/") ||
     pathname === "/sw.js" ||

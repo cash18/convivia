@@ -1,0 +1,101 @@
+"use client";
+
+import {
+  acceptHouseOwnershipTransfer,
+  declineHouseOwnershipTransfer,
+} from "@/lib/actions/members";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+export function HouseOwnershipTransferClient({
+  token,
+  houseName,
+  fromName,
+  isLoggedIn,
+  isRecipient,
+}: {
+  token: string;
+  houseName: string;
+  fromName: string;
+  isLoggedIn: boolean;
+  isRecipient: boolean;
+}) {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState<"accept" | "decline" | null>(null);
+
+  async function accept() {
+    setError(null);
+    setPending("accept");
+    const r = await acceptHouseOwnershipTransfer(token);
+    setPending(null);
+    if ("error" in r) {
+      setError(r.error);
+      return;
+    }
+    router.push(`/casa/${r.houseId}/membri`);
+    router.refresh();
+  }
+
+  async function decline() {
+    setError(null);
+    setPending("decline");
+    const r = await declineHouseOwnershipTransfer(token);
+    setPending(null);
+    if ("error" in r) {
+      setError(r.error);
+      return;
+    }
+    router.push("/case");
+    router.refresh();
+  }
+
+  return (
+    <div className="cv-card p-8 sm:p-9">
+      <h1 className="text-2xl font-extrabold text-slate-900">Trasferimento proprietà</h1>
+      <p className="mt-2 text-sm text-slate-600">
+        <strong className="text-slate-800">{fromName}</strong> ti propone di diventare{" "}
+        <strong className="text-slate-800">amministratore</strong> (proprietario) della casa{" "}
+        <strong className="text-slate-800">«{houseName}»</strong>. Accettando, l’attuale amministratore diventerà un
+        membro come gli altri.
+      </p>
+      {error ? (
+        <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
+      ) : null}
+      <div className="mt-6 space-y-3">
+        {!isLoggedIn ? (
+          <Link
+            href={`/accedi?callbackUrl=${encodeURIComponent(`/trasferimento-proprieta?token=${encodeURIComponent(token)}`)}`}
+            className="cv-btn-primary block w-full py-3 text-center"
+          >
+            Accedi per rispondere
+          </Link>
+        ) : !isRecipient ? (
+          <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+            Questa richiesta è destinata a un altro account. Accedi con l’email del destinatario.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <button
+              type="button"
+              disabled={pending !== null}
+              onClick={() => void decline()}
+              className="cv-btn-outline flex-1 py-3"
+            >
+              {pending === "decline" ? "Invio…" : "Rifiuta"}
+            </button>
+            <button
+              type="button"
+              disabled={pending !== null}
+              onClick={() => void accept()}
+              className="cv-btn-primary flex-1 py-3"
+            >
+              {pending === "accept" ? "Conferma…" : "Accetta proprietà"}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

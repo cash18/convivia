@@ -1,6 +1,7 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signInWithPassword } from "@/lib/actions/login";
+import { resendVerificationEmail } from "@/lib/actions/verify-email";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -9,25 +10,45 @@ export function LoginForm() {
   const callbackUrl = searchParams.get("callbackUrl") ?? "/case";
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [lastEmail, setLastEmail] = useState<string | null>(null);
+  const [resendBusy, setResendBusy] = useState(false);
+  const [resendOk, setResendOk] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    setResendOk(false);
     setPending(true);
     const form = e.currentTarget;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    setLastEmail(email.trim().toLowerCase());
+    const res = await signInWithPassword(email, password);
     setPending(false);
-    if (res?.error) {
+    if ("error" in res) {
+      if (res.error === "UNVERIFIED") {
+        setError(
+          "Devi ancora confermare l’email. Controlla la posta (anche spam) o richiedi un nuovo link qui sotto.",
+        );
+        return;
+      }
       setError("Email o password non corretti.");
       return;
     }
     window.location.href = callbackUrl;
+  }
+
+  async function resend() {
+    if (!lastEmail) return;
+    setResendBusy(true);
+    setResendOk(false);
+    const r = await resendVerificationEmail(lastEmail);
+    setResendBusy(false);
+    if ("error" in r) {
+      setError(r.error);
+      return;
+    }
+    setResendOk(true);
   }
 
   return (
@@ -60,6 +81,27 @@ export function LoginForm() {
       <button type="submit" disabled={pending} className="cv-btn-primary w-full">
         {pending ? "Accesso…" : "Accedi"}
       </button>
+      {error && lastEmail && error.includes("confermare") ? (
+        <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-700">
+          <p className="font-medium text-slate-800">Non ricevi l’email?</p>
+          <button
+            type="button"
+            disabled={resendBusy}
+            onClick={() => void resend()}
+            className="mt-2 text-sm font-semibold text-emerald-700 underline decoration-emerald-400/60 underline-offset-2 hover:text-emerald-900"
+          >
+            {resendBusy ? "Invio…" : "Rinvia email di conferma"}
+          </button>
+          {resendOk ? (
+            <p className="mt-2 text-xs text-emerald-800">Se l’account esiste e non è verificato, abbiamo reinviato il link.</p>
+          ) : null}
+        </div>
+      ) : null}
+      <p className="text-center text-sm">
+        <a href="/reimposta-password" className="cv-link">
+          Password dimenticata?
+        </a>
+      </p>
     </form>
   );
 }

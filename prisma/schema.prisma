@@ -16,6 +16,13 @@ model User {
   passwordHash         String
   name                 String
   createdAt            DateTime               @default(now())
+  /// Impostata al completamento del link di verifica email (obbligatorio per accedere).
+  emailVerifiedAt      DateTime?
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
+  houseEmailInvitesSent   HouseEmailInvite[]       @relation("HouseInviteSender")
+  ownershipTransfersFrom  HouseOwnershipTransfer[] @relation("OwnershipFrom")
+  ownershipTransfersTo    HouseOwnershipTransfer[] @relation("OwnershipTo")
   memberships          HouseMember[]
   expensesPaid         Expense[]              @relation("ExpensePayer")
   expenseSplits        ExpenseSplit[]
@@ -29,6 +36,64 @@ model User {
   webPushSubscriptions WebPushSubscription[]
   /// Preferenze notifiche push per categoria (`EXPENSES`, `CALENDAR`, …). Null = tutte attive.
   pushNotifyPrefs      Json?
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// Invito a unirsi a una casa tramite link email (oltre al codice manuale).
+model HouseEmailInvite {
+  id              String    @id @default(cuid())
+  token           String    @unique
+  houseId         String
+  email           String
+  invitedByUserId String
+  expiresAt       DateTime
+  usedAt          DateTime?
+  createdAt       DateTime  @default(now())
+  house           House     @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  invitedBy       User      @relation("HouseInviteSender", fields: [invitedByUserId], references: [id], onDelete: Cascade)
+
+  @@index([houseId])
+}
+
+/// Richiesta di trasferimento proprietà (OWNER); il destinatario conferma via email.
+model HouseOwnershipTransfer {
+  id          String    @id @default(cuid())
+  houseId     String
+  fromUserId  String
+  toUserId    String
+  token       String    @unique
+  /// PENDING | ACCEPTED | DECLINED | CANCELLED
+  status      String    @default("PENDING")
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  respondedAt DateTime?
+  house       House     @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  fromUser    User      @relation("OwnershipFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser      User      @relation("OwnershipTo", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@index([houseId])
+  @@index([toUserId])
 }
 
 /// Iscrizione Web Push (PWA) per notifiche attività nella casa.
@@ -59,13 +124,16 @@ model House {
   events     CalendarEvent[]
   lists      ShoppingList[]
   tasks      Task[]
+  emailInvites         HouseEmailInvite[]
+  ownershipTransfers HouseOwnershipTransfer[]
 }
 
 model HouseMember {
   id       String   @id @default(cuid())
   userId   String
   houseId  String
-  role     String   @default("MEMBER") // OWNER | MEMBER
+  /// OWNER (creatore / proprietario) | SUPERVISOR (gestione membri) | MEMBER
+  role     String   @default("MEMBER")
   joinedAt DateTime @default(now())
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   house    House    @relation(fields: [houseId], references: [id], onDelete: Cascade)

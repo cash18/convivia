@@ -1,6 +1,8 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
+import { SettlementPlanPanel } from "@/components/SettlementPlanPanel";
 import { auth } from "@/auth";
 import { computeMemberBalances } from "@/lib/balances";
+import { computeMinimalSettlementPlan } from "@/lib/settlement-plan";
 import { formatEuroFromCents } from "@/lib/money";
 import { getMembershipOrRedirect } from "@/lib/house-access";
 import { prisma } from "@/lib/prisma";
@@ -62,6 +64,7 @@ export default async function CasaDashboardPage({
   ]);
 
   const undoneByListId = new Map(listUndoneCounts.map((r) => [r.listId, r._count._all]));
+  const settlementSteps = computeMinimalSettlementPlan(balances);
 
   return (
     <div className="space-y-8">
@@ -96,6 +99,21 @@ export default async function CasaDashboardPage({
               </li>
             ))}
           </ul>
+          {settlementSteps.length > 0 ? (
+            <div className="mt-4 border-t border-slate-100 pt-4">
+              <p className="text-xs font-bold text-slate-800">Piano di pareggio (proposta)</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
+                Meno trasferimenti possibili tra coinquilini; dettaglio e registrazione in Spese.
+              </p>
+              <div className="mt-3">
+                <SettlementPlanPanel steps={settlementSteps} compact />
+              </div>
+            </div>
+          ) : (
+            <p className="mt-4 border-t border-slate-100 pt-4 text-[11px] font-medium text-emerald-800">
+              Saldi in equilibrio: nessun trasferimento necessario.
+            </p>
+          )}
           <p className="mt-4 shrink-0">
             <Link href={`/casa/${houseId}/spese`} className="cv-link text-sm">
               Spese e trasferimenti →

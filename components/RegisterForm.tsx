@@ -7,7 +7,13 @@ import { useEffect } from "react";
 
 const initial: RegisterState = {};
 
-export function RegisterForm() {
+export function RegisterForm({
+  inviteToken,
+  lockedEmail,
+}: {
+  inviteToken?: string | null;
+  lockedEmail?: string | null;
+}) {
   const [state, formAction, pending] = useActionState(registerUser, initial);
 
   useEffect(() => {
@@ -18,6 +24,7 @@ export function RegisterForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
+      {inviteToken ? <input type="hidden" name="inviteToken" value={inviteToken} /> : null}
       {state.error ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
           {state.error}
@@ -41,8 +48,16 @@ export function RegisterForm() {
           required
           autoComplete="email"
           className="cv-input"
+          defaultValue={lockedEmail ?? undefined}
+          readOnly={!!lockedEmail}
+          aria-readonly={!!lockedEmail}
         />
       </label>
+      {lockedEmail ? (
+        <p className="text-xs text-slate-500">
+          L’email è fissata all’invito alla casa. Se non è la tua, chiedi un nuovo invito all’indirizzo corretto.
+        </p>
+      ) : null}
       <label className="flex flex-col gap-1 text-sm font-semibold text-slate-700">
         Password (min. 8 caratteri)
         <input

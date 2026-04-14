@@ -2,6 +2,7 @@ import { CaseLastHouseRedirect } from "@/components/CaseLastHouseRedirect";
 import { CreateHouseForm } from "@/components/CreateHouseForm";
 import { JoinHouseForm } from "@/components/JoinHouseForm";
 import { auth } from "@/auth";
+import { roleLabelKey } from "@/lib/house-roles";
 import { createTranslator } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -39,7 +40,7 @@ export default async function CasePage() {
               >
                 <span className="text-lg font-bold text-slate-900 group-hover:text-emerald-900">{m.house.name}</span>
                 <p className="mt-2 text-xs font-medium text-slate-500">
-                  {m.role === "OWNER" ? t("case.roleOwner") : t("case.roleMember")} · {t("case.codeLabel")}{" "}
+                  {t(roleLabelKey(m.role))} · {t("case.codeLabel")}{" "}
                   <span className="font-mono text-emerald-700">{m.house.inviteCode}</span>
                 </p>
               </Link>

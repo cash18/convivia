@@ -12,7 +12,8 @@
     "expenses": "Spese",
     "calendar": "Calendario",
     "lists": "Liste spesa",
-    "tasks": "Compiti"
+    "tasks": "Compiti",
+    "members": "Membri"
   },
   "pushBell": {
     "ariaEnable": "Attiva notifiche push",
@@ -65,6 +66,7 @@
     "intro": "Crea una casa nuova o entra con il codice che ti ha condiviso un coinquilino.",
     "empty": "Non sei ancora in nessuna casa. Creane una o unisciti con un codice invito.",
     "roleOwner": "Amministratore",
+    "roleSupervisor": "Supervisionatore",
     "roleMember": "Membro",
     "codeLabel": "codice"
   },

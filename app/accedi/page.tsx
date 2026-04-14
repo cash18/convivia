@@ -6,7 +6,7 @@ import { Suspense } from "react";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ registrato?: string }>;
+  searchParams: Promise<{ registrato?: string; reimpostata?: string }>;
 }) {
   const sp = await searchParams;
 
@@ -27,7 +27,13 @@ export default async function LoginPage({
           <p className="mt-1 text-sm text-slate-600">Benvenuto di nuovo su Convivia</p>
           {sp.registrato === "1" ? (
             <p className="mt-4 rounded-2xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 text-sm font-medium text-emerald-900">
-              Account creato. Ora puoi accedere con email e password.
+              Account creato. Ti abbiamo inviato un’email con il link di conferma: apri il link, poi torna qui per
+              accedere.
+            </p>
+          ) : null}
+          {sp.reimpostata === "1" ? (
+            <p className="mt-4 rounded-2xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 text-sm font-medium text-emerald-900">
+              Password aggiornata. Ora puoi accedere.
             </p>
           ) : null}
           <div className="mt-6">

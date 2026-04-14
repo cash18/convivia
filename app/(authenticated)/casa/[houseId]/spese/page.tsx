@@ -1,8 +1,10 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
 import { AddMoneyTransferForm } from "@/components/AddMoneyTransferForm";
 import { ExpenseEditForm, type EditableExpense } from "@/components/ExpenseEditForm";
+import { SettlementPlanPanel } from "@/components/SettlementPlanPanel";
 import { auth } from "@/auth";
 import { computeMemberBalances } from "@/lib/balances";
+import { computeMinimalSettlementPlan } from "@/lib/settlement-plan";
 import { deleteExpense } from "@/lib/actions/expenses";
 import { deleteMoneyTransfer } from "@/lib/actions/transfers";
 import { formatEuroFromCents } from "@/lib/money";
@@ -60,6 +62,8 @@ export default async function SpesePage({
     await deleteMoneyTransfer(houseId, id);
   }
 
+  const settlementSteps = computeMinimalSettlementPlan(balances);
+
   function splitLabel(e: (typeof expenses)[0]): string {
     if (e.splitMode === "PERCENT") {
       return e.splits.map((s) => `${s.user.name} (${s.sharePercent ?? 0}%): ${formatEuroFromCents(s.shareCents)}`).join(" · ");
@@ -95,6 +99,22 @@ export default async function SpesePage({
                 </li>
               ))}
             </ul>
+          </div>
+          <div className="cv-card-solid border-emerald-200/50 bg-gradient-to-b from-emerald-50/35 to-white p-5 sm:p-6">
+            <h2 className="text-sm font-bold text-slate-900">Come pareggiare (proposta)</h2>
+            <p className="mt-1 text-xs leading-relaxed text-slate-600">
+              In base ai saldi attuali, questa è una sequenza con il{" "}
+              <strong className="font-semibold text-slate-800">minor numero possibile di trasferimenti</strong> per
+              riportare tutti verso zero: con <em>n</em> persone con saldo non nullo bastano al massimo <em>n</em> − 1
+              movimenti.
+            </p>
+            <p className="mt-2 text-[11px] text-slate-500">
+              Saldo positivo = ha pagato più della propria quota e va ricevuto; negativo = deve ancora contribuire. Ogni
+              riga indica da chi a chi inviare denaro.
+            </p>
+            <div className="mt-4">
+              <SettlementPlanPanel steps={settlementSteps} />
+            </div>
           </div>
           <div className="cv-card-solid p-5 sm:p-6">
             <h2 className="text-sm font-bold text-slate-900">Trasferimento tra coinquilini</h2>
