@@ -19,8 +19,8 @@ export function Providers({
     <SessionProvider>
       <I18nProvider locale={locale} messages={messages}>
         {children}
+        <PwaClient />
       </I18nProvider>
-      <PwaClient />
     </SessionProvider>
   );
 }
