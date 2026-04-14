@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "prisma migrate deploy && next build",
+  "buildCommand": "npm run build",
   "installCommand": "npm install",
   "env": {
     "NEXT_PUBLIC_VAPID_PUBLIC_KEY": "BG6E7aBiWHHVa_XaSZOAGao5e8Fxwugvv48W9FUn9nw7s3Vw0sI-MF8VR3yT8fSICYVLnH1kst8oqezfbT4QFnk",
