@@ -4,6 +4,8 @@ import {
   acceptHouseOwnershipTransfer,
   declineHouseOwnershipTransfer,
 } from "@/lib/actions/members";
+import { useI18n } from "@/components/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,6 +23,7 @@ export function HouseOwnershipTransferClient({
   isLoggedIn: boolean;
   isRecipient: boolean;
 }) {
+  const { t } = useI18n();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<"accept" | "decline" | null>(null);
@@ -53,12 +56,9 @@ export function HouseOwnershipTransferClient({
 
   return (
     <div className="cv-card p-8 sm:p-9">
-      <h1 className="text-2xl font-extrabold text-slate-900">Trasferimento proprietà</h1>
+      <h1 className="text-2xl font-extrabold text-slate-900">{t("houseTransfer.title")}</h1>
       <p className="mt-2 text-sm text-slate-600">
-        <strong className="text-slate-800">{fromName}</strong> ti propone di diventare{" "}
-        <strong className="text-slate-800">amministratore</strong> (proprietario) della casa{" "}
-        <strong className="text-slate-800">«{houseName}»</strong>. Accettando, l’attuale amministratore diventerà un
-        membro come gli altri.
+        {formatMessage(t("houseTransfer.intro"), { fromName, houseName })}
       </p>
       {error ? (
         <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
@@ -69,11 +69,11 @@ export function HouseOwnershipTransferClient({
             href={`/accedi?callbackUrl=${encodeURIComponent(`/trasferimento-proprieta?token=${encodeURIComponent(token)}`)}`}
             className="cv-btn-primary block w-full py-3 text-center"
           >
-            Accedi per rispondere
+            {t("houseTransfer.loginToRespond")}
           </Link>
         ) : !isRecipient ? (
           <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-            Questa richiesta è destinata a un altro account. Accedi con l’email del destinatario.
+            {t("houseTransfer.wrongRecipient")}
           </p>
         ) : (
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -83,7 +83,7 @@ export function HouseOwnershipTransferClient({
               onClick={() => void decline()}
               className="cv-btn-outline flex-1 py-3"
             >
-              {pending === "decline" ? "Invio…" : "Rifiuta"}
+              {pending === "decline" ? t("houseTransfer.declinePending") : t("houseTransfer.decline")}
             </button>
             <button
               type="button"
@@ -91,7 +91,7 @@ export function HouseOwnershipTransferClient({
               onClick={() => void accept()}
               className="cv-btn-primary flex-1 py-3"
             >
-              {pending === "accept" ? "Conferma…" : "Accetta proprietà"}
+              {pending === "accept" ? t("houseTransfer.acceptPending") : t("houseTransfer.accept")}
             </button>
           </div>
         )}

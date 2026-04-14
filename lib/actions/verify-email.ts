@@ -1,5 +1,6 @@
 "use server";
 
+import { ta } from "@/lib/i18n/action-messages";
 import { prisma } from "@/lib/prisma";
 import { newSecureToken } from "@/lib/crypto-token";
 import { sendTransactionalEmail } from "@/lib/email";
@@ -9,15 +10,15 @@ export async function verifyEmailWithToken(
   token: string,
 ): Promise<{ ok: true } | { error: string }> {
   const trimmed = token.trim();
-  if (!trimmed) return { error: "Link non valido." };
+  if (!trimmed) return { error: await ta("errors.invalidLink") };
 
   const row = await prisma.emailVerificationToken.findUnique({
     where: { token: trimmed },
     include: { user: true },
   });
-  if (!row) return { error: "Link non valido o già usato." };
+  if (!row) return { error: await ta("errors.verifyLinkInvalid") };
   if (row.expiresAt.getTime() < Date.now()) {
-    return { error: "Link scaduto. Richiedi una nuova email di conferma dalla pagina di accesso." };
+    return { error: await ta("errors.verifyLinkExpired") };
   }
 
   await prisma.$transaction([
@@ -60,6 +61,6 @@ export async function resendVerificationEmail(email: string): Promise<{ ok: true
     text: content.text,
     devPreviewUrl: content.previewUrl,
   });
-  if (!sent.ok) return { error: "Invio email non riuscito. Riprova più tardi." };
+  if (!sent.ok) return { error: await ta("errors.verifyResendFailed") };
   return { ok: true };
 }

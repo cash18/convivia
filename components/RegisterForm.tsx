@@ -1,6 +1,7 @@
 "use client";
 
 import { registerUser, type RegisterState } from "@/lib/actions/register";
+import { useI18n } from "@/components/I18nProvider";
 import Link from "next/link";
 import { useActionState } from "react";
 import { useEffect } from "react";
@@ -14,6 +15,7 @@ export function RegisterForm({
   inviteToken?: string | null;
   lockedEmail?: string | null;
 }) {
+  const { t } = useI18n();
   const [state, formAction, pending] = useActionState(registerUser, initial);
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export function RegisterForm({
         </p>
       ) : null}
       <label className="flex flex-col gap-1 text-sm font-semibold text-slate-700">
-        Nome
+        {t("authForms.name")}
         <input
           name="name"
           type="text"
@@ -41,7 +43,7 @@ export function RegisterForm({
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-semibold text-slate-700">
-        Email
+        {t("authForms.email")}
         <input
           name="email"
           type="email"
@@ -55,11 +57,11 @@ export function RegisterForm({
       </label>
       {lockedEmail ? (
         <p className="text-xs text-slate-500">
-          L’email è fissata all’invito alla casa. Se non è la tua, chiedi un nuovo invito all’indirizzo corretto.
+          {t("authForms.lockedEmailHint")}
         </p>
       ) : null}
       <label className="flex flex-col gap-1 text-sm font-semibold text-slate-700">
-        Password (min. 8 caratteri)
+        {t("authForms.passwordMinLabel")}
         <input
           name="password"
           type="password"
@@ -70,12 +72,12 @@ export function RegisterForm({
         />
       </label>
       <button type="submit" disabled={pending} className="cv-btn-primary w-full">
-        {pending ? "Creazione account…" : "Crea account"}
+        {pending ? t("authForms.registerPending") : t("authForms.registerSubmit")}
       </button>
       <p className="text-center text-sm text-slate-600">
-        Hai già un account?{" "}
+        {t("authForms.hasAccount")}{" "}
         <Link href="/accedi" className="cv-link">
-          Accedi
+          {t("authForms.loginLink")}
         </Link>
       </p>
     </form>

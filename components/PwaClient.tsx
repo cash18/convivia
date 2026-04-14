@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
 import { useEffect, useState } from "react";
 
 const DISMISS_KEY = "convivia_install_hint_dismissed";
@@ -23,6 +24,7 @@ function isStandalone(): boolean {
 }
 
 export function PwaClient() {
+  const { t } = useI18n();
   const [dismissed, setDismissed] = useState(false);
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIosHint, setShowIosHint] = useState(false);
@@ -87,18 +89,18 @@ export function PwaClient() {
       <div
         className="fixed bottom-0 left-0 right-0 z-[60] border-t border-emerald-200/80 bg-white/95 p-3 shadow-[0_-8px_30px_-10px_rgba(5,150,105,0.3)] backdrop-blur-md pb-[max(0.75rem,env(safe-area-inset-bottom))]"
         role="region"
-        aria-label="Installa applicazione"
+        aria-label={t("pwa.ariaInstall")}
       >
         <div className="mx-auto flex max-w-lg flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
-            <strong className="text-slate-900">Installa Convivia</strong> sul telefono per aprirla come app a schermo intero.
+            <strong className="text-slate-900">{t("pwa.installStrong")}</strong> {t("pwa.installRest")}
           </p>
           <div className="flex shrink-0 gap-2">
             <button type="button" onClick={() => void runInstall()} className="cv-btn-primary py-2 text-sm">
-              Installa
+              {t("pwa.install")}
             </button>
             <button type="button" onClick={dismiss} className="cv-btn-ghost py-2 text-sm">
-              Più tardi
+              {t("pwa.later")}
             </button>
           </div>
         </div>
@@ -111,15 +113,17 @@ export function PwaClient() {
       <div
         className="fixed bottom-0 left-0 right-0 z-[60] border-t border-emerald-200/80 bg-white/95 p-3 shadow-[0_-8px_30px_-10px_rgba(5,150,105,0.3)] backdrop-blur-md pb-[max(0.75rem,env(safe-area-inset-bottom))]"
         role="region"
-        aria-label="Aggiungi a schermata Home"
+        aria-label={t("pwa.ariaIos")}
       >
         <div className="mx-auto flex max-w-lg flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
-            Su <strong>iPhone/iPad</strong>: tocca <strong className="text-slate-900">Condividi</strong>{" "}
-            <span className="whitespace-nowrap">(□↑)</span> poi <strong className="text-slate-900">Aggiungi a Home</strong>.
+            {t("pwa.iosBodyBefore")} <strong className="text-slate-900">{t("pwa.iosBodyDevice")}</strong>
+            {t("pwa.iosBodyMid")} <strong className="text-slate-900">{t("pwa.iosShare")}</strong>{" "}
+            <span className="whitespace-nowrap">(□↑)</span> {t("pwa.iosBodyAfter")}{" "}
+            <strong className="text-slate-900">{t("pwa.iosAddHome")}</strong>.
           </p>
           <button type="button" onClick={dismiss} className="cv-btn-ghost shrink-0 self-end py-2 text-sm sm:self-auto">
-            OK
+            {t("pwa.ok")}
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { BrandLogo } from "@/components/BrandLogo";
 import { ResetPasswordForm } from "@/components/ResetPasswordForm";
+import { createTranslator } from "@/lib/i18n/server";
 import Link from "next/link";
 
 export default async function ResetPasswordTokenPage({
@@ -8,6 +9,7 @@ export default async function ResetPasswordTokenPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
+  const { t } = await createTranslator();
 
   return (
     <div className="relative flex min-h-dvh min-h-screen flex-col items-center justify-center px-4 py-12 pt-[env(safe-area-inset-top,0px)]">
@@ -22,8 +24,8 @@ export default async function ResetPasswordTokenPage({
           </Link>
         </div>
         <div className="cv-card p-8 sm:p-9">
-          <h1 className="text-2xl font-extrabold text-slate-900">Nuova password</h1>
-          <p className="mt-1 text-sm text-slate-600">Scegli una password sicura (minimo 8 caratteri).</p>
+          <h1 className="text-2xl font-extrabold text-slate-900">{t("passwordNewPage.title")}</h1>
+          <p className="mt-1 text-sm text-slate-600">{t("passwordNewPage.subtitle")}</p>
           <div className="mt-6">
             <ResetPasswordForm token={token} />
           </div>

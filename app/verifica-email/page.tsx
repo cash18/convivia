@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { verifyEmailWithToken } from "@/lib/actions/verify-email";
+import { createTranslator } from "@/lib/i18n/server";
 import Link from "next/link";
 
 export default async function VerifyEmailPage({
@@ -9,31 +11,27 @@ export default async function VerifyEmailPage({
 }) {
   const sp = await searchParams;
   const token = sp.token?.trim() ?? "";
+  const { t } = await createTranslator();
 
-  let title = "Verifica email";
-  let body: React.ReactNode = (
-    <p className="text-sm text-slate-600">
-      Link non valido. Controlla di aver copiato l’intero indirizzo dall’email oppure richiedi una nuova conferma dalla
-      pagina di accesso.
-    </p>
-  );
+  let title = t("verifyEmailPage.titleDefault");
+  let body: ReactNode = <p className="text-sm text-slate-600">{t("verifyEmailPage.invalidHint")}</p>;
 
   if (token) {
     const r = await verifyEmailWithToken(token);
     if ("ok" in r && r.ok) {
-      title = "Email confermata";
+      title = t("verifyEmailPage.successTitle");
       body = (
         <div className="space-y-4 text-sm text-slate-600">
           <p className="rounded-2xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 font-medium text-emerald-900">
-            Il tuo account è attivo. Ora puoi accedere con email e password.
+            {t("verifyEmailPage.successBanner")}
           </p>
           <Link href="/accedi" className="cv-btn-primary inline-flex w-full justify-center px-4 py-3 text-center">
-            Vai all’accesso
+            {t("verifyEmailPage.goLogin")}
           </Link>
         </div>
       );
     } else if ("error" in r) {
-      title = "Verifica non riuscita";
+      title = t("verifyEmailPage.failTitle");
       body = (
         <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">{r.error}</p>
       );
@@ -57,7 +55,7 @@ export default async function VerifyEmailPage({
           <div className="mt-6">{body}</div>
           <p className="mt-6 text-center">
             <Link href="/" className="text-sm text-slate-500 transition hover:text-slate-800">
-              ← Torna alla home
+              {t("verifyEmailPage.backHome")}
             </Link>
           </p>
         </div>

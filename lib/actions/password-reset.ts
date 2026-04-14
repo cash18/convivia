@@ -1,6 +1,7 @@
 "use server";
 
 import { hash } from "bcryptjs";
+import { ta } from "@/lib/i18n/action-messages";
 import { prisma } from "@/lib/prisma";
 import { newSecureToken } from "@/lib/crypto-token";
 import { sendTransactionalEmail } from "@/lib/email";
@@ -32,7 +33,7 @@ export async function requestPasswordReset(email: string): Promise<{ ok: true } 
     text: content.text,
     devPreviewUrl: content.previewUrl,
   });
-  if (!sent.ok) return { error: "Invio email non riuscito. Riprova più tardi." };
+  if (!sent.ok) return { error: await ta("errors.passwordResetSendFailed") };
   return { ok: true };
 }
 
@@ -41,15 +42,15 @@ export async function resetPasswordWithToken(
   newPassword: string,
 ): Promise<{ ok: true } | { error: string }> {
   const trimmed = token.trim();
-  if (trimmed.length < 20) return { error: "Link non valido." };
-  if (newPassword.length < 8) return { error: "La password deve avere almeno 8 caratteri." };
+  if (trimmed.length < 20) return { error: await ta("errors.invalidLink") };
+  if (newPassword.length < 8) return { error: await ta("errors.passwordMin8") };
 
   const row = await prisma.passwordResetToken.findUnique({
     where: { token: trimmed },
   });
-  if (!row) return { error: "Link non valido o già usato." };
+  if (!row) return { error: await ta("errors.resetLinkInvalidOrUsed") };
   if (row.expiresAt.getTime() < Date.now()) {
-    return { error: "Link scaduto. Richiedi un nuovo reset dalla pagina di accesso." };
+    return { error: await ta("errors.resetLinkExpired") };
   }
 
   const passwordHash = await hash(newPassword, 12);

@@ -2,10 +2,12 @@
 
 import { signInWithPassword } from "@/lib/actions/login";
 import { resendVerificationEmail } from "@/lib/actions/verify-email";
+import { useI18n } from "@/components/I18nProvider";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export function LoginForm() {
+  const { t } = useI18n();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/case";
   const [error, setError] = useState<string | null>(null);
@@ -13,11 +15,13 @@ export function LoginForm() {
   const [lastEmail, setLastEmail] = useState<string | null>(null);
   const [resendBusy, setResendBusy] = useState(false);
   const [resendOk, setResendOk] = useState(false);
+  const [showResend, setShowResend] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setResendOk(false);
+    setShowResend(false);
     setPending(true);
     const form = e.currentTarget;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
@@ -27,12 +31,15 @@ export function LoginForm() {
     setPending(false);
     if ("error" in res) {
       if (res.error === "UNVERIFIED") {
-        setError(
-          "Devi ancora confermare l’email. Controlla la posta (anche spam) o richiedi un nuovo link qui sotto.",
-        );
+        setError(t("authForms.errorUnverified"));
+        setShowResend(true);
         return;
       }
-      setError("Email o password non corretti.");
+      if (res.error === "INVALID") {
+        setError(t("authForms.errorBadCredentials"));
+        return;
+      }
+      setError(t("authForms.errorBadCredentials"));
       return;
     }
     window.location.href = callbackUrl;
@@ -59,7 +66,7 @@ export function LoginForm() {
         </p>
       ) : null}
       <label className="flex flex-col gap-1 text-sm font-semibold text-slate-700">
-        Email
+        {t("authForms.email")}
         <input
           name="email"
           type="email"
@@ -69,7 +76,7 @@ export function LoginForm() {
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-semibold text-slate-700">
-        Password
+        {t("authForms.password")}
         <input
           name="password"
           type="password"
@@ -79,27 +86,27 @@ export function LoginForm() {
         />
       </label>
       <button type="submit" disabled={pending} className="cv-btn-primary w-full">
-        {pending ? "Accesso…" : "Accedi"}
+        {pending ? t("authForms.loginPending") : t("authForms.loginSubmit")}
       </button>
-      {error && lastEmail && error.includes("confermare") ? (
+      {showResend && lastEmail ? (
         <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-700">
-          <p className="font-medium text-slate-800">Non ricevi l’email?</p>
+          <p className="font-medium text-slate-800">{t("authForms.resendQuestion")}</p>
           <button
             type="button"
             disabled={resendBusy}
             onClick={() => void resend()}
             className="mt-2 text-sm font-semibold text-emerald-700 underline decoration-emerald-400/60 underline-offset-2 hover:text-emerald-900"
           >
-            {resendBusy ? "Invio…" : "Rinvia email di conferma"}
+            {resendBusy ? t("authForms.resendPending") : t("authForms.resendAction")}
           </button>
           {resendOk ? (
-            <p className="mt-2 text-xs text-emerald-800">Se l’account esiste e non è verificato, abbiamo reinviato il link.</p>
+            <p className="mt-2 text-xs text-emerald-800">{t("authForms.resendOk")}</p>
           ) : null}
         </div>
       ) : null}
       <p className="text-center text-sm">
         <a href="/reimposta-password" className="cv-link">
-          Password dimenticata?
+          {t("authForms.forgotPassword")}
         </a>
       </p>
     </form>

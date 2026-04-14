@@ -1,6 +1,8 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
 import { updateExpense } from "@/lib/actions/expenses";
+import { formatMessage } from "@/lib/i18n/format-message";
 import { formatEuroNumberForInput } from "@/lib/money";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -38,6 +40,7 @@ export function ExpenseEditForm({
   members: Member[];
   expense: EditableExpense;
 }) {
+  const { t } = useI18n();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,7 +132,7 @@ export function ExpenseEditForm({
     const raw = el?.value ?? "";
     const n = parseFloat(raw.replace(",", ".").trim());
     if (Number.isNaN(n) || n <= 0 || checkedIds.length === 0) {
-      setError("Importo o partecipanti non validi.");
+      setError(t("expenseEditForm.invalid"));
       return;
     }
     const totalCents = Math.round(n * 100);
@@ -149,7 +152,7 @@ export function ExpenseEditForm({
     e.preventDefault();
     setError(null);
     if (splitMode === "PERCENT" && percentSum !== 100) {
-      setError(`Le percentuali devono sommare a 100% (attualmente ${percentSum}%).`);
+      setError(formatMessage(t("addExpenseForm.errorPercentSum"), { sum: percentSum }));
       return;
     }
     setPending(true);
@@ -181,7 +184,7 @@ export function ExpenseEditForm({
         onClick={() => setOpen(true)}
         className="text-xs font-medium text-emerald-700 hover:text-emerald-900"
       >
-        Modifica
+        {t("listsPage.edit")}
       </button>
       {open ? (
         <div
@@ -193,14 +196,14 @@ export function ExpenseEditForm({
           <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
             <div className="flex items-start justify-between gap-3">
               <h2 id={`edit-expense-${expense.id}`} className="text-base font-bold text-slate-900">
-                Modifica spesa
+                {t("expenseEditForm.title")}
               </h2>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-2 py-1 text-sm text-slate-500 hover:bg-slate-100"
               >
-                Chiudi
+                {t("common.close")}
               </button>
             </div>
             <form onSubmit={onSubmit} encType="multipart/form-data" className="mt-4 flex flex-col gap-3">
@@ -220,13 +223,19 @@ export function ExpenseEditForm({
               <select name="paidById" required className="cv-input-sm" defaultValue={expense.paidById}>
                 {members.map((m) => (
                   <option key={m.id} value={m.id}>
-                    Pagato da: {m.name}
+                    {formatMessage(t("addExpenseForm.paidBy"), { name: m.name })}
                   </option>
                 ))}
               </select>
-              <textarea name="notes" placeholder="Note" rows={2} defaultValue={expense.notes ?? ""} className="cv-input-sm" />
+              <textarea
+                name="notes"
+                placeholder={t("expenseEditForm.notesPlaceholder")}
+                rows={2}
+                defaultValue={expense.notes ?? ""}
+                className="cv-input-sm"
+              />
               <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 text-xs text-slate-600">
-                <p className="font-semibold text-slate-700">Scontrino</p>
+                <p className="font-semibold text-slate-700">{t("expenseForm.receiptSection")}</p>
                 {expense.receiptUrl ? (
                   <a
                     href={expense.receiptUrl}
@@ -234,12 +243,12 @@ export function ExpenseEditForm({
                     rel="noopener noreferrer"
                     className="mt-1 inline-block font-medium text-emerald-700 hover:text-emerald-900"
                   >
-                    Apri scontrino attuale
+                    {t("expenseEditForm.openCurrentReceipt")}
                   </a>
                 ) : (
-                  <p className="mt-1">Nessuno scontrino allegato.</p>
+                  <p className="mt-1">{t("expenseForm.receiptNone")}</p>
                 )}
-                <p className="mt-2">Sostituisci (opzionale):</p>
+                <p className="mt-2">{t("expenseForm.replaceOptional")}</p>
                 <input
                   type="file"
                   name="receipt"
@@ -249,7 +258,7 @@ export function ExpenseEditForm({
               </div>
 
               <fieldset className="rounded-xl border border-slate-200/80 p-3">
-                <legend className="px-1 text-xs font-semibold text-slate-600">Ripartizione</legend>
+                <legend className="px-1 text-xs font-semibold text-slate-600">{t("expenseForm.splitLegend")}</legend>
                 <div className="mt-2 flex flex-wrap gap-3 text-sm">
                   <label className="flex cursor-pointer items-center gap-2">
                     <input
@@ -258,7 +267,7 @@ export function ExpenseEditForm({
                       onChange={() => setSplitMode("EQUAL")}
                       className="border-emerald-300 text-emerald-600"
                     />
-                    Uguale
+                    {t("addExpenseForm.modeEqual")}
                   </label>
                   <label className="flex cursor-pointer items-center gap-2">
                     <input
@@ -267,7 +276,7 @@ export function ExpenseEditForm({
                       onChange={() => setSplitMode("PERCENT")}
                       className="border-emerald-300 text-emerald-600"
                     />
-                    Percentuali
+                    {t("addExpenseForm.modePercent")}
                   </label>
                   <label className="flex cursor-pointer items-center gap-2">
                     <input
@@ -276,13 +285,13 @@ export function ExpenseEditForm({
                       onChange={() => setSplitMode("CUSTOM")}
                       className="border-emerald-300 text-emerald-600"
                     />
-                    Importo per persona
+                    {t("addExpenseForm.modeCustom")}
                   </label>
                 </div>
               </fieldset>
 
               <fieldset className="rounded-xl border border-slate-200/80 p-3">
-                <legend className="px-1 text-xs font-semibold text-slate-600">Partecipanti</legend>
+                <legend className="px-1 text-xs font-semibold text-slate-600">{t("expenseForm.participantsLegend")}</legend>
                 <div className="mt-2 flex flex-col gap-2">
                   {members.map((m) => (
                     <div key={m.id} className="flex flex-wrap items-center gap-2 text-sm">
@@ -319,7 +328,7 @@ export function ExpenseEditForm({
                 </div>
                 {splitMode === "PERCENT" ? (
                   <p className={`mt-2 text-xs ${percentSum === 100 ? "text-emerald-700" : "text-amber-800"}`}>
-                    Somma: {percentSum}%
+                    {formatMessage(t("addExpenseForm.percentSumLine"), { sum: percentSum })}
                   </p>
                 ) : null}
                 {splitMode === "CUSTOM" ? (
@@ -328,17 +337,17 @@ export function ExpenseEditForm({
                     onClick={distributeCustomEqually}
                     className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium"
                   >
-                    Distribuisci totale in parti uguali
+                    {t("addExpenseForm.distributeAmounts")}
                   </button>
                 ) : null}
               </fieldset>
 
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={() => setOpen(false)} className="cv-btn-outline flex-1">
-                  Annulla
+                  {t("expenseEditForm.cancel")}
                 </button>
                 <button type="submit" disabled={pending} className="cv-btn-primary flex-1">
-                  {pending ? "Salvataggio…" : "Salva"}
+                  {pending ? t("expenseEditForm.saving") : t("expenseEditForm.save")}
                 </button>
               </div>
             </form>

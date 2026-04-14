@@ -1,10 +1,12 @@
 "use client";
 
 import { resetPasswordWithToken } from "@/lib/actions/password-reset";
+import { useI18n } from "@/components/I18nProvider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function ResetPasswordForm({ token }: { token: string }) {
+  const { t } = useI18n();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -30,11 +32,11 @@ export function ResetPasswordForm({ token }: { token: string }) {
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
       ) : null}
       <label className="flex flex-col gap-1 text-sm font-semibold text-slate-700">
-        Nuova password
+        {t("passwordResetForm.newPasswordLabel")}
         <input name="password" type="password" required minLength={8} autoComplete="new-password" className="cv-input" />
       </label>
       <button type="submit" disabled={pending} className="cv-btn-primary w-full">
-        {pending ? "Salvataggio…" : "Salva password"}
+        {pending ? t("passwordResetForm.saving") : t("passwordResetForm.savePassword")}
       </button>
     </form>
   );

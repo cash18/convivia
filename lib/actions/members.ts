@@ -2,6 +2,8 @@
 
 import { z } from "zod";
 import { auth } from "@/auth";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { ta } from "@/lib/i18n/action-messages";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import {
@@ -28,18 +30,18 @@ export async function inviteHouseMemberByEmail(
   emailRaw: string,
 ): Promise<{ ok: true } | { error: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
   const parsed = z.string().email().safeParse(emailRaw.trim().toLowerCase());
-  if (!parsed.success) return { error: "Email non valida." };
+  if (!parsed.success) return { error: await ta("errors.emailInvalid") };
   const email = parsed.data;
 
   const m = await membership(houseId, session.user.id);
-  if (!m || !canManageHouseMembers(m.role)) return { error: "Non hai i permessi per invitare." };
+  if (!m || !canManageHouseMembers(m.role)) return { error: await ta("errors.noPermissionInvite") };
 
   const already = await prisma.houseMember.findFirst({
     where: { houseId, user: { email } },
   });
-  if (already) return { error: "Questa persona è già nella casa." };
+  if (already) return { error: await ta("errors.alreadyInHouse") };
 
   const token = newSecureToken();
   await prisma.houseEmailInvite.create({
@@ -52,7 +54,8 @@ export async function inviteHouseMemberByEmail(
     },
   });
 
-  const inviterName = session.user.name?.trim() || session.user.email || "Un coinquilino";
+  const inviterName =
+    session.user.name?.trim() || session.user.email || (await ta("labels.inviterFallback"));
   const content = houseInviteEmailContent({
     token,
     houseName: m.house.name,
@@ -65,7 +68,7 @@ export async function inviteHouseMemberByEmail(
     text: content.text,
     devPreviewUrl: content.previewUrl,
   });
-  if (!sent.ok) return { error: "Invio email non riuscito. Riprova più tardi." };
+  if (!sent.ok) return { error: await ta("errors.emailSendFailed") };
 
   revalidatePath(`/casa/${houseId}/membri`);
   return { ok: true };
@@ -75,18 +78,18 @@ export async function acceptHouseEmailInvite(
   token: string,
 ): Promise<{ ok: true; houseId: string } | { error: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Devi accedere." };
+  if (!session?.user?.id) return { error: await ta("errors.mustSignIn") };
 
   const inv = await prisma.houseEmailInvite.findUnique({
     where: { token: token.trim() },
     include: { house: true },
   });
-  if (!inv || inv.usedAt) return { error: "Invito non valido o già usato." };
-  if (inv.expiresAt.getTime() < Date.now()) return { error: "Invito scaduto." };
+  if (!inv || inv.usedAt) return { error: await ta("errors.inviteInvalidOrUsed") };
+  if (inv.expiresAt.getTime() < Date.now()) return { error: await ta("errors.inviteExpired") };
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!user || user.email.toLowerCase() !== inv.email.toLowerCase()) {
-    return { error: "Accedi con l’indirizzo email a cui è stato inviato l’invito." };
+    return { error: await ta("errors.signInWithInviteEmail") };
   }
 
   const already = await prisma.houseMember.findUnique({
@@ -110,13 +113,13 @@ export async function acceptHouseEmailInvite(
   revalidatePath(`/casa/${inv.houseId}/membri`);
 
   if (!already) {
-    const who = session.user.name?.trim() || "Qualcuno";
+    const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
     void notifyHouseMembersExceptActor({
       houseId: inv.houseId,
       actorUserId: session.user.id,
       category: "HOUSE",
-      title: "Nuovo membro",
-      body: `${who} è entrato in «${inv.house.name}».`,
+      title: await ta("pushTitles.newMember"),
+      body: formatMessage(await ta("push.memberJoined"), { who, houseName: inv.house.name }),
       path: `/casa/${inv.houseId}`,
       tag: `convivia-join-${inv.houseId}`,
     });
@@ -130,17 +133,17 @@ export async function removeHouseMember(
   targetUserId: string,
 ): Promise<{ ok: true } | { error: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (targetUserId === session.user.id) return { error: "Per lasciare la casa serve un’uscita dedicata (in arrivo). Qui puoi solo rimuovere altri." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (targetUserId === session.user.id) return { error: await ta("errors.cannotRemoveSelf") };
 
   const actor = await membership(houseId, session.user.id);
   const target = await membership(houseId, targetUserId);
-  if (!actor || !target) return { error: "Membro non trovato." };
+  if (!actor || !target) return { error: await ta("errors.memberNotFound") };
   if (!canRemoveMember(actor.role, target.role)) {
-    return { error: "Non hai i permessi per rimuovere questo membro." };
+    return { error: await ta("errors.noPermissionRemove") };
   }
   if (isOwnerRole(target.role)) {
-    return { error: "Il proprietario non può essere rimosso. Trasferisci prima la proprietà." };
+    return { error: await ta("errors.ownerCannotBeRemoved") };
   }
 
   await prisma.houseMember.delete({
@@ -158,12 +161,12 @@ export async function promoteHouseSupervisor(
   targetUserId: string,
 ): Promise<{ ok: true } | { error: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
   const actor = await membership(houseId, session.user.id);
   const target = await membership(houseId, targetUserId);
-  if (!actor || !target) return { error: "Membro non trovato." };
-  if (!canPromoteSupervisor(actor.role)) return { error: "Solo il proprietario può nominare un supervisionatore." };
-  if (target.role !== HouseRole.MEMBER) return { error: "Puoi promuovere solo un membro standard." };
+  if (!actor || !target) return { error: await ta("errors.memberNotFound") };
+  if (!canPromoteSupervisor(actor.role)) return { error: await ta("errors.onlyOwnerPromotes") };
+  if (target.role !== HouseRole.MEMBER) return { error: await ta("errors.onlyMemberCanPromote") };
 
   await prisma.houseMember.update({
     where: { userId_houseId: { userId: targetUserId, houseId } },
@@ -178,12 +181,12 @@ export async function demoteHouseSupervisor(
   targetUserId: string,
 ): Promise<{ ok: true } | { error: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
   const actor = await membership(houseId, session.user.id);
   const target = await membership(houseId, targetUserId);
-  if (!actor || !target) return { error: "Membro non trovato." };
-  if (!canPromoteSupervisor(actor.role)) return { error: "Solo il proprietario può modificare i ruoli." };
-  if (target.role !== HouseRole.SUPERVISOR) return { error: "Questo membro non è un supervisionatore." };
+  if (!actor || !target) return { error: await ta("errors.memberNotFound") };
+  if (!canPromoteSupervisor(actor.role)) return { error: await ta("errors.onlyOwnerChangesRoles") };
+  if (target.role !== HouseRole.SUPERVISOR) return { error: await ta("errors.notSupervisor") };
 
   await prisma.houseMember.update({
     where: { userId_houseId: { userId: targetUserId, houseId } },
@@ -198,13 +201,13 @@ export async function requestHouseOwnershipTransfer(
   toUserId: string,
 ): Promise<{ ok: true } | { error: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (toUserId === session.user.id) return { error: "Scegli un altro membro come nuovo proprietario." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (toUserId === session.user.id) return { error: await ta("errors.chooseOtherOwner") };
 
   const actor = await membership(houseId, session.user.id);
   const target = await membership(houseId, toUserId);
-  if (!actor || !target) return { error: "Membro non trovato." };
-  if (!isOwnerRole(actor.role)) return { error: "Solo il proprietario può avviare un trasferimento." };
+  if (!actor || !target) return { error: await ta("errors.memberNotFound") };
+  if (!isOwnerRole(actor.role)) return { error: await ta("errors.onlyOwnerTransfers") };
 
   await prisma.houseOwnershipTransfer.updateMany({
     where: { houseId, status: "PENDING" },
@@ -228,7 +231,8 @@ export async function requestHouseOwnershipTransfer(
     },
   });
 
-  const fromName = transfer.fromUser.name?.trim() || transfer.fromUser.email || "Il proprietario";
+  const fromName =
+    transfer.fromUser.name?.trim() || transfer.fromUser.email || (await ta("labels.ownerFallback"));
   const content = ownershipTransferEmailContent({
     token,
     houseName: transfer.house.name,
@@ -243,7 +247,7 @@ export async function requestHouseOwnershipTransfer(
   });
   if (!sent.ok) {
     await prisma.houseOwnershipTransfer.delete({ where: { id: transfer.id } });
-    return { error: "Invio email non riuscito. Riprova più tardi." };
+    return { error: await ta("errors.emailSendFailed") };
   }
 
   revalidatePath(`/casa/${houseId}/membri`);
@@ -255,12 +259,12 @@ export async function cancelHouseOwnershipTransfer(
   transferId: string,
 ): Promise<{ ok: true } | { error: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
 
   const t = await prisma.houseOwnershipTransfer.findFirst({
     where: { id: transferId, houseId, fromUserId: session.user.id, status: "PENDING" },
   });
-  if (!t) return { error: "Richiesta non trovata o già chiusa." };
+  if (!t) return { error: await ta("errors.transferNotFoundOrClosed") };
 
   await prisma.houseOwnershipTransfer.update({
     where: { id: transferId },
@@ -274,21 +278,21 @@ export async function acceptHouseOwnershipTransfer(
   token: string,
 ): Promise<{ ok: true; houseId: string } | { error: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Devi accedere." };
+  if (!session?.user?.id) return { error: await ta("errors.mustSignIn") };
 
   const t = await prisma.houseOwnershipTransfer.findUnique({
     where: { token: token.trim() },
     include: { house: { select: { id: true, name: true } } },
   });
-  if (!t || t.status !== "PENDING") return { error: "Richiesta non valida o già gestita." };
-  if (t.expiresAt.getTime() < Date.now()) return { error: "Richiesta scaduta." };
-  if (t.toUserId !== session.user.id) return { error: "Questa richiesta è destinata a un altro account." };
+  if (!t || t.status !== "PENDING") return { error: await ta("errors.transferInvalidOrHandled") };
+  if (t.expiresAt.getTime() < Date.now()) return { error: await ta("errors.transferExpired") };
+  if (t.toUserId !== session.user.id) return { error: await ta("errors.transferWrongAccount") };
 
   const ownerRow = await prisma.houseMember.findUnique({
     where: { userId_houseId: { userId: t.fromUserId, houseId: t.houseId } },
   });
   if (!ownerRow || !isOwnerRole(ownerRow.role)) {
-    return { error: "La situazione della casa è cambiata. Contatta i coinquilini." };
+    return { error: await ta("errors.houseChanged") };
   }
 
   await prisma.$transaction([
@@ -314,13 +318,13 @@ export async function acceptHouseOwnershipTransfer(
   revalidatePath(`/casa/${t.houseId}`);
   revalidatePath(`/casa/${t.houseId}/membri`);
 
-  const who = session.user.name?.trim() || "Il nuovo proprietario";
+  const who = session.user.name?.trim() || (await ta("labels.newOwnerFallback"));
   void notifyHouseMembersExceptActor({
     houseId: t.houseId,
     actorUserId: session.user.id,
     category: "HOUSE",
-    title: "Nuovo proprietario",
-    body: `${who} è ora amministratore di «${t.house.name}».`,
+    title: await ta("pushTitles.newOwner"),
+    body: formatMessage(await ta("push.ownerChanged"), { who, houseName: t.house.name }),
     path: `/casa/${t.houseId}/membri`,
     tag: `convivia-owner-${t.houseId}`,
   });
@@ -332,13 +336,13 @@ export async function declineHouseOwnershipTransfer(
   token: string,
 ): Promise<{ ok: true } | { error: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Devi accedere." };
+  if (!session?.user?.id) return { error: await ta("errors.mustSignIn") };
 
   const t = await prisma.houseOwnershipTransfer.findUnique({
     where: { token: token.trim() },
   });
-  if (!t || t.status !== "PENDING") return { error: "Richiesta non valida." };
-  if (t.toUserId !== session.user.id) return { error: "Questa richiesta è destinata a un altro account." };
+  if (!t || t.status !== "PENDING") return { error: await ta("errors.transferInvalid") };
+  if (t.toUserId !== session.user.id) return { error: await ta("errors.transferWrongAccount") };
 
   await prisma.houseOwnershipTransfer.update({
     where: { id: t.id },

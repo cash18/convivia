@@ -1,8 +1,11 @@
 import { BrandLogo } from "@/components/BrandLogo";
 import { ForgotPasswordForm } from "@/components/ForgotPasswordForm";
+import { createTranslator } from "@/lib/i18n/server";
 import Link from "next/link";
 
-export default function ForgotPasswordPage() {
+export default async function ForgotPasswordPage() {
+  const { t } = await createTranslator();
+
   return (
     <div className="relative flex min-h-dvh min-h-screen flex-col items-center justify-center px-4 py-12 pt-[env(safe-area-inset-top,0px)]">
       <div
@@ -16,16 +19,14 @@ export default function ForgotPasswordPage() {
           </Link>
         </div>
         <div className="cv-card p-8 sm:p-9">
-          <h1 className="text-2xl font-extrabold text-slate-900">Password dimenticata</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Inserisci l’email dell’account: se esiste, riceverai un link per scegliere una nuova password.
-          </p>
+          <h1 className="text-2xl font-extrabold text-slate-900">{t("passwordRequestPage.title")}</h1>
+          <p className="mt-1 text-sm text-slate-600">{t("passwordRequestPage.lead")}</p>
           <div className="mt-6">
             <ForgotPasswordForm />
           </div>
           <p className="mt-6 text-center text-sm text-slate-600">
             <Link href="/accedi" className="cv-link">
-              Torna all’accesso
+              {t("passwordRequestPage.backLogin")}
             </Link>
           </p>
         </div>

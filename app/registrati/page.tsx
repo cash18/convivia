@@ -1,5 +1,6 @@
 import { BrandLogo } from "@/components/BrandLogo";
 import { RegisterForm } from "@/components/RegisterForm";
+import { createTranslator } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -9,6 +10,7 @@ export default async function RegisterPage({
   searchParams: Promise<{ invito?: string }>;
 }) {
   const sp = await searchParams;
+  const { t } = await createTranslator();
   const invito = sp.invito?.trim();
   let inviteToken: string | null = null;
   let lockedEmail: string | null = null;
@@ -39,15 +41,13 @@ export default async function RegisterPage({
           </Link>
         </div>
         <div className="cv-card p-8 sm:p-9">
-          <h1 className="text-2xl font-extrabold text-slate-900">Crea account</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900">{t("authRegister.title")}</h1>
           <p className="mt-1 text-sm text-slate-600">
-            Unisciti a Convivia e sincronizza la tua casa con i coinquilini.
+            {t("authRegister.subtitle")}
             {inviteToken ? (
               <>
                 {" "}
-                Stai creando l’account per accettare un <strong className="font-semibold text-slate-800">invito via
-                email</strong>: dopo la registrazione conferma l’indirizzo email, poi apri di nuovo il link dell’invito
-                dalla posta.
+                {t("authRegister.subtitleInviteSuffix")}
               </>
             ) : null}
           </p>
@@ -56,7 +56,7 @@ export default async function RegisterPage({
           </div>
           <p className="mt-4 text-center">
             <Link href="/" className="text-sm text-slate-500 transition hover:text-slate-800">
-              ← Torna alla home
+              {t("authRegister.backHome")}
             </Link>
           </p>
         </div>

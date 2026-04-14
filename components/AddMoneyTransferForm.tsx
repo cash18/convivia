@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
 import { createMoneyTransfer } from "@/lib/actions/transfers";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -7,6 +8,7 @@ import { useState } from "react";
 type Member = { id: string; name: string };
 
 export function AddMoneyTransferForm({ houseId, members }: { houseId: string; members: Member[] }) {
+  const { t } = useI18n();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -27,9 +29,7 @@ export function AddMoneyTransferForm({ houseId, members }: { houseId: string; me
   }
 
   if (members.length < 2) {
-    return (
-      <p className="text-xs text-slate-500">Servono almeno due membri per registrare un trasferimento.</p>
-    );
+    return <p className="text-xs text-slate-500">{t("moneyTransferForm.needTwoMembers")}</p>;
   }
 
   return (
@@ -39,7 +39,7 @@ export function AddMoneyTransferForm({ houseId, members }: { houseId: string; me
       ) : null}
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
-          Da
+          {t("moneyTransferForm.from")}
           <select name="fromUserId" required className="cv-input-sm">
             <option value="">—</option>
             {members.map((m) => (
@@ -50,7 +50,7 @@ export function AddMoneyTransferForm({ houseId, members }: { houseId: string; me
           </select>
         </label>
         <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
-          A
+          {t("moneyTransferForm.to")}
           <select name="toUserId" required className="cv-input-sm">
             <option value="">—</option>
             {members.map((m) => (
@@ -61,17 +61,23 @@ export function AddMoneyTransferForm({ houseId, members }: { houseId: string; me
           </select>
         </label>
       </div>
-      <input
-        name="amount"
-        required
-        type="text"
-        inputMode="decimal"
-        placeholder="Importo (es. 20,00)"
-        className="cv-input-sm"
-      />
-      <input name="note" type="text" placeholder="Nota (opzionale)" className="cv-input-sm" />
+      <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        {t("moneyTransferForm.amount")}
+        <input
+          name="amount"
+          required
+          type="text"
+          inputMode="decimal"
+          placeholder={t("moneyTransferForm.amountPlaceholder")}
+          className="cv-input-sm"
+        />
+      </label>
+      <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        {t("moneyTransferForm.note")}
+        <input name="note" type="text" placeholder={t("moneyTransferForm.note")} className="cv-input-sm" />
+      </label>
       <button type="submit" disabled={pending} className="cv-btn-primary text-sm">
-        {pending ? "Salvataggio…" : "Registra trasferimento"}
+        {pending ? t("moneyTransferForm.submitting") : t("moneyTransferForm.submit")}
       </button>
     </form>
   );

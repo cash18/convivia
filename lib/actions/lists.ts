@@ -1,6 +1,8 @@
 "use server";
 
 import { auth } from "@/auth";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { ta } from "@/lib/i18n/action-messages";
 import { notifyHouseMembersExceptActor } from "@/lib/push-notify";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -17,23 +19,23 @@ export async function createShoppingList(
   name: string,
 ): Promise<{ error?: string; listId?: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
   const trimmed = name.trim();
-  if (!trimmed) return { error: "Nome lista obbligatorio." };
+  if (!trimmed) return { error: await ta("errors.listNameRequired") };
 
   const list = await prisma.shoppingList.create({
     data: { houseId, name: trimmed },
   });
   revalidatePath(`/casa/${houseId}/liste`);
   revalidatePath(`/casa/${houseId}`);
-  const who = session.user.name?.trim() || "Qualcuno";
+  const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
   void notifyHouseMembersExceptActor({
     houseId,
     actorUserId: session.user.id,
     category: "LISTS",
-    title: "Nuova lista spesa",
-    body: `${who} ha creato la lista «${trimmed}».`,
+    title: await ta("pushTitles.newList"),
+    body: formatMessage(await ta("push.listCreated"), { who, listName: trimmed }),
     path: `/casa/${houseId}/liste`,
     tag: `convivia-list-${houseId}`,
   });
@@ -46,28 +48,28 @@ export async function addListItem(
   name: string,
 ): Promise<{ error?: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const list = await prisma.shoppingList.findFirst({
     where: { id: listId, houseId },
   });
-  if (!list) return { error: "Lista non trovata." };
+  if (!list) return { error: await ta("errors.listNotFound") };
   const trimmed = name.trim();
-  if (!trimmed) return { error: "Nome articolo obbligatorio." };
+  if (!trimmed) return { error: await ta("errors.itemNameRequired") };
 
   await prisma.shoppingListItem.create({
     data: { listId, name: trimmed, addedById: session.user.id },
   });
   revalidatePath(`/casa/${houseId}/liste`);
   revalidatePath(`/casa/${houseId}`);
-  const who = session.user.name?.trim() || "Qualcuno";
+  const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
   void notifyHouseMembersExceptActor({
     houseId,
     actorUserId: session.user.id,
     category: "LISTS",
-    title: "Lista spesa",
-    body: `${who} ha aggiunto «${trimmed}» in «${list.name}».`,
+    title: await ta("pushTitles.listItem"),
+    body: formatMessage(await ta("push.listItemAdded"), { who, item: trimmed, listName: list.name }),
     path: `/casa/${houseId}/liste`,
     tag: `convivia-listitem-${houseId}`,
   });
@@ -76,13 +78,13 @@ export async function addListItem(
 
 export async function toggleListItem(houseId: string, itemId: string, done: boolean) {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const item = await prisma.shoppingListItem.findFirst({
     where: { id: itemId, list: { houseId } },
   });
-  if (!item) return { error: "Articolo non trovato." };
+  if (!item) return { error: await ta("errors.itemNotFound") };
 
   await prisma.shoppingListItem.update({
     where: { id: itemId },
@@ -95,13 +97,13 @@ export async function toggleListItem(houseId: string, itemId: string, done: bool
 
 export async function deleteListItem(houseId: string, itemId: string) {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const item = await prisma.shoppingListItem.findFirst({
     where: { id: itemId, list: { houseId } },
   });
-  if (!item) return { error: "Articolo non trovato." };
+  if (!item) return { error: await ta("errors.itemNotFound") };
 
   await prisma.shoppingListItem.delete({ where: { id: itemId } });
   revalidatePath(`/casa/${houseId}/liste`);
@@ -115,15 +117,15 @@ export async function updateShoppingList(
   name: string,
 ): Promise<{ error?: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const list = await prisma.shoppingList.findFirst({
     where: { id: listId, houseId },
   });
-  if (!list) return { error: "Lista non trovata." };
+  if (!list) return { error: await ta("errors.listNotFound") };
   const trimmed = name.trim();
-  if (!trimmed) return { error: "Nome obbligatorio." };
+  if (!trimmed) return { error: await ta("errors.nameRequired") };
 
   await prisma.shoppingList.update({
     where: { id: listId },
@@ -136,24 +138,24 @@ export async function updateShoppingList(
 
 export async function deleteShoppingList(houseId: string, listId: string): Promise<{ error?: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const list = await prisma.shoppingList.findFirst({
     where: { id: listId, houseId },
   });
-  if (!list) return { error: "Lista non trovata." };
+  if (!list) return { error: await ta("errors.listNotFound") };
 
   await prisma.shoppingList.delete({ where: { id: listId } });
   revalidatePath(`/casa/${houseId}/liste`);
   revalidatePath(`/casa/${houseId}`);
-  const who = session.user.name?.trim() || "Qualcuno";
+  const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
   void notifyHouseMembersExceptActor({
     houseId,
     actorUserId: session.user.id,
     category: "LISTS",
-    title: "Lista eliminata",
-    body: `${who} ha eliminato la lista «${list.name}».`,
+    title: await ta("pushTitles.listDeleted"),
+    body: formatMessage(await ta("push.listDeleted"), { who, listName: list.name }),
     path: `/casa/${houseId}/liste`,
     tag: `convivia-list-del-${houseId}`,
   });
@@ -166,16 +168,16 @@ export async function updateShoppingListItem(
   name: string,
 ): Promise<{ error?: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const item = await prisma.shoppingListItem.findFirst({
     where: { id: itemId, list: { houseId } },
     include: { list: { select: { name: true } } },
   });
-  if (!item) return { error: "Articolo non trovato." };
+  if (!item) return { error: await ta("errors.itemNotFound") };
   const trimmed = name.trim();
-  if (!trimmed) return { error: "Testo obbligatorio." };
+  if (!trimmed) return { error: await ta("errors.textRequired") };
 
   await prisma.shoppingListItem.update({
     where: { id: itemId },

@@ -1,6 +1,8 @@
+import type { ReactNode } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { HouseOwnershipTransferClient } from "@/components/HouseOwnershipTransferClient";
 import { auth } from "@/auth";
+import { createTranslator } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -12,16 +14,17 @@ export default async function TrasferimentoProprietaPage({
   const sp = await searchParams;
   const token = sp.token?.trim() ?? "";
   const session = await auth();
+  const { t } = await createTranslator();
 
-  let inner: React.ReactNode = (
+  let inner: ReactNode = (
     <div className="cv-card p-8 sm:p-9">
-      <h1 className="text-2xl font-extrabold text-slate-900">Richiesta non valida</h1>
-      <p className="mt-2 text-sm text-slate-600">Link scaduto, già gestito o incompleto.</p>
+      <h1 className="text-2xl font-extrabold text-slate-900">{t("transferPage.invalidTitle")}</h1>
+      <p className="mt-2 text-sm text-slate-600">{t("transferPage.invalidBody")}</p>
     </div>
   );
 
   if (token) {
-    const t = await prisma.houseOwnershipTransfer.findUnique({
+    const tr = await prisma.houseOwnershipTransfer.findUnique({
       where: { token },
       include: {
         house: { select: { name: true } },
@@ -29,13 +32,13 @@ export default async function TrasferimentoProprietaPage({
         toUser: { select: { id: true } },
       },
     });
-    if (t && t.status === "PENDING" && t.expiresAt.getTime() >= Date.now()) {
-      const fromName = t.fromUser.name?.trim() || t.fromUser.email;
-      const isRecipient = !!session?.user?.id && session.user.id === t.toUser.id;
+    if (tr && tr.status === "PENDING" && tr.expiresAt.getTime() >= Date.now()) {
+      const fromName = tr.fromUser.name?.trim() || tr.fromUser.email;
+      const isRecipient = !!session?.user?.id && session.user.id === tr.toUser.id;
       inner = (
         <HouseOwnershipTransferClient
           token={token}
-          houseName={t.house.name}
+          houseName={tr.house.name}
           fromName={fromName}
           isLoggedIn={!!session?.user}
           isRecipient={isRecipient}
@@ -59,7 +62,7 @@ export default async function TrasferimentoProprietaPage({
         {inner}
         <p className="mt-6 text-center">
           <Link href="/" className="text-sm text-slate-500 transition hover:text-slate-800">
-            ← Torna alla home
+            {t("transferPage.backHome")}
           </Link>
         </p>
       </div>

@@ -1,6 +1,8 @@
+import type { ReactNode } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { HouseInviteClient } from "@/components/HouseInviteClient";
 import { auth } from "@/auth";
+import { createTranslator } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -12,11 +14,12 @@ export default async function InvitoCasaPage({
   const sp = await searchParams;
   const token = sp.token?.trim() ?? "";
   const session = await auth();
+  const { t } = await createTranslator();
 
-  let inner: React.ReactNode = (
+  let inner: ReactNode = (
     <div className="cv-card p-8 sm:p-9">
-      <h1 className="text-2xl font-extrabold text-slate-900">Invito non valido</h1>
-      <p className="mt-2 text-sm text-slate-600">Manca il token nell’URL o il link non è più valido.</p>
+      <h1 className="text-2xl font-extrabold text-slate-900">{t("invitePage.invalidTitle")}</h1>
+      <p className="mt-2 text-sm text-slate-600">{t("invitePage.invalidBody")}</p>
     </div>
   );
 
@@ -53,7 +56,7 @@ export default async function InvitoCasaPage({
         {inner}
         <p className="mt-6 text-center">
           <Link href="/" className="text-sm text-slate-500 transition hover:text-slate-800">
-            ← Torna alla home
+            {t("invitePage.backHome")}
           </Link>
         </p>
       </div>

@@ -1,6 +1,8 @@
 "use server";
 
 import { auth } from "@/auth";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { ta } from "@/lib/i18n/action-messages";
 import { notifyHouseMembersExceptActor } from "@/lib/push-notify";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -17,8 +19,8 @@ export async function createTask(
   formData: FormData,
 ): Promise<{ error?: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim() || null;
@@ -31,13 +33,13 @@ export async function createTask(
     if (Number.isNaN(dueDate.getTime())) dueDate = null;
   }
 
-  if (!title) return { error: "Titolo obbligatorio." };
+  if (!title) return { error: await ta("errors.taskTitleRequired") };
 
   if (assigneeId) {
     const ok = await prisma.houseMember.findFirst({
       where: { houseId, userId: assigneeId },
     });
-    if (!ok) return { error: "Assegnatario non valido." };
+    if (!ok) return { error: await ta("errors.assigneeInvalid") };
   }
 
   await prisma.task.create({
@@ -54,14 +56,14 @@ export async function createTask(
 
   revalidatePath(`/casa/${houseId}/compiti`);
   revalidatePath(`/casa/${houseId}`);
-  const who = session.user.name?.trim() || "Qualcuno";
-  const assignHint = assigneeId ? " (assegnato)" : "";
+  const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
+  const assignHint = assigneeId ? await ta("push.taskAssignSuffix") : "";
   void notifyHouseMembersExceptActor({
     houseId,
     actorUserId: session.user.id,
     category: "TASKS",
-    title: "Nuovo compito",
-    body: `${who} ha creato «${title}»${assignHint}.`,
+    title: await ta("pushTitles.newTask"),
+    body: formatMessage(await ta("push.taskCreated"), { who, title, assignHint }),
     path: `/casa/${houseId}/compiti`,
     tag: `convivia-task-${houseId}`,
   });
@@ -74,13 +76,13 @@ export async function setTaskStatus(
   status: "TODO" | "DONE",
 ) {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const task = await prisma.task.findFirst({
     where: { id: taskId, houseId },
   });
-  if (!task) return { error: "Compito non trovato." };
+  if (!task) return { error: await ta("errors.taskNotFound") };
 
   await prisma.task.update({
     where: { id: taskId },
@@ -89,13 +91,13 @@ export async function setTaskStatus(
   revalidatePath(`/casa/${houseId}/compiti`);
   revalidatePath(`/casa/${houseId}`);
   if (status === "DONE") {
-    const who = session.user.name?.trim() || "Qualcuno";
+    const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
     void notifyHouseMembersExceptActor({
       houseId,
       actorUserId: session.user.id,
       category: "TASKS",
-      title: "Compito completato",
-      body: `${who} ha completato «${task.title}».`,
+      title: await ta("pushTitles.taskCompleted"),
+      body: formatMessage(await ta("push.taskCompleted"), { who, title: task.title }),
       path: `/casa/${houseId}/compiti`,
       tag: `convivia-task-done-${houseId}`,
     });
@@ -105,25 +107,25 @@ export async function setTaskStatus(
 
 export async function deleteTask(houseId: string, taskId: string) {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const task = await prisma.task.findFirst({
     where: { id: taskId, houseId },
   });
-  if (!task) return { error: "Compito non trovato." };
+  if (!task) return { error: await ta("errors.taskNotFound") };
 
   const title = task.title;
   await prisma.task.delete({ where: { id: taskId } });
   revalidatePath(`/casa/${houseId}/compiti`);
   revalidatePath(`/casa/${houseId}`);
-  const who = session.user.name?.trim() || "Qualcuno";
+  const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
   void notifyHouseMembersExceptActor({
     houseId,
     actorUserId: session.user.id,
     category: "TASKS",
-    title: "Compito eliminato",
-    body: `${who} ha rimosso «${title}».`,
+    title: await ta("pushTitles.taskDeleted"),
+    body: formatMessage(await ta("push.taskRemoved"), { who, title }),
     path: `/casa/${houseId}/compiti`,
     tag: `convivia-task-del-${houseId}`,
   });

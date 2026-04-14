@@ -4,42 +4,45 @@ import {
   IconCheck,
   IconWallet,
 } from "@/components/CasaSectionIcons";
+import { createTranslator } from "@/lib/i18n/server";
 import Link from "next/link";
 
-const sections = [
-  {
-    href: (id: string) => `/casa/${id}/spese`,
-    title: "Spese",
-    description: "Saldi, storico e nuove uscite condivise",
-    accent: "from-emerald-500/20 to-teal-500/10",
-    Icon: IconWallet,
-  },
-  {
-    href: (id: string) => `/casa/${id}/calendario`,
-    title: "Calendario",
-    description: "Eventi, turni e appuntamenti della casa",
-    accent: "from-cyan-500/20 to-sky-500/10",
-    Icon: IconCalendar,
-  },
-  {
-    href: (id: string) => `/casa/${id}/liste`,
-    title: "Liste spesa",
-    description: "Liste collaborative da spuntare",
-    accent: "from-lime-500/18 to-emerald-500/10",
-    Icon: IconCart,
-  },
-  {
-    href: (id: string) => `/casa/${id}/compiti`,
-    title: "Compiti",
-    description: "Cose da fare e chi le gestisce",
-    accent: "from-amber-500/20 to-orange-500/10",
-    Icon: IconCheck,
-  },
-] as const;
+export async function CasaHomeQuickNav({ houseId }: { houseId: string }) {
+  const { t } = await createTranslator();
 
-export function CasaHomeQuickNav({ houseId }: { houseId: string }) {
+  const sections = [
+    {
+      href: (id: string) => `/casa/${id}/spese`,
+      title: t("casaNav.expenses"),
+      description: t("casaHomeQuick.expensesDesc"),
+      accent: "from-emerald-500/20 to-teal-500/10",
+      Icon: IconWallet,
+    },
+    {
+      href: (id: string) => `/casa/${id}/calendario`,
+      title: t("casaNav.calendar"),
+      description: t("casaHomeQuick.calendarDesc"),
+      accent: "from-cyan-500/20 to-sky-500/10",
+      Icon: IconCalendar,
+    },
+    {
+      href: (id: string) => `/casa/${id}/liste`,
+      title: t("casaNav.lists"),
+      description: t("casaHomeQuick.listsDesc"),
+      accent: "from-lime-500/18 to-emerald-500/10",
+      Icon: IconCart,
+    },
+    {
+      href: (id: string) => `/casa/${id}/compiti`,
+      title: t("casaNav.tasks"),
+      description: t("casaHomeQuick.tasksDesc"),
+      accent: "from-amber-500/20 to-orange-500/10",
+      Icon: IconCheck,
+    },
+  ] as const;
+
   return (
-    <nav aria-label="Sezioni della casa" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <nav aria-label={t("casaHomeQuick.aria")} className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {sections.map((s) => {
         const Si = s.Icon;
         return (
@@ -62,7 +65,7 @@ export function CasaHomeQuickNav({ houseId }: { houseId: string }) {
           </div>
           <span className="font-bold text-slate-900 group-hover:text-emerald-900">{s.title}</span>
           <span className="text-xs leading-snug text-slate-600">{s.description}</span>
-          <span className="mt-2 text-xs font-semibold text-emerald-700">Apri →</span>
+          <span className="mt-2 text-xs font-semibold text-emerald-700">{t("quickNav.open")}</span>
         </Link>
         );
       })}

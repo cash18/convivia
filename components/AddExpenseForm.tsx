@@ -1,8 +1,10 @@
 "use client";
 
+import { useI18n } from "@/components/I18nProvider";
 import { createExpense } from "@/lib/actions/expenses";
 import { MAX_RECEIPT_BYTES } from "@/lib/expense-receipt-limits";
-import { formatEuroFromCents, formatEuroNumberForInput } from "@/lib/money";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { formatEuroNumberForInput } from "@/lib/money";
 import { runReceiptOcr } from "@/lib/receipt-ocr-browser";
 import { extractEuroTotalFromDualOcr } from "@/lib/receipt-total-parse";
 import { useRouter } from "next/navigation";
@@ -40,6 +42,7 @@ export function AddExpenseForm({
   members: Member[];
   variant?: "full" | "compact";
 }) {
+  const { t } = useI18n();
   const router = useRouter();
   const compact = variant === "compact";
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +115,7 @@ export function AddExpenseForm({
     const normalized = raw.replace(",", ".").trim();
     const n = parseFloat(normalized);
     if (Number.isNaN(n) || n <= 0 || checkedIds.length === 0) {
-      setError("Inserisci prima un importo totale valido e seleziona i partecipanti.");
+      setError(t("addExpenseForm.errorAmountParticipants"));
       return;
     }
     const totalCents = Math.round(n * 100);
@@ -133,11 +136,11 @@ export function AddExpenseForm({
     const input = receiptInputRef.current;
     const file = input?.files?.[0];
     if (!file) {
-      setError("Seleziona prima un’immagine dello scontrino.");
+      setError(t("addExpenseForm.errorSelectReceipt"));
       return;
     }
     if (file.size > MAX_RECEIPT_BYTES) {
-      setError("Immagine troppo grande (max 20 MB).");
+      setError(t("addExpenseForm.errorImageBig"));
       return;
     }
     setOcrBusy(true);
@@ -145,13 +148,13 @@ export function AddExpenseForm({
       const { textFull, textBottom } = await runReceiptOcr(file);
       const euro = extractEuroTotalFromDualOcr(textBottom, textFull);
       if (euro === null) {
-        setError("Non è stato possibile leggere un totale dallo scontrino. Inserisci l’importo a mano.");
+        setError(t("addExpenseForm.errorOcrNone"));
         return;
       }
       const el = amountInputRef.current;
       if (el) el.value = formatEuroNumberForInput(euro);
     } catch {
-      setError("Errore durante la lettura dell’immagine. Riprova o inserisci l’importo manualmente.");
+      setError(t("addExpenseForm.errorOcrRead"));
     } finally {
       setOcrBusy(false);
     }
@@ -162,17 +165,17 @@ export function AddExpenseForm({
     setError(null);
     if (!compact && splitMode === "PERCENT") {
       if (checkedIds.length === 0) {
-        setError("Seleziona almeno un partecipante.");
+        setError(t("addExpenseForm.errorPickParticipant"));
         return;
       }
       if (percentSum !== 100) {
-        setError(`Le percentuali devono sommare a 100% (attualmente ${percentSum}%).`);
+        setError(formatMessage(t("addExpenseForm.errorPercentSum"), { sum: String(percentSum) }));
         return;
       }
     }
     if (!compact && splitMode === "CUSTOM") {
       if (checkedIds.length === 0) {
-        setError("Seleziona almeno un partecipante.");
+        setError(t("addExpenseForm.errorPickParticipant"));
         return;
       }
     }
@@ -205,14 +208,14 @@ export function AddExpenseForm({
 
   return (
     <form onSubmit={onSubmit} encType="multipart/form-data" className="cv-card-solid flex h-full min-h-0 flex-col gap-3 p-5 sm:p-6">
-      <h2 className="text-sm font-bold text-slate-900">{compact ? "Aggiungi spesa (rapido)" : "Nuova spesa"}</h2>
+      <h2 className="text-sm font-bold text-slate-900">{compact ? t("addExpenseForm.titleCompact") : t("addExpenseForm.titleFull")}</h2>
       {error ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
       ) : null}
       <input
         name="title"
         required
-        placeholder="Descrizione (es. Bolletta luce)"
+        placeholder={t("addExpenseForm.placeholderTitle")}
         className="cv-input-sm"
       />
       <div className="grid gap-3 sm:grid-cols-2">
@@ -222,7 +225,7 @@ export function AddExpenseForm({
           required
           type="text"
           inputMode="decimal"
-          placeholder="Importo (es. 45,50)"
+          placeholder={t("addExpenseForm.placeholderAmount")}
           className="cv-input-sm"
         />
         <select
@@ -233,7 +236,7 @@ export function AddExpenseForm({
         >
           {members.map((m) => (
             <option key={m.id} value={m.id}>
-              Pagato da: {m.name}
+              {formatMessage(t("addExpenseForm.paidBy"), { name: m.name ?? "" })}
             </option>
           ))}
         </select>
@@ -242,11 +245,8 @@ export function AddExpenseForm({
       {!compact ? (
         <>
           <div className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
-            <p className="text-xs font-semibold text-slate-600">Scontrino (opzionale)</p>
-            <p className="mt-1 text-xs text-slate-500">
-              Allega una foto (immagini fino a 20 MB); puoi usare &quot;Leggi totale&quot; per compilare l&apos;importo
-              (OCR, non sempre perfetto).
-            </p>
+            <p className="text-xs font-semibold text-slate-600">{t("addExpenseForm.receiptLabel")}</p>
+            <p className="mt-1 text-xs text-slate-500">{t("addExpenseForm.receiptLongHint")}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <input
                 ref={receiptInputRef}
@@ -261,20 +261,20 @@ export function AddExpenseForm({
                 disabled={ocrBusy}
                 className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-900 hover:bg-emerald-100 disabled:opacity-50"
               >
-                {ocrBusy ? "Lettura…" : "Leggi totale da scontrino"}
+                {ocrBusy ? t("addExpenseForm.ocrBusy") : t("addExpenseForm.ocrButton")}
               </button>
             </div>
           </div>
 
           <textarea
             name="notes"
-            placeholder="Note (opzionale)"
+            placeholder={t("addExpenseForm.placeholderNotes")}
             rows={2}
             className="cv-input-sm"
           />
 
           <fieldset className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
-            <legend className="px-1 text-xs font-semibold text-slate-600">Modalità ripartizione</legend>
+            <legend className="px-1 text-xs font-semibold text-slate-600">{t("addExpenseForm.splitModeLegend")}</legend>
             <div className="mt-2 flex flex-wrap gap-4 text-sm">
               <label className="flex cursor-pointer items-center gap-2">
                 <input
@@ -284,7 +284,7 @@ export function AddExpenseForm({
                   onChange={() => setSplitMode("EQUAL")}
                   className="border-emerald-300 text-emerald-600"
                 />
-                Uguale tra i selezionati
+                {t("addExpenseForm.modeEqual")}
               </label>
               <label className="flex cursor-pointer items-center gap-2">
                 <input
@@ -294,7 +294,7 @@ export function AddExpenseForm({
                   onChange={() => setSplitMode("PERCENT")}
                   className="border-emerald-300 text-emerald-600"
                 />
-                Percentuali (somma 100%)
+                {t("addExpenseForm.modePercent")}
               </label>
               <label className="flex cursor-pointer items-center gap-2">
                 <input
@@ -304,17 +304,17 @@ export function AddExpenseForm({
                   onChange={() => setSplitMode("CUSTOM")}
                   className="border-emerald-300 text-emerald-600"
                 />
-                Importo per persona
+                {t("addExpenseForm.modeCustom")}
               </label>
             </div>
           </fieldset>
         </>
       ) : (
-        <p className="text-xs text-slate-500">Ripartizione uguale tra i partecipanti selezionati. Per percentuali o importi personalizzati usa la pagina Spese.</p>
+        <p className="text-xs text-slate-500">{t("addExpenseForm.equalHint")}</p>
       )}
 
       <fieldset className="min-h-0 flex-1 rounded-xl border border-slate-200/80 bg-white/80 p-3">
-        <legend className="px-1 text-xs font-semibold text-slate-600">Ripartizione tra</legend>
+        <legend className="px-1 text-xs font-semibold text-slate-600">{t("addExpenseForm.participantsLegend")}</legend>
         <div className="mt-2 flex flex-col gap-2">
           {members.map((m) => (
             <div key={m.id} className="flex flex-wrap items-center gap-2 text-sm">
@@ -337,7 +337,7 @@ export function AddExpenseForm({
                     value={percents[m.id] ?? 0}
                     onChange={(e) => setPercent(m.id, e.target.value)}
                     className="cv-input-sm w-16 py-1 text-right tabular-nums"
-                    aria-label={`Percentuale per ${m.name}`}
+                    aria-label={formatMessage(t("addExpenseForm.ariaPercentFor"), { name: m.name ?? "" })}
                   />
                   <span className="text-xs text-slate-500">%</span>
                 </div>
@@ -351,7 +351,7 @@ export function AddExpenseForm({
                     onChange={(e) => setCustomEur((prev) => ({ ...prev, [m.id]: e.target.value }))}
                     placeholder="0,00"
                     className="cv-input-sm w-24 py-1 text-right tabular-nums"
-                    aria-label={`Quota in euro per ${m.name}`}
+                    aria-label={formatMessage(t("addExpenseForm.ariaEuroFor"), { name: m.name ?? "" })}
                   />
                   <span className="text-xs text-slate-500">€</span>
                 </div>
@@ -370,27 +370,27 @@ export function AddExpenseForm({
                     : "font-medium text-red-700"
               }
             >
-              Somma percentuali: {percentSum}%
+              {formatMessage(t("addExpenseForm.percentSumLine"), { sum: String(percentSum) })}
               {percentSum !== 100 ? (
                 <>
                   {" "}
-                  — rimangono{" "}
+                  {t("addExpenseForm.percentDashRemain")}{" "}
                   <span className="tabular-nums">{remainingPercent > 0 ? remainingPercent : -remainingPercent}%</span>{" "}
-                  {remainingPercent > 0 ? "da assegnare" : "in eccesso"}
+                  {remainingPercent > 0 ? t("addExpenseForm.percentRemaining") : t("addExpenseForm.percentOver")}
                 </>
               ) : null}
             </p>
             {suggestion ? (
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-slate-600">
-                  Suggerimento per chi è a 0%: {suggestion.labels.join(" · ")}
+                  {t("addExpenseForm.suggestionPrefix")} {suggestion.labels.join(" · ")}
                 </p>
                 <button
                   type="button"
                   onClick={applySuggestion}
                   className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-800 hover:bg-slate-100"
                 >
-                  Applica suggerimento
+                  {t("addExpenseForm.applySuggestion")}
                 </button>
               </div>
             ) : null}
@@ -399,32 +399,29 @@ export function AddExpenseForm({
               onClick={() => checkedIds.length > 0 && setPercents(equalPercentsForIds(checkedIds))}
               className="text-xs font-medium text-emerald-700 hover:text-emerald-900"
             >
-              Ripartisci il 100% in parti uguali tra i selezionati
+              {t("addExpenseForm.redistribute100")}
             </button>
             <p className="text-slate-500">
-              Se modifichi chi partecipa, le percentuali si aggiornano in parti uguali; poi puoi rifinirle.
+              {t("addExpenseForm.percentFooterHint")}
             </p>
           </div>
         ) : null}
         {!compact && splitMode === "CUSTOM" ? (
           <div className="mt-3 space-y-2 border-t border-slate-100 pt-3 text-xs text-slate-600">
-            <p>
-              Indica quanto spetta a ciascuno: la somma deve coincidere esattamente con l&apos;importo totale della
-              spesa.
-            </p>
+            <p>{t("addExpenseForm.customIntro")}</p>
             <button
               type="button"
               onClick={distributeCustomEqually}
               className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-800 hover:bg-slate-100"
             >
-              Distribuisci il totale in parti uguali tra i selezionati
+              {t("addExpenseForm.distributeAmounts")}
             </button>
           </div>
         ) : null}
       </fieldset>
 
       <button type="submit" disabled={pending} className="cv-btn-primary mt-auto shrink-0">
-        {pending ? "Salvataggio…" : compact ? "Aggiungi" : "Aggiungi spesa"}
+        {pending ? t("addExpenseForm.pending") : compact ? t("addExpenseForm.submitCompact") : t("addExpenseForm.submitFull")}
       </button>
     </form>
   );

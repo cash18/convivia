@@ -1,5 +1,6 @@
 import { BrandLogo } from "@/components/BrandLogo";
 import { LoginForm } from "@/components/LoginForm";
+import { createTranslator } from "@/lib/i18n/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -9,6 +10,7 @@ export default async function LoginPage({
   searchParams: Promise<{ registrato?: string; reimpostata?: string }>;
 }) {
   const sp = await searchParams;
+  const { t } = await createTranslator();
 
   return (
     <div className="relative flex min-h-dvh min-h-screen flex-col items-center justify-center px-4 py-12 pt-[env(safe-area-inset-top,0px)]">
@@ -23,33 +25,32 @@ export default async function LoginPage({
           </Link>
         </div>
         <div className="cv-card p-8 sm:p-9">
-          <h1 className="text-2xl font-extrabold text-slate-900">Accedi</h1>
-          <p className="mt-1 text-sm text-slate-600">Benvenuto di nuovo su Convivia</p>
+          <h1 className="text-2xl font-extrabold text-slate-900">{t("authLogin.title")}</h1>
+          <p className="mt-1 text-sm text-slate-600">{t("authLogin.subtitle")}</p>
           {sp.registrato === "1" ? (
             <p className="mt-4 rounded-2xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 text-sm font-medium text-emerald-900">
-              Account creato. Ti abbiamo inviato un’email con il link di conferma: apri il link, poi torna qui per
-              accedere.
+              {t("authLogin.registeredBanner")}
             </p>
           ) : null}
           {sp.reimpostata === "1" ? (
             <p className="mt-4 rounded-2xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 text-sm font-medium text-emerald-900">
-              Password aggiornata. Ora puoi accedere.
+              {t("authLogin.resetBanner")}
             </p>
           ) : null}
           <div className="mt-6">
-            <Suspense fallback={<p className="text-sm text-slate-500">Caricamento form…</p>}>
+            <Suspense fallback={<p className="text-sm text-slate-500">{t("authLogin.loadingForm")}</p>}>
               <LoginForm />
             </Suspense>
           </div>
           <p className="mt-6 text-center text-sm text-slate-600">
-            Non hai un account?{" "}
+            {t("authLogin.noAccount")}{" "}
             <Link href="/registrati" className="cv-link">
-              Registrati
+              {t("authLogin.registerLink")}
             </Link>
           </p>
           <p className="mt-4 text-center">
             <Link href="/" className="text-sm text-slate-500 transition hover:text-slate-800">
-              ← Torna alla home
+              {t("authLogin.backHome")}
             </Link>
           </p>
         </div>

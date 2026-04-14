@@ -1,6 +1,8 @@
 "use server";
 
 import { auth } from "@/auth";
+import { formatMessage } from "@/lib/i18n/format-message";
+import { ta } from "@/lib/i18n/action-messages";
 import { formatEuroFromCents, parseEuroToCents } from "@/lib/money";
 import { notifyHouseMembersExceptActor } from "@/lib/push-notify";
 import { prisma } from "@/lib/prisma";
@@ -18,22 +20,22 @@ export async function createMoneyTransfer(
   formData: FormData,
 ): Promise<{ error?: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const fromUserId = String(formData.get("fromUserId") ?? "");
   const toUserId = String(formData.get("toUserId") ?? "");
   const amountCents = parseEuroToCents(String(formData.get("amount") ?? ""));
   const note = String(formData.get("note") ?? "").trim() || null;
 
-  if (!fromUserId || !toUserId) return { error: "Seleziona mittente e destinatario." };
-  if (fromUserId === toUserId) return { error: "Mittente e destinatario devono essere diversi." };
-  if (amountCents === null || amountCents <= 0) return { error: "Importo non valido." };
+  if (!fromUserId || !toUserId) return { error: await ta("errors.transferUsersRequired") };
+  if (fromUserId === toUserId) return { error: await ta("errors.transferSameUser") };
+  if (amountCents === null || amountCents <= 0) return { error: await ta("errors.transferAmountInvalid") };
 
   const members = await prisma.houseMember.findMany({
     where: { houseId, userId: { in: [fromUserId, toUserId] } },
   });
-  if (members.length !== 2) return { error: "Utenti non validi per questa casa." };
+  if (members.length !== 2) return { error: await ta("errors.transferUsersInvalid") };
 
   const fromName = await prisma.user.findUnique({
     where: { id: fromUserId },
@@ -58,14 +60,14 @@ export async function createMoneyTransfer(
   revalidatePath(`/casa/${houseId}/spese`);
   revalidatePath(`/casa/${houseId}`);
 
-  const who = session.user.name?.trim() || "Qualcuno";
-  const body = `${fromName?.name ?? "?"} → ${toName?.name ?? "?"} · ${formatEuroFromCents(amountCents)}`;
+  const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
+  const detail = `${fromName?.name ?? "?"} → ${toName?.name ?? "?"} · ${formatEuroFromCents(amountCents)}`;
   void notifyHouseMembersExceptActor({
     houseId,
     actorUserId: session.user.id,
     category: "EXPENSES",
-    title: "Trasferimento",
-    body: `${who} ha registrato un trasferimento: ${body}.`,
+    title: await ta("pushTitles.transfer"),
+    body: formatMessage(await ta("push.moneyTransfer"), { who, detail }),
     path: `/casa/${houseId}/spese`,
     tag: `convivia-transfer-${houseId}`,
   });
@@ -74,13 +76,13 @@ export async function createMoneyTransfer(
 
 export async function deleteMoneyTransfer(houseId: string, transferId: string) {
   const session = await auth();
-  if (!session?.user?.id) return { error: "Non autenticato." };
-  if (!(await assertMember(houseId, session.user.id))) return { error: "Accesso negato." };
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
 
   const row = await prisma.moneyTransfer.findFirst({
     where: { id: transferId, houseId },
   });
-  if (!row) return { error: "Trasferimento non trovato." };
+  if (!row) return { error: await ta("errors.transferNotFound") };
 
   await prisma.moneyTransfer.delete({ where: { id: transferId } });
   revalidatePath(`/casa/${houseId}/spese`);
