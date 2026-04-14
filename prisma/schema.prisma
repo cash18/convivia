@@ -211,12 +211,16 @@ model CalendarEvent {
 }
 
 model ShoppingList {
-  id        String             @id @default(cuid())
-  houseId   String
-  name      String
-  createdAt DateTime           @default(now())
-  house     House              @relation(fields: [houseId], references: [id], onDelete: Cascade)
-  items     ShoppingListItem[]
+  id          String             @id @default(cuid())
+  houseId     String
+  name        String
+  createdAt   DateTime           @default(now())
+  /// Set when the trip is closed (e.g. after creating an expense from checked items).
+  completedAt DateTime?
+  house       House              @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  items       ShoppingListItem[]
+
+  @@index([houseId, completedAt])
 }
 
 model ShoppingListItem {

@@ -239,7 +239,16 @@
     "removeItem": "Remove",
     "markDoneAria": "Mark done",
     "markTodoAria": "Mark to do",
-    "ok": "OK"
+    "ok": "OK",
+    "createExpenseFromChecked": "Create expense from checked items",
+    "createExpenseFromCheckedHint": "Check off items you bought, then open this form. Enter the total, use receipt OCR if you want, choose split — optionally complete the whole list.",
+    "completeListCheckbox": "Mark shopping list as completed (removes any remaining items and archives the list)",
+    "modalExpenseTitle": "Expense from shopping list",
+    "completedBadge": "Completed",
+    "completedOn": "Completed {{date}}",
+    "reopenList": "Reopen list",
+    "completedSectionTitle": "Completed lists",
+    "expenseNotesListIntro": "Shopping list «{{name}}» — items:"
   },
   "membersPage": {
     "badge": "Members & access",
@@ -301,6 +310,9 @@
     "heroCtaPrimary": "Create your home for free",
     "heroCtaSecondary": "Log in to your account: create or manage your homes",
     "heroFootnote": "No hidden cost to get started: create homes, invite members and use core features right away.",
+    "heroImageAlt": "Illustration : colocataires dans le salon qui organisent le foyer ensemble sur une tablette (calendrier et outils partagés).",
+    "featuresStripImageAlt": "Illustration abstraite : calendrier, dépenses, courses et tâches au même endroit.",
+    "lifestyleImageAlt": "Illustration : cuisine partagée claire avec calendrier et liste, vie domestique organisée.",
     "cardEyebrow": "What’s inside",
     "cardTitle": "One dashboard for the whole home",
     "cardLi1Strong": "Expenses",
@@ -621,7 +633,10 @@
     "taskNotFound": "Task not found.",
     "registerPasswordMin": "At least 8 characters",
     "percentSumMust100": "Percentages must sum to 100% (currently {{sum}}%).",
-    "customSumMismatch": "Share amounts ({{sum}}) must equal the expense total ({{total}})."
+    "customSumMismatch": "Share amounts ({{sum}}) must equal the expense total ({{total}}).",
+    "shoppingListNoItemsSelected": "No checked list items were included. Mark items as done in the list and try again.",
+    "shoppingListItemsInvalid": "Some items are missing or do not belong to this list.",
+    "shoppingListItemsNotChecked": "Only items marked as done in the list can be included in the expense."
   },
   "pushTitles": {
     "newCalendarEvent": "New event",

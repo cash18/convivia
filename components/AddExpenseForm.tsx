@@ -12,6 +12,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 type Member = { id: string; name: string };
 
+export type ShoppingListExpenseMeta = { listId: string; itemIds: string[] };
+
 function splitIntegerEqually(total: number, n: number): number[] {
   if (n <= 0) return [];
   const base = Math.floor(total / n);
@@ -37,10 +39,22 @@ export function AddExpenseForm({
   houseId,
   members,
   variant = "full",
+  defaultTitle,
+  defaultNotes,
+  shoppingListMeta,
+  expenseAction,
+  onSuccess,
 }: {
   houseId: string;
   members: Member[];
   variant?: "full" | "compact";
+  /** Default value for title (e.g. expense from shopping list). */
+  defaultTitle?: string;
+  defaultNotes?: string;
+  shoppingListMeta?: ShoppingListExpenseMeta | null;
+  /** When set (e.g. `createExpenseFromShoppingList`), hidden list fields must be present in the form. */
+  expenseAction?: (hid: string, fd: FormData) => Promise<{ error?: string }>;
+  onSuccess?: () => void;
 }) {
   const { t } = useI18n();
   const router = useRouter();
@@ -191,12 +205,14 @@ export function AddExpenseForm({
     if (!compact && splitMode === "CUSTOM") {
       checkedIds.forEach((id) => fd.set(`eur_${id}`, customEur[id] ?? ""));
     }
-    const res = await createExpense(houseId, fd);
+    const submit = expenseAction ?? createExpense;
+    const res = await submit(houseId, fd);
     setPending(false);
     if (res.error) {
       setError(res.error);
       return;
     }
+    onSuccess?.();
     form.reset();
     setChecked(Object.fromEntries(members.map((m) => [m.id, true])));
     setPercents(equalPercentsForIds(members.map((m) => m.id)));
@@ -208,6 +224,14 @@ export function AddExpenseForm({
 
   return (
     <form onSubmit={onSubmit} encType="multipart/form-data" className="cv-card-solid flex h-full min-h-0 flex-col gap-3 p-5 sm:p-6">
+      {shoppingListMeta ? (
+        <>
+          <input type="hidden" name="shoppingListId" value={shoppingListMeta.listId} />
+          {shoppingListMeta.itemIds.map((id) => (
+            <input key={id} type="hidden" name="shoppingListItemId" value={id} />
+          ))}
+        </>
+      ) : null}
       <h2 className="text-sm font-bold text-slate-900">{compact ? t("addExpenseForm.titleCompact") : t("addExpenseForm.titleFull")}</h2>
       {error ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
@@ -217,6 +241,7 @@ export function AddExpenseForm({
         required
         placeholder={t("addExpenseForm.placeholderTitle")}
         className="cv-input-sm"
+        defaultValue={defaultTitle ?? undefined}
       />
       <div className="grid gap-3 sm:grid-cols-2">
         <input
@@ -271,6 +296,7 @@ export function AddExpenseForm({
             placeholder={t("addExpenseForm.placeholderNotes")}
             rows={2}
             className="cv-input-sm"
+            defaultValue={defaultNotes ?? undefined}
           />
 
           <fieldset className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
@@ -419,6 +445,18 @@ export function AddExpenseForm({
           </div>
         ) : null}
       </fieldset>
+
+      {shoppingListMeta ? (
+        <label className="flex cursor-pointer items-start gap-2 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            name="completeShoppingList"
+            defaultChecked
+            className="mt-0.5 rounded border-emerald-300 text-emerald-600"
+          />
+          <span>{t("listsPage.completeListCheckbox")}</span>
+        </label>
+      ) : null}
 
       <button type="submit" disabled={pending} className="cv-btn-primary mt-auto shrink-0">
         {pending ? t("addExpenseForm.pending") : compact ? t("addExpenseForm.submitCompact") : t("addExpenseForm.submitFull")}

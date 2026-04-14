@@ -3,6 +3,7 @@ import { CalendarFeedPanel } from "@/components/CalendarFeedPanel";
 import { HouseCalendarGrid, type CalendarEventDTO } from "@/components/HouseCalendarGrid";
 import { auth } from "@/auth";
 import { deleteCalendarEvent } from "@/lib/actions/calendar";
+import { utcCalendarDateKey } from "@/lib/calendar-all-day";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { intlLocaleTag } from "@/lib/i18n/intl-locale";
 import { createTranslator } from "@/lib/i18n/server";
@@ -11,6 +12,26 @@ import { canRotateCalendarFeed } from "@/lib/house-roles";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { Suspense } from "react";
+
+function formatAllDayEventListLine(
+  ev: { startsAt: Date; endsAt: Date | null },
+  intlTag: string,
+  tf: (key: string) => string,
+): string {
+  const utcFmt: Intl.DateTimeFormatOptions = {
+    timeZone: "UTC",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  };
+  const startStr = new Date(ev.startsAt).toLocaleDateString(intlTag, utcFmt);
+  if (!ev.endsAt) return formatMessage(tf("calendarPage.allDayLine"), { date: startStr });
+  const startU = utcCalendarDateKey(new Date(ev.startsAt));
+  const endU = utcCalendarDateKey(new Date(ev.endsAt));
+  if (endU === startU) return formatMessage(tf("calendarPage.allDayLine"), { date: startStr });
+  const endStr = new Date(ev.endsAt).toLocaleDateString(intlTag, utcFmt);
+  return `${formatMessage(tf("calendarPage.allDayLine"), { date: startStr })} — ${endStr}`;
+}
 
 export default async function CalendarioPage({
   params,
@@ -113,9 +134,11 @@ export default async function CalendarioPage({
                   {ev.description ? <p className="mt-1 text-sm text-slate-600">{ev.description}</p> : null}
                   <p className="mt-2 text-xs text-slate-500">
                     {ev.allDay
-                      ? formatMessage(t("calendarPage.allDayLine"), {
-                          date: new Date(ev.startsAt).toLocaleDateString(intlTag),
-                        })
+                      ? formatAllDayEventListLine(
+                          { startsAt: ev.startsAt, endsAt: ev.endsAt },
+                          intlTag,
+                          t,
+                        )
                       : `${new Date(ev.startsAt).toLocaleString(intlTag)}`}
                     {ev.endsAt && !ev.allDay ? ` — ${new Date(ev.endsAt).toLocaleString(intlTag)}` : ""}
                   </p>

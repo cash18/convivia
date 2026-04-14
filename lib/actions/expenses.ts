@@ -197,6 +197,101 @@ export async function createExpense(
   return {};
 }
 
+/** Crea una spesa collegata a una lista spesa: rimuove le voci segnate come comprate; opzione chiudi lista. */
+export async function createExpenseFromShoppingList(
+  houseId: string,
+  formData: FormData,
+): Promise<{ error?: string }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
+
+  const listId = String(formData.get("shoppingListId") ?? "").trim();
+  const itemIds = [...new Set(formData.getAll("shoppingListItemId").map(String).filter(Boolean))];
+  const completeList = formData.get("completeShoppingList") === "on";
+
+  if (!listId) return { error: await ta("errors.listNotFound") };
+  if (itemIds.length === 0) return { error: await ta("errors.shoppingListNoItemsSelected") };
+
+  const list = await prisma.shoppingList.findFirst({
+    where: { id: listId, houseId, completedAt: null },
+    include: {
+      items: {
+        where: { id: { in: itemIds } },
+      },
+    },
+  });
+  if (!list) return { error: await ta("errors.listNotFound") };
+  if (list.items.length !== itemIds.length) return { error: await ta("errors.shoppingListItemsInvalid") };
+  if (list.items.some((i) => !i.done)) return { error: await ta("errors.shoppingListItemsNotChecked") };
+
+  const title = String(formData.get("title") ?? "").trim();
+  const amountCents = parseEuroToCents(String(formData.get("amount") ?? ""));
+  const paidById = String(formData.get("paidById") ?? "");
+  const notes = String(formData.get("notes") ?? "").trim() || null;
+  const participantIds = formData.getAll("participants").map(String).filter(Boolean);
+
+  if (!title) return { error: await ta("errors.expenseTitleRequired") };
+  if (amountCents === null || amountCents <= 0) return { error: await ta("errors.expenseAmountInvalid") };
+  if (!paidById) return { error: await ta("errors.expensePaidByRequired") };
+  if (participantIds.length === 0) return { error: await ta("errors.expenseParticipantsRequired") };
+
+  const members = await prisma.houseMember.findMany({
+    where: { houseId, userId: { in: participantIds } },
+  });
+  if (members.length !== participantIds.length) return { error: await ta("errors.expenseParticipantsInvalid") };
+
+  const receiptRead = await readReceiptUrl(formData);
+  if (receiptRead.error) return { error: receiptRead.error };
+  const receiptUrl = receiptRead.receiptUrl;
+
+  const resolved = await resolveExpenseSplits(formData, amountCents, participantIds);
+  if ("error" in resolved) return { error: resolved.error };
+
+  await prisma.$transaction(async (tx) => {
+    const expense = await tx.expense.create({
+      data: {
+        houseId,
+        title,
+        amountCents,
+        paidById,
+        notes,
+        splitMode: resolved.splitMode,
+        receiptUrl,
+        expenseDate: new Date(),
+      },
+    });
+    await writeExpenseSplits(tx, expense.id, participantIds, resolved.shareCentsList, resolved.sharePercents);
+    await tx.shoppingListItem.deleteMany({ where: { id: { in: itemIds } } });
+    if (completeList) {
+      await tx.shoppingListItem.deleteMany({ where: { listId } });
+      await tx.shoppingList.update({
+        where: { id: listId },
+        data: { completedAt: new Date() },
+      });
+    }
+  });
+
+  revalidatePath(`/casa/${houseId}/spese`);
+  revalidatePath(`/casa/${houseId}/liste`);
+  revalidatePath(`/casa/${houseId}`);
+  const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
+  void notifyHouseMembersExceptActor({
+    houseId,
+    actorUserId: session.user.id,
+    category: "EXPENSES",
+    title: await ta("pushTitles.newExpense"),
+    body: formatMessage(await ta("push.expenseAdded"), {
+      who,
+      title,
+      amount: formatEuroFromCents(amountCents),
+    }),
+    path: `/casa/${houseId}/spese`,
+    tag: `convivia-expense-${houseId}`,
+  });
+  return {};
+}
+
 export async function updateExpense(
   houseId: string,
   expenseId: string,

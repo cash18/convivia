@@ -3,6 +3,8 @@
  * UID stabile + DTSTAMP da ultima modifica + SEQUENCE + STATUS:CANCELLED per sync corretta.
  */
 
+import { allDayRangeDateKeysFromDb, dateKeyToIcsYYYYMMDD } from "@/lib/calendar-all-day";
+
 export type IcsEventInput = {
   id: string;
   title: string;
@@ -40,22 +42,6 @@ function formatUtcStamp(d: Date): string {
   return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 }
 
-/** YYYYMMDD in fuso Europe/Rome (eventi tutto il giorno). */
-function formatDateValueRome(d: Date): string {
-  const s = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Rome",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(d);
-  return s.replace(/-/g, "");
-}
-
-function formatDateValuePlusDays(d: Date, days: number): string {
-  const x = new Date(d.getTime() + days * 86_400_000);
-  return formatDateValueRome(x);
-}
-
 function buildVEvent(ev: IcsEventInput, calName: string): string[] {
   const lines: string[] = [];
   const uid = `${ev.id}@convivia-calendar`;
@@ -81,12 +67,9 @@ function buildVEvent(ev: IcsEventInput, calName: string): string[] {
   lines.push(icsFold(`LOCATION:${icsEscape(calName)}`));
 
   if (ev.allDay) {
-    const start = formatDateValueRome(ev.startsAt);
-    const endExclusive = ev.endsAt
-      ? formatDateValuePlusDays(ev.endsAt, 1)
-      : formatDateValuePlusDays(ev.startsAt, 1);
-    lines.push(`DTSTART;VALUE=DATE:${start}`);
-    lines.push(`DTEND;VALUE=DATE:${endExclusive}`);
+    const { start, endExclusive } = allDayRangeDateKeysFromDb(ev.startsAt, ev.endsAt);
+    lines.push(`DTSTART;VALUE=DATE:${dateKeyToIcsYYYYMMDD(start)}`);
+    lines.push(`DTEND;VALUE=DATE:${dateKeyToIcsYYYYMMDD(endExclusive)}`);
   } else {
     const start = formatUtcStamp(ev.startsAt);
     let end: Date;

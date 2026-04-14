@@ -162,6 +162,25 @@ export async function deleteShoppingList(houseId: string, listId: string): Promi
   return {};
 }
 
+export async function reopenShoppingList(houseId: string, listId: string): Promise<{ error?: string }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
+  if (!(await assertMember(houseId, session.user.id))) return { error: await ta("errors.accessDenied") };
+
+  const list = await prisma.shoppingList.findFirst({
+    where: { id: listId, houseId },
+  });
+  if (!list) return { error: await ta("errors.listNotFound") };
+
+  await prisma.shoppingList.update({
+    where: { id: listId },
+    data: { completedAt: null },
+  });
+  revalidatePath(`/casa/${houseId}/liste`);
+  revalidatePath(`/casa/${houseId}`);
+  return {};
+}
+
 export async function updateShoppingListItem(
   houseId: string,
   itemId: string,

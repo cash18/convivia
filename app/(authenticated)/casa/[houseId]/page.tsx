@@ -49,7 +49,7 @@ export default async function CasaDashboardPage({
       include: { paidBy: { select: { name: true } } },
     }),
     prisma.shoppingList.findMany({
-      where: { houseId },
+      where: { houseId, completedAt: null },
       orderBy: { createdAt: "desc" },
       take: 4,
       include: {
@@ -64,7 +64,7 @@ export default async function CasaDashboardPage({
     }),
     prisma.shoppingListItem.groupBy({
       by: ["listId"],
-      where: { done: false, list: { houseId } },
+      where: { done: false, list: { houseId, completedAt: null } },
       _count: { _all: true },
     }),
   ]);

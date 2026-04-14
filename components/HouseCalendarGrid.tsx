@@ -1,6 +1,7 @@
 "use client";
 
 import { useI18n } from "@/components/I18nProvider";
+import { allDayRangeDateKeysFromDb } from "@/lib/calendar-all-day";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { intlLocaleTag } from "@/lib/i18n/intl-locale";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -58,15 +59,7 @@ function getMonthGrid(monthFirst: Date): Date[] {
 }
 
 function allDayRangeKeys(ev: CalendarEventDTO): { start: string; endExclusive: string } {
-  const s = new Date(ev.startsAt);
-  const start = dateKeyLocal(s);
-  if (ev.endsAt) {
-    const e = new Date(ev.endsAt);
-    const endPlus = new Date(e.getFullYear(), e.getMonth(), e.getDate() + 1);
-    return { start, endExclusive: dateKeyLocal(endPlus) };
-  }
-  const endPlus = new Date(s.getFullYear(), s.getMonth(), s.getDate() + 1);
-  return { start, endExclusive: dateKeyLocal(endPlus) };
+  return allDayRangeDateKeysFromDb(new Date(ev.startsAt), ev.endsAt ? new Date(ev.endsAt) : null);
 }
 
 function eventOnLocalDay(ev: CalendarEventDTO, day: Date): boolean {

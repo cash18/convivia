@@ -16,13 +16,25 @@ export default async function ListePage({
 
   const { t } = await createTranslator();
 
-  await getMembershipOrRedirect(houseId, session.user.id);
+  const membership = await getMembershipOrRedirect(houseId, session.user.id);
+  const members = membership.house.members.map((m) => ({
+    id: m.userId,
+    name: m.user.name,
+  }));
 
-  const lists = await prisma.shoppingList.findMany({
-    where: { houseId },
-    orderBy: { createdAt: "desc" },
-    include: { items: { orderBy: { createdAt: "asc" } } },
-  });
+  const [activeLists, completedLists] = await Promise.all([
+    prisma.shoppingList.findMany({
+      where: { houseId, completedAt: null },
+      orderBy: { createdAt: "desc" },
+      include: { items: { orderBy: { createdAt: "asc" } } },
+    }),
+    prisma.shoppingList.findMany({
+      where: { houseId, completedAt: { not: null } },
+      orderBy: { completedAt: "desc" },
+      take: 40,
+      include: { items: { orderBy: { createdAt: "asc" } } },
+    }),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -30,21 +42,42 @@ export default async function ListePage({
         <NewShoppingListForm houseId={houseId} />
       </div>
 
-      {lists.length === 0 ? (
+      {activeLists.length === 0 && completedLists.length === 0 ? (
         <p className="text-sm font-medium text-slate-500">{t("listsPage.empty")}</p>
-      ) : (
+      ) : activeLists.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2">
-          {lists.map((list) => (
+          {activeLists.map((list) => (
             <ShoppingListCard
               key={list.id}
               houseId={houseId}
               listId={list.id}
               name={list.name}
+              members={members}
+              completedAt={list.completedAt?.toISOString() ?? null}
               items={list.items.map((i) => ({ id: i.id, name: i.name, done: i.done }))}
             />
           ))}
         </div>
-      )}
+      ) : null}
+
+      {completedLists.length > 0 ? (
+        <section className="space-y-3">
+          <h2 className="text-sm font-bold text-slate-800">{t("listsPage.completedSectionTitle")}</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {completedLists.map((list) => (
+              <ShoppingListCard
+                key={list.id}
+                houseId={houseId}
+                listId={list.id}
+                name={list.name}
+                members={members}
+                completedAt={list.completedAt?.toISOString() ?? null}
+                items={list.items.map((i) => ({ id: i.id, name: i.name, done: i.done }))}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

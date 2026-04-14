@@ -3,6 +3,7 @@
 import { randomBytes } from "node:crypto";
 
 import { auth } from "@/auth";
+import { parseDateKeyFromDatetimeLocal } from "@/lib/calendar-all-day";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { ta } from "@/lib/i18n/action-messages";
 import { canRotateCalendarFeed } from "@/lib/house-roles";
@@ -36,12 +37,29 @@ export async function createCalendarEvent(
   const allDay = formData.get("allDay") === "on";
 
   if (!title) return { error: await ta("errors.calendarTitleRequired") };
-  const startsAt = new Date(startsAtRaw);
-  if (Number.isNaN(startsAt.getTime())) return { error: await ta("errors.calendarInvalidStart") };
+
+  let startsAt: Date;
   let endsAt: Date | null = null;
-  if (endsAtRaw) {
-    endsAt = new Date(endsAtRaw);
-    if (Number.isNaN(endsAt.getTime())) return { error: await ta("errors.calendarInvalidEnd") };
+
+  if (allDay) {
+    const startDay = parseDateKeyFromDatetimeLocal(startsAtRaw);
+    if (!startDay) return { error: await ta("errors.calendarInvalidStart") };
+    startsAt = new Date(`${startDay}T12:00:00.000Z`);
+    if (endsAtRaw) {
+      const endDay = parseDateKeyFromDatetimeLocal(endsAtRaw);
+      if (!endDay) return { error: await ta("errors.calendarInvalidEnd") };
+      endsAt = new Date(`${endDay}T12:00:00.000Z`);
+    }
+    if (endsAt && endsAt.getTime() < startsAt.getTime()) {
+      return { error: await ta("errors.calendarInvalidEnd") };
+    }
+  } else {
+    startsAt = new Date(startsAtRaw);
+    if (Number.isNaN(startsAt.getTime())) return { error: await ta("errors.calendarInvalidStart") };
+    if (endsAtRaw) {
+      endsAt = new Date(endsAtRaw);
+      if (Number.isNaN(endsAt.getTime())) return { error: await ta("errors.calendarInvalidEnd") };
+    }
   }
 
   await prisma.calendarEvent.create({

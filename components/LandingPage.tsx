@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { BrandLogo } from "@/components/BrandLogo";
 import { createTranslator } from "@/lib/i18n/server";
@@ -147,7 +148,19 @@ export async function LandingPage() {
           </div>
 
           <div className="relative lg:pl-4">
-            <div className="cv-card relative overflow-hidden p-6 sm:p-8">
+            <div className="flex flex-col gap-5">
+              <figure className="relative aspect-[1376/768] w-full overflow-hidden rounded-2xl border border-emerald-200/50 bg-slate-100/60 shadow-[0_20px_50px_-20px_rgba(5,150,105,0.35)] ring-1 ring-white/90">
+                <Image
+                  src="/landing/landing-hero-shared-home.png"
+                  alt={t("landing.heroImageAlt")}
+                  width={1376}
+                  height={768}
+                  className="h-full w-full object-cover object-center"
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 520px"
+                />
+              </figure>
+              <div className="cv-card relative overflow-hidden p-6 sm:p-8">
               <div className="absolute -right-8 -top-8 h-36 w-36 rounded-full bg-gradient-to-br from-emerald-400/35 to-teal-400/25 blur-2xl" />
               <p className="text-xs font-semibold tracking-wider text-emerald-600 uppercase">{t("landing.cardEyebrow")}</p>
               <p className="mt-2 text-xl font-bold text-slate-900">{t("landing.cardTitle")}</p>
@@ -175,6 +188,7 @@ export async function LandingPage() {
                 <strong className="font-semibold">{t("landing.cardHintStrong")}</strong> {t("landing.cardHintRest")}
               </div>
             </div>
+            </div>
           </div>
         </section>
 
@@ -186,6 +200,17 @@ export async function LandingPage() {
             </div>
           ))}
         </section>
+
+        <figure className="mx-auto mt-16 max-w-4xl overflow-hidden rounded-2xl border border-emerald-200/40 bg-white/60 shadow-md shadow-emerald-900/5 ring-1 ring-white/80">
+          <Image
+            src="/landing/landing-features-abstract.png"
+            alt={t("landing.featuresStripImageAlt")}
+            width={1376}
+            height={768}
+            className="h-auto w-full object-cover"
+            sizes="(max-width: 896px) 100vw, 896px"
+          />
+        </figure>
 
         <section id="funzionalita" className="mt-24 scroll-mt-24">
           <div className="max-w-2xl">
@@ -226,6 +251,17 @@ export async function LandingPage() {
             ))}
           </ol>
         </section>
+
+        <figure className="mx-auto mt-20 max-w-5xl overflow-hidden rounded-2xl border border-teal-200/40 bg-white/50 shadow-lg shadow-teal-900/5 ring-1 ring-white/90">
+          <Image
+            src="/landing/landing-lifestyle-kitchen.png"
+            alt={t("landing.lifestyleImageAlt")}
+            width={1376}
+            height={768}
+            className="h-auto w-full object-cover"
+            sizes="(max-width: 1024px) 100vw, 1024px"
+          />
+        </figure>
 
         <section id="perche" className="mt-24 scroll-mt-24">
           <div className="cv-card relative overflow-hidden rounded-[1.75rem] p-8 sm:p-10 lg:p-12">

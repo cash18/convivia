@@ -19,6 +19,7 @@ export async function getCalendarFeedIcsResponse(
     return new Response("Not found", { status: 404 });
   }
 
+  /** Stessi record della casa del portale: eventi attivi + tombstone cancellati (STATUS:CANCELLED nel .ics). */
   const house = await prisma.house.findUnique({
     where: { calendarFeedToken: token },
     include: {
