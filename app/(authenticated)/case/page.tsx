@@ -3,9 +3,12 @@ import { CreateHouseForm } from "@/components/CreateHouseForm";
 import { JoinHouseForm } from "@/components/JoinHouseForm";
 import { auth } from "@/auth";
 import { roleLabelKey } from "@/lib/house-roles";
+import { LAST_HOUSE_ID_KEY } from "@/lib/last-house-preference";
 import { createTranslator } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function CasePage() {
   const session = await auth();
@@ -20,6 +23,11 @@ export default async function CasePage() {
   });
 
   const memberHouseIds = memberships.map((m) => m.houseId);
+
+  const lastFromCookie = (await cookies()).get(LAST_HOUSE_ID_KEY)?.value;
+  if (lastFromCookie && memberHouseIds.includes(lastFromCookie)) {
+    redirect(`/casa/${lastFromCookie}`);
+  }
 
   return (
     <div className="space-y-8 sm:space-y-10">

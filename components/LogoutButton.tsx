@@ -1,6 +1,7 @@
 "use client";
 
 import { useI18n } from "@/components/I18nProvider";
+import { clearLastHouseOnClient } from "@/lib/last-house-preference";
 import { signOut } from "next-auth/react";
 
 async function removePushSubscription(): Promise<void> {
@@ -26,7 +27,12 @@ export function LogoutButton() {
   return (
     <button
       type="button"
-      onClick={() => void removePushSubscription().finally(() => signOut({ callbackUrl: "/" }))}
+      onClick={() =>
+        void removePushSubscription().finally(() => {
+          clearLastHouseOnClient();
+          void signOut({ callbackUrl: "/" });
+        })
+      }
       className="cv-btn-ghost py-1.5 text-xs sm:py-2 sm:text-sm"
     >
       {t("common.logout")}

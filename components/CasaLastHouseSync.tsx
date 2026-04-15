@@ -1,16 +1,11 @@
 "use client";
 
+import { persistLastHouseOnClient } from "@/lib/last-house-preference";
 import { useEffect } from "react";
-
-const STORAGE_KEY = "convivia_last_house_id";
 
 export function CasaLastHouseSync({ houseId }: { houseId: string }) {
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, houseId);
-    } catch {
-      /* ignore */
-    }
+    persistLastHouseOnClient(houseId);
   }, [houseId]);
   return null;
 }
