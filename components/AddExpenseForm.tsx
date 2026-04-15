@@ -1,5 +1,6 @@
 "use client";
 
+import { ExpenseNotesBody } from "@/components/ExpenseNotesBody";
 import { useI18n } from "@/components/I18nProvider";
 import { createExpense } from "@/lib/actions/expenses";
 import { MAX_RECEIPT_BYTES } from "@/lib/expense-receipt-limits";
@@ -291,10 +292,17 @@ export function AddExpenseForm({
             </div>
           </div>
 
+          {shoppingListMeta && defaultNotes ? (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-slate-700">{t("addExpenseForm.linkedListPreviewTitle")}</p>
+              <ExpenseNotesBody notes={defaultNotes} variant="compact" />
+              <p className="text-[11px] leading-snug text-slate-500">{t("addExpenseForm.linkedListPreviewHint")}</p>
+            </div>
+          ) : null}
           <textarea
             name="notes"
             placeholder={t("addExpenseForm.placeholderNotes")}
-            rows={2}
+            rows={shoppingListMeta && defaultNotes ? 4 : 2}
             className="cv-input-sm"
             defaultValue={defaultNotes ?? undefined}
           />

@@ -1,9 +1,11 @@
 "use client";
 
+import { ExpenseNotesBody } from "@/components/ExpenseNotesBody";
 import { useI18n } from "@/components/I18nProvider";
 import { updateExpense } from "@/lib/actions/expenses";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { formatEuroNumberForInput } from "@/lib/money";
+import { parseExpenseNotes } from "@/lib/shopping-list-expense-notes";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -119,6 +121,8 @@ export function ExpenseEditForm({
     [checkedIds, percents],
   );
 
+  const parsedNotes = useMemo(() => parseExpenseNotes(expense.notes), [expense.notes]);
+
   function setPercent(id: string, raw: string) {
     const v = parseInt(raw, 10);
     setPercents((p) => ({
@@ -227,10 +231,16 @@ export function ExpenseEditForm({
                   </option>
                 ))}
               </select>
+              {parsedNotes.kind === "shopping_list" ? (
+                <div className="space-y-2">
+                  <ExpenseNotesBody notes={expense.notes} variant="compact" />
+                  <p className="text-[11px] leading-snug text-slate-500">{t("addExpenseForm.linkedListNotesEditHint")}</p>
+                </div>
+              ) : null}
               <textarea
                 name="notes"
                 placeholder={t("expenseEditForm.notesPlaceholder")}
-                rows={2}
+                rows={parsedNotes.kind === "shopping_list" ? 4 : 2}
                 defaultValue={expense.notes ?? ""}
                 className="cv-input-sm"
               />

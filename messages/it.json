@@ -87,7 +87,9 @@
     "roleOwner": "Amministratore",
     "roleSupervisor": "Supervisionatore",
     "roleMember": "Membro",
-    "codeLabel": "codice"
+    "codeLabel": "codice",
+    "openingHouse": "Apertura in corso…",
+    "loadingHouseAria": "Caricamento della casa"
   },
   "pushCat": {
     "EXPENSES": {
@@ -202,7 +204,10 @@
     "labelPaidBy": "Pagato da",
     "labelSplit": "Ripartizione",
     "labelReceipt": "Scontrino",
-    "receiptOpen": "Apri"
+    "receiptOpen": "Apri",
+    "notesFromListBadge": "Dettaglio da lista spesa",
+    "notesFromListItems": "Articoli compresi in questa spesa",
+    "notesFromListNoItems": "Nessun articolo elencato nel dettaglio."
   },
   "settlement": {
     "balancedTitle": "Saldi già in equilibrio",
@@ -406,7 +411,7 @@
   "authLogin": {
     "title": "Accedi",
     "subtitle": "Benvenuto di nuovo su Convivia",
-    "registeredBanner": "Account creato. Ti abbiamo inviato un’email con il link di conferma: apri il link, poi torna qui per accedere.",
+    "registeredBanner": "Account creato. Controlla la posta: troverai un messaggio di benvenuto e uno con il link per confermare l’email. Apri il link di conferma, poi torna qui per accedere.",
     "resetBanner": "Password aggiornata. Ora puoi accedere.",
     "loadingForm": "Caricamento form…",
     "noAccount": "Non hai un account?",
@@ -581,6 +586,9 @@
     "distributeAmounts": "Distribuisci il totale tra i partecipanti",
     "submitCompact": "Aggiungi",
     "submitFull": "Aggiungi spesa",
+    "linkedListPreviewTitle": "Cosa salveremo nei dettagli",
+    "linkedListPreviewHint": "Questo riepilogo corrisponde al campo «Note» sotto: puoi integrarlo o lasciarlo così.",
+    "linkedListNotesEditHint": "Sotto trovi il testo completo salvato con la spesa (incluso il riepilogo lista). Modificalo solo se serve.",
     "pending": "Salvataggio…",
     "errorAmountParticipants": "Inserisci prima un importo totale valido e seleziona i partecipanti.",
     "errorSelectReceipt": "Seleziona prima un’immagine dello scontrino.",

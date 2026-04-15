@@ -30,10 +30,12 @@ async function readReceiptUrl(formData: FormData): Promise<{ receiptUrl: string 
     };
   }
   const buf = Buffer.from(await file.arrayBuffer());
-  const mime = (file as File).type || "image/jpeg";
-  if (!mime.startsWith("image/")) {
+  const mimeRaw = ((file as File).type || "image/jpeg").split(";")[0]?.trim().toLowerCase() ?? "image/jpeg";
+  const allowedReceiptMimes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+  if (!allowedReceiptMimes.has(mimeRaw)) {
     return { receiptUrl: null, error: await ta("errors.receiptNotImage") };
   }
+  const mime = mimeRaw;
   const b64 = buf.toString("base64");
   const dataUrl = `data:${mime};base64,${b64}`;
   if (dataUrl.length > MAX_RECEIPT_DATA_URL_CHARS) {

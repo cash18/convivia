@@ -26,7 +26,7 @@ export async function signInWithPassword(
   if (!user.emailVerifiedAt) {
     return { error: "UNVERIFIED" };
   }
-  const redirectTo = sanitizeAppCallbackTarget(callbackPath ?? undefined, "/case");
+  const redirectTo = sanitizeAppCallbackTarget(callbackPath ?? undefined, "/");
   try {
     await signIn("credentials", {
       email: user.email,

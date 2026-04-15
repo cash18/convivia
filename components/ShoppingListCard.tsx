@@ -13,6 +13,7 @@ import {
   updateShoppingListItem,
 } from "@/lib/actions/lists";
 import { formatMessage } from "@/lib/i18n/format-message";
+import { buildShoppingListExpenseNotes } from "@/lib/shopping-list-expense-notes";
 import { intlLocaleTag } from "@/lib/i18n/intl-locale";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { useRouter } from "next/navigation";
@@ -80,8 +81,8 @@ export function ShoppingListCard({
   );
   const expenseNotesDefault = useMemo(() => {
     const intro = formatMessage(t("listsPage.expenseNotesListIntro"), { name });
-    const lines = doneItems.map((i) => `· ${i.name}`).join("\n");
-    return lines ? `${intro}\n${lines}` : intro;
+    const lines = doneItems.map((i) => `· ${i.name}`);
+    return buildShoppingListExpenseNotes(intro, lines);
   }, [doneItems, name, t]);
 
   async function onReopenList() {

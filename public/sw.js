@@ -8,7 +8,7 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("push", (event) => {
-  let payload = { title: "Convivia", body: "", path: "/case", tag: "convivia" };
+  let payload = { title: "Convivia", body: "", path: "/", tag: "convivia" };
   try {
     if (event.data) {
       const parsed = event.data.json();
@@ -25,7 +25,7 @@ self.addEventListener("push", (event) => {
     }
   }
 
-  const openPath = typeof payload.path === "string" && payload.path.startsWith("/") ? payload.path : "/case";
+  const openPath = typeof payload.path === "string" && payload.path.startsWith("/") ? payload.path : "/";
 
   event.waitUntil(
     self.registration.showNotification(String(payload.title), {
@@ -41,7 +41,7 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const path = event.notification.data?.path || "/case";
+  const path = event.notification.data?.path || "/";
   const url = new URL(path, self.location.origin).href;
 
   event.waitUntil(

@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Spese condivise, calendario, liste spesa e compiti per coinquilini.",
     lang: "it",
     dir: "ltr",
-    start_url: "/case",
+    start_url: "/",
     scope: "/",
     display: "standalone",
     display_override: ["standalone", "browser"],

@@ -1,14 +1,10 @@
-import { CaseLastHouseRedirect } from "@/components/CaseLastHouseRedirect";
+import { CaseHouseCardLink } from "@/components/CaseHouseCardLink";
 import { CreateHouseForm } from "@/components/CreateHouseForm";
 import { JoinHouseForm } from "@/components/JoinHouseForm";
 import { auth } from "@/auth";
 import { roleLabelKey } from "@/lib/house-roles";
-import { LAST_HOUSE_ID_KEY } from "@/lib/last-house-preference";
 import { createTranslator } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
-import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default async function CasePage() {
   const session = await auth();
@@ -22,16 +18,8 @@ export default async function CasePage() {
     orderBy: { joinedAt: "desc" },
   });
 
-  const memberHouseIds = memberships.map((m) => m.houseId);
-
-  const lastFromCookie = (await cookies()).get(LAST_HOUSE_ID_KEY)?.value;
-  if (lastFromCookie && memberHouseIds.includes(lastFromCookie)) {
-    redirect(`/casa/${lastFromCookie}`);
-  }
-
   return (
     <div className="space-y-8 sm:space-y-10">
-      <CaseLastHouseRedirect memberHouseIds={memberHouseIds} />
       <div>
         <p className="cv-badge w-fit">{t("case.badge")}</p>
         <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{t("case.title")}</h1>
@@ -42,16 +30,13 @@ export default async function CasePage() {
         <ul className="grid gap-4 sm:grid-cols-2">
           {memberships.map((m) => (
             <li key={m.id}>
-              <Link
-                href={`/casa/${m.houseId}`}
-                className="cv-card-solid group block p-5 transition hover:shadow-[0_12px_40px_-12px_rgba(5,150,105,0.2)] sm:p-6"
-              >
+              <CaseHouseCardLink houseId={m.houseId}>
                 <span className="text-lg font-bold text-slate-900 group-hover:text-emerald-900">{m.house.name}</span>
                 <p className="mt-2 text-xs font-medium text-slate-500">
                   {t(roleLabelKey(m.role))} · {t("case.codeLabel")}{" "}
                   <span className="font-mono text-emerald-700">{m.house.inviteCode}</span>
                 </p>
-              </Link>
+              </CaseHouseCardLink>
             </li>
           ))}
         </ul>

@@ -2,7 +2,7 @@
  * Consente solo percorsi relativi interni (stesso host del browser).
  * Blocca URL assoluti e open-redirect verso altri domini.
  */
-export function sanitizeAppCallbackTarget(raw: string | null | undefined, fallback = "/case"): string {
+export function sanitizeAppCallbackTarget(raw: string | null | undefined, fallback = "/"): string {
   if (raw == null || raw === "") return fallback;
   let s = raw.trim();
   try {

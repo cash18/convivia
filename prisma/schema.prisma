@@ -140,6 +140,7 @@ model HouseMember {
   house    House    @relation(fields: [houseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, houseId])
+  @@index([houseId])
 }
 
 model Expense {
@@ -158,6 +159,9 @@ model Expense {
   house       House          @relation(fields: [houseId], references: [id], onDelete: Cascade)
   paidBy      User           @relation("ExpensePayer", fields: [paidById], references: [id])
   splits      ExpenseSplit[]
+
+  @@index([houseId])
+  @@index([houseId, expenseDate(sort: Desc)])
 }
 
 model ExpenseSplit {
@@ -171,6 +175,7 @@ model ExpenseSplit {
   user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([expenseId, userId])
+  @@index([expenseId])
 }
 
 /// Trasferimento di denaro tra membri (non è una spesa): utile per pareggiare i conti.
@@ -210,6 +215,9 @@ model CalendarEvent {
   house       House     @relation(fields: [houseId], references: [id], onDelete: Cascade)
   createdBy   User      @relation("EventCreator", fields: [createdById], references: [id])
   participants CalendarEventParticipant[]
+
+  @@index([houseId])
+  @@index([houseId, startsAt])
 }
 
 /// Membri della casa invitati come partecipanti a un evento calendario.
@@ -261,4 +269,6 @@ model Task {
   house       House     @relation(fields: [houseId], references: [id], onDelete: Cascade)
   assignee    User?     @relation("TaskAssignee", fields: [assigneeId], references: [id])
   createdBy   User      @relation("TaskCreator", fields: [createdById], references: [id])
+
+  @@index([houseId])
 }

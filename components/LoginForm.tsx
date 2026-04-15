@@ -43,7 +43,7 @@ export function LoginForm() {
       setError(t("authForms.errorBadCredentials"));
       return;
     }
-    router.replace(sanitizeAppCallbackTarget(searchParams.get("callbackUrl"), "/case"));
+    router.replace(sanitizeAppCallbackTarget(searchParams.get("callbackUrl"), "/"));
   }
 
   async function resend() {

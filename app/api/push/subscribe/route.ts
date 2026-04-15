@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { validatePushSubscriptionInput } from "@/lib/push-subscription-validate";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -17,25 +18,32 @@ export async function POST(req: Request) {
 
   const sub = (body as { subscription?: { endpoint?: string; keys?: { p256dh?: string; auth?: string } } })
     .subscription;
-  if (!sub?.endpoint || !sub.keys?.p256dh || !sub.keys?.auth) {
+  if (!sub) {
     return NextResponse.json({ error: "Iscrizione incompleta." }, { status: 400 });
   }
+  const valid = validatePushSubscriptionInput(sub);
+  if (!valid.ok) {
+    return NextResponse.json({ error: valid.message }, { status: 400 });
+  }
 
-  const ua = req.headers.get("user-agent") ?? null;
+  const ua = req.headers.get("user-agent")?.slice(0, 512) ?? null;
+  const endpoint = sub.endpoint!.trim();
+  const p256dh = sub.keys!.p256dh!.trim();
+  const authKey = sub.keys!.auth!.trim();
 
   await prisma.webPushSubscription.upsert({
-    where: { endpoint: sub.endpoint },
+    where: { endpoint },
     create: {
       userId: session.user.id,
-      endpoint: sub.endpoint,
-      p256dh: sub.keys.p256dh,
-      auth: sub.keys.auth,
+      endpoint,
+      p256dh,
+      auth: authKey,
       userAgent: ua,
     },
     update: {
       userId: session.user.id,
-      p256dh: sub.keys.p256dh,
-      auth: sub.keys.auth,
+      p256dh,
+      auth: authKey,
       userAgent: ua,
     },
   });
@@ -56,9 +64,10 @@ export async function DELETE(req: Request) {
     /* opzionale */
   }
 
-  if (body.endpoint) {
+  const ep = typeof body.endpoint === "string" ? body.endpoint.trim().slice(0, 2048) : "";
+  if (ep) {
     await prisma.webPushSubscription.deleteMany({
-      where: { userId: session.user.id, endpoint: body.endpoint },
+      where: { userId: session.user.id, endpoint: ep },
     });
   } else {
     await prisma.webPushSubscription.deleteMany({

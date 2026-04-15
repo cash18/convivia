@@ -1,4 +1,5 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
+import { ExpenseNotesBody } from "@/components/ExpenseNotesBody";
 import { AddMoneyTransferForm } from "@/components/AddMoneyTransferForm";
 import { ExpenseEditForm, type EditableExpense } from "@/components/ExpenseEditForm";
 import { SettlementPlanPanel } from "@/components/SettlementPlanPanel";
@@ -174,7 +175,7 @@ export default async function SpesePage({
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="font-bold text-slate-900">{e.title}</p>
-                      {e.notes ? <p className="mt-1 text-sm text-slate-600">{e.notes}</p> : null}
+                      <ExpenseNotesBody notes={e.notes} />
                     </div>
                     <p className="shrink-0 text-lg font-bold tabular-nums text-slate-900">
                       {formatEuroFromCents(e.amountCents)}

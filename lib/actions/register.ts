@@ -6,7 +6,7 @@ import { ta } from "@/lib/i18n/action-messages";
 import { prisma } from "@/lib/prisma";
 import { newSecureToken } from "@/lib/crypto-token";
 import { sendTransactionalEmail } from "@/lib/email";
-import { verificationEmailContent } from "@/lib/email-messages";
+import { verificationEmailContent, welcomeGreetingEmailContent } from "@/lib/email-messages";
 
 export type RegisterState = { error?: string; ok?: boolean };
 
@@ -79,6 +79,17 @@ export async function registerUser(
   if (!sent.ok) {
     await prisma.user.delete({ where: { id: user.id } });
     return { error: await ta("errors.verificationEmailFailed") };
+  }
+
+  const welcome = welcomeGreetingEmailContent(name);
+  const welcomeSent = await sendTransactionalEmail({
+    to: user.email,
+    subject: welcome.subject,
+    html: welcome.html,
+    text: welcome.text,
+  });
+  if (!welcomeSent.ok) {
+    console.warn("[email] welcome greeting after registration failed:", welcomeSent.error);
   }
 
   return { ok: true };

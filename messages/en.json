@@ -87,7 +87,9 @@
     "roleOwner": "Admin",
     "roleSupervisor": "Supervisor",
     "roleMember": "Member",
-    "codeLabel": "code"
+    "codeLabel": "code",
+    "openingHouse": "Opening…",
+    "loadingHouseAria": "Loading home"
   },
   "pushCat": {
     "EXPENSES": {
@@ -202,7 +204,10 @@
     "labelPaidBy": "Paid by",
     "labelSplit": "Split",
     "labelReceipt": "Receipt",
-    "receiptOpen": "Open"
+    "receiptOpen": "Open",
+    "notesFromListBadge": "Shopping list detail",
+    "notesFromListItems": "Items included in this expense",
+    "notesFromListNoItems": "No line items were stored in the notes."
   },
   "settlement": {
     "balancedTitle": "Balances already even",
@@ -406,7 +411,7 @@
   "authLogin": {
     "title": "Log in",
     "subtitle": "Welcome back to Convivia",
-    "registeredBanner": "Account created. We sent a confirmation email: open the link, then come back here to sign in.",
+    "registeredBanner": "Account created. Check your inbox: you’ll get a welcome message and a separate email with the confirmation link. Open the confirmation link, then come back here to sign in.",
     "resetBanner": "Password updated. You can sign in now.",
     "loadingForm": "Loading form…",
     "noAccount": "Don’t have an account?",
@@ -581,6 +586,9 @@
     "distributeAmounts": "Distribute total across participants",
     "submitCompact": "Add",
     "submitFull": "Add expense",
+    "linkedListPreviewTitle": "What we will save in the details",
+    "linkedListPreviewHint": "This summary matches the «Notes» field below — you can add to it or leave it as is.",
+    "linkedListNotesEditHint": "Below is the full text stored with the expense (including the list summary). Edit only if you need to.",
     "pending": "Saving…",
     "errorAmountParticipants": "Enter a valid total amount and select participants first.",
     "errorSelectReceipt": "Select a receipt image first.",

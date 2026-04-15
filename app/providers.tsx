@@ -16,7 +16,7 @@ export function Providers({
   messages: Messages;
 }) {
   return (
-    <SessionProvider>
+    <SessionProvider refetchOnWindowFocus={false} refetchInterval={5 * 60}>
       <I18nProvider locale={locale} messages={messages}>
         {children}
         <PwaClient />

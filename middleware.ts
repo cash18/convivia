@@ -41,7 +41,9 @@ export default auth((req) => {
 
   if (!isLoggedIn && !isPublic) {
     const url = new URL("/accedi", req.nextUrl.origin);
-    url.searchParams.set("callbackUrl", pathname);
+    const safePath =
+      pathname.startsWith("//") || pathname.includes("\0") ? "/" : pathname.length > 2048 ? "/" : pathname;
+    url.searchParams.set("callbackUrl", safePath);
     const res = NextResponse.redirect(url);
     return withLocaleCookie(req, res);
   }
