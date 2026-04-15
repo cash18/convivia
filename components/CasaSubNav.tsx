@@ -32,38 +32,37 @@ export function CasaSubNav({
 }) {
   const { t } = useI18n();
   const pathname = usePathname();
-  const homeHref = `/casa/${houseId}`;
-  const isHouseHome = pathname === homeHref;
 
   return (
-    <div className="cv-card-solid mb-6 p-4 sm:mb-8 sm:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold tracking-wider text-emerald-600 uppercase">{t("casaNav.activeHouse")}</p>
-          <h1 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">{houseName}</h1>
-          <p className="text-sm text-slate-600">
-            {t("casaNav.inviteCode")}{" "}
-            <code className="rounded-xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50 to-green-50 px-2.5 py-1 font-mono text-sm font-semibold text-green-900">
+    <div className="cv-card-solid mb-4 px-3 py-3 sm:mb-5 sm:px-4 sm:py-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <div className="min-w-0 flex flex-1 flex-wrap items-baseline gap-x-2 gap-y-1">
+          <span className="sr-only">
+            {t("casaNav.activeHouse")}:{" "}
+          </span>
+          <h1 className="max-w-full text-lg font-extrabold tracking-tight text-slate-900 sm:text-xl">{houseName}</h1>
+          <span className="hidden text-slate-300 sm:inline" aria-hidden>
+            ·
+          </span>
+          <span className="flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-slate-600 sm:text-sm">
+            <span className="shrink-0">{t("casaNav.inviteCode")}</span>
+            <code className="rounded-lg border border-emerald-200/80 bg-emerald-50/90 px-2 py-0.5 font-mono text-[0.7rem] font-semibold text-emerald-900 sm:text-xs">
               {inviteCode}
             </code>
-          </p>
+          </span>
         </div>
-        <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-          {!isHouseHome ? (
-            <Link
-              href={homeHref}
-              className="inline-flex touch-manipulation items-center gap-2 rounded-xl border border-emerald-300/60 bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-green-500/25 transition hover:from-emerald-500 hover:to-green-500 active:scale-[0.97] active:shadow-inner active:brightness-95"
-            >
-              <IconHome className="h-4 w-4 shrink-0 opacity-95" />
-              {t("casaNav.homeButton")}
-            </Link>
-          ) : null}
-          <Link href="/case" className="cv-link text-sm">
-            {t("casaNav.otherHouses")}
-          </Link>
-        </div>
+        <Link
+          href="/case"
+          className="cv-pill-nav shrink-0 touch-manipulation px-3 py-1.5 text-xs font-semibold sm:text-sm"
+        >
+          {t("casaNav.switchHome")}
+        </Link>
       </div>
-      <nav className="mt-4 flex flex-wrap gap-2 border-t border-slate-200/60 pt-4 sm:mt-5 sm:pt-5" aria-label="Sottomenu sezioni">
+
+      <nav
+        className="mt-3 flex flex-wrap gap-1.5 border-t border-slate-200/60 pt-3"
+        aria-label={t("casaNav.sectionsAria")}
+      >
         {linkKeys.map((l) => {
           const href = l.href(houseId);
           const active = pathname === href;
@@ -75,11 +74,11 @@ export function CasaSubNav({
               href={href}
               className={
                 active
-                  ? "inline-flex touch-manipulation items-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-green-500/25 transition active:scale-[0.97] active:shadow-inner active:brightness-95 sm:px-3.5 sm:py-2 sm:text-sm"
-                  : "cv-pill-nav inline-flex touch-manipulation items-center gap-2 px-3 py-1.5 text-xs sm:py-2 sm:text-sm"
+                  ? "inline-flex touch-manipulation items-center gap-1.5 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-green-500/25 transition active:scale-[0.97] active:shadow-inner active:brightness-95 sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
+                  : "cv-pill-nav inline-flex touch-manipulation items-center gap-1.5 px-2.5 py-1.5 text-xs sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
               }
             >
-              <Icon className={`h-[1rem] w-[1rem] shrink-0 sm:h-[1.1rem] sm:w-[1.1rem] ${active ? "text-white" : "text-emerald-700"}`} />
+              <Icon className={`h-[0.95rem] w-[0.95rem] shrink-0 sm:h-[1.05rem] sm:w-[1.05rem] ${active ? "text-white" : "text-emerald-700"}`} />
               {label}
             </Link>
           );

@@ -41,7 +41,7 @@ function BellIcon({ filled }: { filled: boolean }) {
   );
 }
 
-export function PushNotificationsClient() {
+export function PushNotificationsClient({ compact = false }: { compact?: boolean }) {
   const { t } = useI18n();
   const { status } = useSession();
   const [swReady, setSwReady] = useState(false);
@@ -149,8 +149,10 @@ export function PushNotificationsClient() {
   const denied = typeof Notification !== "undefined" && Notification.permission === "denied";
 
   return (
-    <div className="flex min-w-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-2">
-      {!subscribed && !denied ? (
+    <div
+      className={`flex min-w-0 gap-1 ${compact ? "flex-row flex-wrap items-center" : "flex-col items-end sm:flex-row sm:items-center sm:gap-2"}`}
+    >
+      {!compact && !subscribed && !denied ? (
         <p className="max-w-[min(100%,18rem)] text-right text-[10px] leading-snug text-slate-600 sm:max-w-[20rem]">
           {t("pushBell.encourage")}{" "}
           <Link href="/impostazioni" className="cv-link font-medium whitespace-nowrap">
@@ -188,12 +190,21 @@ export function PushNotificationsClient() {
           ) : null}
         </button>
         {subscribed ? (
-          <Link href="/impostazioni" className="hidden text-[11px] font-medium text-emerald-800 underline sm:inline">
+          <Link
+            href="/impostazioni"
+            className={`text-[11px] font-medium text-emerald-800 underline ${compact ? "inline" : "hidden sm:inline"}`}
+          >
             {t("pushBell.categoriesLink")}
           </Link>
         ) : null}
       </div>
-      {hint ? <p className="max-w-[18rem] text-right text-[10px] leading-snug text-red-700">{hint}</p> : null}
+      {hint ? (
+        <p
+          className={`text-[10px] leading-snug text-red-700 ${compact ? "max-w-full text-left" : "max-w-[18rem] text-right"}`}
+        >
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -22,7 +22,7 @@ async function removePushSubscription(): Promise<void> {
   }
 }
 
-export function LogoutButton() {
+export function LogoutButton({ className }: { className?: string }) {
   const { t } = useI18n();
   return (
     <button
@@ -34,7 +34,7 @@ export function LogoutButton() {
           window.location.assign("/");
         })
       }
-      className="cv-btn-ghost py-1.5 text-xs sm:py-2 sm:text-sm"
+      className={className ?? "cv-btn-ghost py-1.5 text-xs sm:py-2 sm:text-sm"}
     >
       {t("common.logout")}
     </button>

@@ -5,7 +5,13 @@ import { useI18n } from "@/components/I18nProvider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function LanguageSwitcher() {
+type LanguageSwitcherProps = {
+  align?: "left" | "right";
+  onAfterSelect?: () => void;
+};
+
+export function LanguageSwitcher(props?: LanguageSwitcherProps) {
+  const { align = "right", onAfterSelect } = props ?? {};
   const { locale, t } = useI18n();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -13,6 +19,7 @@ export function LanguageSwitcher() {
   function setLocale(next: AppLocale) {
     document.cookie = `${LOCALE_COOKIE_NAME}=${next};path=/;max-age=${60 * 60 * 24 * 400};SameSite=Lax`;
     setOpen(false);
+    onAfterSelect?.();
     router.refresh();
   }
 
@@ -32,7 +39,9 @@ export function LanguageSwitcher() {
         <>
           <button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Close" onClick={() => setOpen(false)} />
           <ul
-            className="absolute right-0 z-50 mt-1 max-h-[min(70vh,22rem)] w-44 overflow-auto rounded-xl border border-slate-200/90 bg-white py-1 text-xs shadow-lg"
+            className={`absolute z-50 mt-1 max-h-[min(70vh,22rem)] w-44 overflow-auto rounded-xl border border-slate-200/90 bg-white py-1 text-xs shadow-lg ${
+              align === "left" ? "left-0" : "right-0"
+            }`}
             role="listbox"
           >
             {SUPPORTED_LOCALES.map((loc) => (

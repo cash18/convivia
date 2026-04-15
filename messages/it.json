@@ -1,13 +1,19 @@
 {
   "nav": {
     "myHouses": "Le mie case",
-    "settings": "Impostazioni"
+    "settings": "Impostazioni",
+    "accountMenuAria": "Apri menu account",
+    "menuSectionNav": "Vai a",
+    "menuSectionPrefs": "Preferenze",
+    "menuPush": "Notifiche"
   },
   "casaNav": {
     "activeHouse": "Casa attiva",
-    "inviteCode": "Codice invito:",
+    "inviteCode": "Invito:",
     "homeButton": "Home della casa",
     "otherHouses": "← Altre case",
+    "switchHome": "Cambia casa",
+    "sectionsAria": "Sezioni della casa",
     "home": "Home",
     "expenses": "Spese",
     "calendar": "Calendario",

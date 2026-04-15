@@ -1,13 +1,19 @@
 {
   "nav": {
     "myHouses": "My homes",
-    "settings": "Settings"
+    "settings": "Settings",
+    "accountMenuAria": "Open account menu",
+    "menuSectionNav": "Navigate",
+    "menuSectionPrefs": "Preferences",
+    "menuPush": "Notifications"
   },
   "casaNav": {
     "activeHouse": "Active home",
-    "inviteCode": "Invite code:",
+    "inviteCode": "Invite:",
     "homeButton": "House home",
     "otherHouses": "← Other homes",
+    "switchHome": "Switch home",
+    "sectionsAria": "House sections",
     "home": "Home",
     "expenses": "Expenses",
     "calendar": "Calendar",
