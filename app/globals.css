@@ -66,6 +66,25 @@ body {
     @apply rounded-xl border border-slate-200/90 bg-white/95 px-3 py-2 text-sm text-slate-900 shadow-inner shadow-slate-900/[0.03] outline-none transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/15;
   }
 
+  /*
+   * iOS Safari ingrandisce al focus se il font dell’input è <16px (qui rem è ridotto a 13px su mobile).
+   * Almeno 16px sui controlli testuali evita lo zoom automatico senza bloccare lo zoom pagina.
+   */
+  @media (max-width: 768px) {
+    .cv-input,
+    .cv-input-sm {
+      font-size: 16px !important;
+    }
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="button"]):not([type="submit"]):not([type="image"]):not([type="reset"]),
+    textarea,
+    select {
+      font-size: max(16px, 1em) !important;
+    }
+  }
+
   .cv-link {
     @apply touch-manipulation font-medium text-emerald-700 underline decoration-emerald-400/45 underline-offset-2 transition hover:text-green-800 hover:decoration-green-600/55 active:text-emerald-950 active:opacity-70 active:decoration-emerald-700;
   }

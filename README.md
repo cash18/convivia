@@ -42,7 +42,8 @@ npx vercel link --yes --project convivia
 | `DATABASE_URL` | Connection string Postgres (su Neon di solito *pooled* / transaction) |
 | `DATABASE_URL_UNPOOLED` | Connection string *direct* (per `prisma migrate deploy`); su Vercel+Neon è già creata dall’integrazione |
 | `AUTH_SECRET` | Stesso valore sicuro che usi in locale (`openssl rand -base64 32`) |
-| `AUTH_URL` | URL del sito, es. `https://convivia-xxx.vercel.app` (aggiorna dopo il primo deploy se cambia dominio) |
+| `AUTH_URL` | **Dominio pubblico finale**, es. `https://convivia.it`. Se resta `*.vercel.app` mentre gli utenti usano un custom domain, login e link possono finire sul sottodominio Vercel. |
+| `NEXT_PUBLIC_APP_URL` | Stesso URL canonico (link email, feed calendario). Impostalo su `https://convivia.it` in produzione. |
 
 5. **Sincronizza in locale** (opzionale): `npx vercel env pull .env.local`
 6. **Deploy**: `npx vercel --prod` oppure push su GitHub se il repo è collegato a Vercel con deploy automatici.

@@ -228,6 +228,9 @@
     "deleteListConfirm": "Delete list «{{name}}» and all items?",
     "addItemPlaceholder": "Add item…",
     "add": "Add",
+    "addingItem": "Adding…",
+    "savingListName": "Saving…",
+    "removingItem": "Removing…",
     "newListLabel": "New list",
     "newListPlaceholder": "e.g. Weekly groceries",
     "create": "Create",
@@ -287,7 +290,9 @@
     "logout": "Log out",
     "language": "Language",
     "defaultUserName": "User",
-    "close": "Close"
+    "close": "Close",
+    "loading": "Loading…",
+    "saving": "Saving…"
   },
   "labels": {
     "inviterFallback": "A roommate",

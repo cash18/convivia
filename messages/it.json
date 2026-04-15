@@ -228,6 +228,9 @@
     "deleteListConfirm": "Eliminare la lista «{{name}}» e tutte le voci?",
     "addItemPlaceholder": "Aggiungi articolo…",
     "add": "Aggiungi",
+    "addingItem": "Aggiunta…",
+    "savingListName": "Salvataggio…",
+    "removingItem": "Rimozione…",
     "newListLabel": "Nuova lista",
     "newListPlaceholder": "es. Spesa settimanale",
     "create": "Crea",
@@ -287,7 +290,9 @@
     "logout": "Esci",
     "language": "Lingua",
     "defaultUserName": "Utente",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "loading": "Caricamento…",
+    "saving": "Salvataggio…"
   },
   "labels": {
     "inviterFallback": "Un coinquilino",

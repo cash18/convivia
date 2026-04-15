@@ -28,9 +28,10 @@ export function LogoutButton() {
     <button
       type="button"
       onClick={() =>
-        void removePushSubscription().finally(() => {
+        void removePushSubscription().finally(async () => {
           clearLastHouseOnClient();
-          void signOut({ callbackUrl: "/" });
+          await signOut({ redirect: false });
+          window.location.assign("/");
         })
       }
       className="cv-btn-ghost py-1.5 text-xs sm:py-2 sm:text-sm"

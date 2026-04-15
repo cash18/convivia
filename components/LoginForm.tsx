@@ -3,13 +3,14 @@
 import { signInWithPassword } from "@/lib/actions/login";
 import { resendVerificationEmail } from "@/lib/actions/verify-email";
 import { useI18n } from "@/components/I18nProvider";
-import { useSearchParams } from "next/navigation";
+import { sanitizeAppCallbackTarget } from "@/lib/sanitize-callback-url";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export function LoginForm() {
   const { t } = useI18n();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/case";
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [lastEmail, setLastEmail] = useState<string | null>(null);
@@ -27,7 +28,7 @@ export function LoginForm() {
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const password = (form.elements.namedItem("password") as HTMLInputElement).value;
     setLastEmail(email.trim().toLowerCase());
-    const res = await signInWithPassword(email, password);
+    const res = await signInWithPassword(email, password, searchParams.get("callbackUrl"));
     setPending(false);
     if ("error" in res) {
       if (res.error === "UNVERIFIED") {
@@ -42,7 +43,7 @@ export function LoginForm() {
       setError(t("authForms.errorBadCredentials"));
       return;
     }
-    window.location.href = callbackUrl;
+    router.replace(sanitizeAppCallbackTarget(searchParams.get("callbackUrl"), "/case"));
   }
 
   async function resend() {
