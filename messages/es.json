@@ -100,7 +100,17 @@
     "startsAt": "Starts",
     "endsAt": "Ends (optional)",
     "submit": "Add event",
-    "submitting": "Saving…"
+    "submitting": "Saving…",
+    "participantsLabel": "Participants",
+    "participantsHint": "Optional — choose housemates involved (shown in the app and in the shared calendar feed).",
+    "recurrenceLabel": "Repeat",
+    "recurrenceNone": "Does not repeat",
+    "recurrenceDaily": "Every day",
+    "recurrenceWeekly": "Every week",
+    "recurrenceBiweekly": "Every two weeks",
+    "recurrenceMonthly": "Every month",
+    "recurrenceUntilLabel": "Repeat until (optional)",
+    "recurrenceUntilHint": "Leave empty to repeat indefinitely in the app; calendar apps may still ask for a range when subscribing."
   },
   "calendarGrid": {
     "viewTitle": "Calendar view",
@@ -116,6 +126,7 @@
     "dayPanelHintEnd": "above. Review and remove events here.",
     "noEventsDay": "No events on this day.",
     "createdBy": "Created by",
+    "participants": "Participants:",
     "weekDaySelectAria": "Select {{day}}, show events for this day below",
     "delete": "Delete"
   },
@@ -125,7 +136,14 @@
     "eventListTitle": "All events",
     "eventListEmpty": "No events yet. Add the first one above.",
     "allDayLine": "All day · {{date}}",
-    "createdBy": "Created by"
+    "createdBy": "Created by",
+    "participants": "Participants:",
+    "recurrenceDaily": "Repeats every day",
+    "recurrenceWeekly": "Repeats every week",
+    "recurrenceBiweekly": "Repeats every two weeks",
+    "recurrenceMonthly": "Repeats every month",
+    "recurrenceOther": "Repeating event",
+    "recurrenceUntil": "until {{date}}"
   },
   "casaHome": {
     "badge": "House home",
@@ -562,6 +580,8 @@
     "calendarTitleRequired": "Title is required.",
     "calendarInvalidStart": "Invalid start date/time.",
     "calendarInvalidEnd": "Invalid end date/time.",
+    "calendarRecurrenceInvalid": "Invalid repeat option.",
+    "calendarRepeatUntilBeforeStart": "The “repeat until” date must be on or after the start date.",
     "eventNotFound": "Event not found.",
     "onlyOwnerRotatesCalendar": "Only the home owner can rotate the calendar link.",
     "tokenRotateFailed": "Could not rotate the token. Try again.",

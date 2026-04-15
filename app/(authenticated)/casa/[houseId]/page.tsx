@@ -5,6 +5,7 @@ import { computeMemberBalances } from "@/lib/balances";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { intlLocaleTag } from "@/lib/i18n/intl-locale";
 import { createTranslator } from "@/lib/i18n/server";
+import { expandOccurrencesInRange } from "@/lib/calendar-recurrence";
 import { computeMinimalSettlementPlan } from "@/lib/settlement-plan";
 import { formatEuroFromCents } from "@/lib/money";
 import { getMembershipOrRedirect } from "@/lib/house-access";
@@ -32,7 +33,7 @@ export default async function CasaDashboardPage({
 
   const [
     balances,
-    upcoming,
+    calendarRows,
     myOpenTasks,
     otherOpenTasks,
     recentExpenses,
@@ -42,9 +43,9 @@ export default async function CasaDashboardPage({
   ] = await Promise.all([
     computeMemberBalances(houseId),
     prisma.calendarEvent.findMany({
-      where: { houseId, cancelledAt: null, startsAt: { gte: new Date() } },
+      where: { houseId, cancelledAt: null },
       orderBy: { startsAt: "asc" },
-      take: 6,
+      take: 48,
     }),
     prisma.task.findMany({
       where: { houseId, status: "TODO", assigneeId: userId },
@@ -94,6 +95,33 @@ export default async function CasaDashboardPage({
       _count: { _all: true },
     }),
   ]);
+
+  const now = new Date();
+  const horizon = new Date(now.getTime() + 90 * 86400000);
+  type UpcomingRow = { key: string; title: string; allDay: boolean; startsAt: Date };
+  const upcomingRows: UpcomingRow[] = [];
+  for (const ev of calendarRows) {
+    const occs = expandOccurrencesInRange(
+      ev.startsAt,
+      ev.endsAt,
+      ev.allDay,
+      ev.recurrenceRule,
+      now,
+      horizon,
+    );
+    for (const o of occs) {
+      if (o.startsAt.getTime() >= now.getTime()) {
+        upcomingRows.push({
+          key: `${ev.id}_${o.startsAt.getTime()}`,
+          title: ev.title,
+          allDay: ev.allDay,
+          startsAt: o.startsAt,
+        });
+      }
+    }
+  }
+  upcomingRows.sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
+  const upcomingPreview = upcomingRows.slice(0, 6);
 
   const balancesSorted = [...balances].sort((a, b) => {
     if (a.userId === userId) return -1;
@@ -278,17 +306,17 @@ export default async function CasaDashboardPage({
       <div className="grid auto-rows-fr gap-6 md:grid-cols-2 xl:grid-cols-3">
         <section className="flex min-h-[14rem] flex-col rounded-2xl border border-slate-200/80 bg-white/60 p-5 shadow-sm">
           <h2 className="text-base font-bold text-slate-900">{t("casaHome.upcoming")}</h2>
-          {upcoming.length === 0 ? (
+          {upcomingPreview.length === 0 ? (
             <p className="mt-2 flex-1 text-sm text-slate-500">{t("casaHome.noUpcoming")}</p>
           ) : (
             <ul className="mt-3 flex flex-1 flex-col gap-2 overflow-auto">
-              {upcoming.map((ev) => (
-                <li key={ev.id} className="rounded-xl border border-slate-100 bg-white/90 px-3 py-2.5 text-sm">
+              {upcomingPreview.map((ev) => (
+                <li key={ev.key} className="rounded-xl border border-slate-100 bg-white/90 px-3 py-2.5 text-sm">
                   <span className="font-semibold text-slate-900">{ev.title}</span>
                   <p className="text-xs text-slate-500">
                     {ev.allDay
-                      ? new Date(ev.startsAt).toLocaleDateString(intlTag)
-                      : new Date(ev.startsAt).toLocaleString(intlTag)}
+                      ? ev.startsAt.toLocaleDateString(intlTag)
+                      : ev.startsAt.toLocaleString(intlTag)}
                   </p>
                 </li>
               ))}

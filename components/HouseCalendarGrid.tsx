@@ -2,6 +2,7 @@
 
 import { useI18n } from "@/components/I18nProvider";
 import { allDayRangeDateKeysFromDb } from "@/lib/calendar-all-day";
+import { expandOccurrencesInRange } from "@/lib/calendar-recurrence";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { intlLocaleTag } from "@/lib/i18n/intl-locale";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,6 +10,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 export type CalendarEventDTO = {
   id: string;
+  /** Chiave React per occorrenze espanse (serie + istante inizio). */
+  displayKey?: string;
   title: string;
   description: string | null;
   startsAt: string;
@@ -16,6 +19,7 @@ export type CalendarEventDTO = {
   allDay: boolean;
   createdByName: string;
   participantNames: string[];
+  recurrenceRule?: string | null;
 };
 
 function dateKeyLocal(d: Date): string {
@@ -159,6 +163,8 @@ export function HouseCalendarGrid({
     [intlTag],
   );
 
+  /* Allineamento ?day= / initialDayKey al cursore: setState qui è voluto (URL → stato UI). */
+  /* eslint-disable react-hooks/set-state-in-effect -- sync controlled day from URL / server props */
   useEffect(() => {
     const d = parseDayKey(initialDayKey ?? null) ?? dayFromUrl;
     if (!d) return;
@@ -166,6 +172,7 @@ export function HouseCalendarGrid({
     const dt = dateFromDayKey(d);
     if (dt) setCursor(dt);
   }, [initialDayKey, dayFromUrl]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const selectDay = useCallback(
     (key: string) => {
@@ -179,6 +186,45 @@ export function HouseCalendarGrid({
   const monthGrid = useMemo(() => getMonthGrid(monthFirst), [monthFirst]);
   const weekDays = useMemo(() => getWeekDays(cursor), [cursor]);
 
+  const expansionWindow = useMemo(() => {
+    if (view === "month") {
+      const first = monthGrid[0]!;
+      const last = monthGrid[41]!;
+      const ws = new Date(first.getFullYear(), first.getMonth(), first.getDate(), 0, 0, 0, 0);
+      const we = new Date(last.getFullYear(), last.getMonth(), last.getDate() + 1, 0, 0, 0, 0);
+      return { ws, we };
+    }
+    const a = weekDays[0]!;
+    const b = weekDays[6]!;
+    const ws = new Date(a.getFullYear(), a.getMonth(), a.getDate(), 0, 0, 0, 0);
+    const we = new Date(b.getFullYear(), b.getMonth(), b.getDate() + 1, 0, 0, 0, 0);
+    return { ws, we };
+  }, [view, monthGrid, weekDays]);
+
+  const expandedEvents = useMemo(() => {
+    const { ws, we } = expansionWindow;
+    const out: CalendarEventDTO[] = [];
+    for (const ev of events) {
+      const occs = expandOccurrencesInRange(
+        new Date(ev.startsAt),
+        ev.endsAt ? new Date(ev.endsAt) : null,
+        ev.allDay,
+        ev.recurrenceRule ?? null,
+        ws,
+        we,
+      );
+      for (const o of occs) {
+        out.push({
+          ...ev,
+          startsAt: o.startsAt.toISOString(),
+          endsAt: o.endsAt?.toISOString() ?? null,
+          displayKey: `${ev.id}:${o.startsAt.getTime()}`,
+        });
+      }
+    }
+    return out;
+  }, [events, expansionWindow]);
+
   const selectedDate = useMemo(() => {
     if (!selectedDayKey) return null;
     return dateFromDayKey(selectedDayKey);
@@ -186,8 +232,8 @@ export function HouseCalendarGrid({
 
   const selectedDayEvents = useMemo(() => {
     if (!selectedDate) return [];
-    return eventsForDay(events, selectedDate);
-  }, [events, selectedDate]);
+    return eventsForDay(expandedEvents, selectedDate);
+  }, [expandedEvents, selectedDate]);
 
   const weekLabel = useMemo(() => {
     const a = weekDays[0]!;
@@ -312,7 +358,7 @@ export function HouseCalendarGrid({
           <div className="grid grid-cols-7 gap-px rounded-b-xl border border-t-0 border-slate-200/80 bg-slate-200/80">
             {monthGrid.map((day) => {
               const inMonth = isSameMonth(day, monthFirst);
-              const dayEvts = eventsForDay(events, day);
+              const dayEvts = eventsForDay(expandedEvents, day);
               const today = isToday(day);
               const key = dateKeyLocal(day);
               const selected = selectedDayKey === key;
@@ -337,7 +383,7 @@ export function HouseCalendarGrid({
                   <ul className="mt-1 space-y-0.5">
                     {dayEvts.slice(0, 3).map((ev) => (
                       <li
-                        key={ev.id}
+                        key={ev.displayKey ?? ev.id}
                         className="truncate rounded bg-emerald-50 px-1 py-0.5 text-[10px] font-medium text-emerald-900 sm:text-[11px]"
                         title={`${ev.title}${ev.allDay ? "" : ` · ${new Date(ev.startsAt).toLocaleTimeString(intlTag, { hour: "2-digit", minute: "2-digit" })}`}`}
                       >
@@ -367,7 +413,7 @@ export function HouseCalendarGrid({
         <div className="overflow-x-auto border-t border-slate-200/80 [-webkit-overflow-scrolling:touch]">
           <div className="grid min-w-[52rem] grid-cols-7 gap-px rounded-b-xl border-x border-b border-slate-200/80 bg-slate-200/80 sm:min-w-0 sm:rounded-none sm:border-x-0">
             {weekDays.map((day) => {
-              const dayEvts = eventsForDay(events, day);
+              const dayEvts = eventsForDay(expandedEvents, day);
               const today = isToday(day);
               const key = dateKeyLocal(day);
               const selected = selectedDayKey === key;
@@ -400,7 +446,7 @@ export function HouseCalendarGrid({
                   <ul className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-2">
                     {dayEvts.map((ev) => (
                       <li
-                        key={ev.id}
+                        key={ev.displayKey ?? ev.id}
                         className="rounded-lg border border-emerald-100 bg-emerald-50/90 px-2 py-1.5 text-xs text-emerald-950"
                       >
                         <p className="font-semibold leading-tight">{ev.title}</p>
@@ -447,7 +493,7 @@ export function HouseCalendarGrid({
             <ul className="mt-3 space-y-3">
               {selectedDayEvents.map((ev) => (
                 <li
-                  key={ev.id}
+                  key={ev.displayKey ?? ev.id}
                   className="flex flex-col gap-2 rounded-xl border border-slate-100 bg-slate-50/80 p-3 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>

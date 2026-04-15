@@ -4,6 +4,7 @@
  */
 
 import { allDayRangeDateKeysFromDb, dateKeyToIcsYYYYMMDD } from "@/lib/calendar-all-day";
+import { parseRecurrenceRule } from "@/lib/calendar-recurrence";
 
 export type IcsEventInput = {
   id: string;
@@ -17,6 +18,7 @@ export type IcsEventInput = {
   updatedAt: Date;
   /** Nomi partecipanti (membri casa) da aggiungere in description nel feed. */
   participantNames?: string[];
+  recurrenceRule?: string | null;
 };
 
 function icsEscape(text: string): string {
@@ -89,6 +91,11 @@ function buildVEvent(ev: IcsEventInput, calName: string): string[] {
     }
     lines.push(`DTSTART:${start}`);
     lines.push(`DTEND:${formatUtcStamp(end)}`);
+  }
+
+  const rrule = ev.recurrenceRule?.trim();
+  if (rrule && parseRecurrenceRule(rrule, ev.allDay)) {
+    lines.push(icsFold(`RRULE:${rrule}`));
   }
 
   lines.push("END:VEVENT");

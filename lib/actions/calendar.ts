@@ -3,7 +3,12 @@
 import { randomBytes } from "node:crypto";
 
 import { auth } from "@/auth";
-import { parseDateKeyFromDatetimeLocal } from "@/lib/calendar-all-day";
+import { parseDateKeyFromDatetimeLocal, utcCalendarDateKey } from "@/lib/calendar-all-day";
+import {
+  buildRecurrenceRuleFromForm,
+  recurrencePresetFromForm,
+  recurrenceUntilFromForm,
+} from "@/lib/calendar-recurrence";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { ta } from "@/lib/i18n/action-messages";
 import { canRotateCalendarFeed } from "@/lib/house-roles";
@@ -35,6 +40,8 @@ export async function createCalendarEvent(
   const startsAtRaw = String(formData.get("startsAt") ?? "");
   const endsAtRaw = String(formData.get("endsAt") ?? "").trim();
   const allDay = formData.get("allDay") === "on";
+  const preset = recurrencePresetFromForm(formData);
+  const untilKey = recurrenceUntilFromForm(formData);
 
   if (!title) return { error: await ta("errors.calendarTitleRequired") };
 
@@ -68,6 +75,18 @@ export async function createCalendarEvent(
     }
   }
 
+  let recurrenceRule: string | null = null;
+  if (preset && preset !== "none") {
+    recurrenceRule = buildRecurrenceRuleFromForm(preset, untilKey, allDay);
+    if (!recurrenceRule) return { error: await ta("errors.calendarRecurrenceInvalid") };
+    if (untilKey) {
+      const startDayKey = utcCalendarDateKey(startsAt);
+      if (untilKey < startDayKey) {
+        return { error: await ta("errors.calendarRepeatUntilBeforeStart") };
+      }
+    }
+  }
+
   const members = await prisma.houseMember.findMany({
     where: { houseId, userId: { in: participantIds } },
     select: { userId: true },
@@ -83,6 +102,7 @@ export async function createCalendarEvent(
       startsAt,
       endsAt,
       allDay,
+      recurrenceRule,
       createdById: session.user.id,
       participants: participantsCreate.length ? { create: participantsCreate } : undefined,
     },

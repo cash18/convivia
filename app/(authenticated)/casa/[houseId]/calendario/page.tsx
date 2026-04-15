@@ -4,6 +4,7 @@ import { HouseCalendarGrid, type CalendarEventDTO } from "@/components/HouseCale
 import { auth } from "@/auth";
 import { deleteCalendarEvent } from "@/lib/actions/calendar";
 import { utcCalendarDateKey } from "@/lib/calendar-all-day";
+import { recurrenceListParts } from "@/lib/calendar-recurrence";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { intlLocaleTag } from "@/lib/i18n/intl-locale";
 import { createTranslator } from "@/lib/i18n/server";
@@ -87,6 +88,7 @@ export default async function CalendarioPage({
     allDay: ev.allDay,
     createdByName: ev.createdBy.name,
     participantNames: ev.participants.map((p) => p.user.name),
+    recurrenceRule: ev.recurrenceRule,
   }));
 
   async function removeEventAction(formData: FormData) {
@@ -144,6 +146,25 @@ export default async function CalendarioPage({
                 <div>
                   <p className="font-bold text-slate-900">{ev.title}</p>
                   {ev.description ? <p className="mt-1 text-sm text-slate-600">{ev.description}</p> : null}
+                  {(() => {
+                    const rp = recurrenceListParts(ev.recurrenceRule, ev.allDay);
+                    if (!rp) return null;
+                    const base = t(rp.lineKey);
+                    const untilPart =
+                      rp.untilDateKey &&
+                      formatMessage(t("calendarPage.recurrenceUntil"), {
+                        date: new Date(`${rp.untilDateKey}T12:00:00Z`).toLocaleDateString(intlTag, {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        }),
+                      });
+                    return (
+                      <p className="mt-1 text-xs font-medium text-emerald-800/95">
+                        {untilPart ? `${base} · ${untilPart}` : base}
+                      </p>
+                    );
+                  })()}
                   <p className="mt-2 text-xs text-slate-500">
                     {ev.allDay
                       ? formatAllDayEventListLine(

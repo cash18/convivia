@@ -96,6 +96,22 @@ export function AddEventForm({
         </label>
       </div>
 
+      <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        {t("calendarForm.recurrenceLabel")}
+        <select name="recurrencePreset" className="cv-input-sm" defaultValue="">
+          <option value="">{t("calendarForm.recurrenceNone")}</option>
+          <option value="daily">{t("calendarForm.recurrenceDaily")}</option>
+          <option value="weekly">{t("calendarForm.recurrenceWeekly")}</option>
+          <option value="biweekly">{t("calendarForm.recurrenceBiweekly")}</option>
+          <option value="monthly">{t("calendarForm.recurrenceMonthly")}</option>
+        </select>
+      </label>
+      <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        {t("calendarForm.recurrenceUntilLabel")}
+        <input name="recurrenceUntil" type="date" className="cv-input-sm" />
+      </label>
+      <p className="text-[11px] leading-snug text-slate-500">{t("calendarForm.recurrenceUntilHint")}</p>
+
       {members.length > 0 ? (
         <fieldset className="rounded-xl border border-slate-200/80 bg-slate-50/50 px-3 py-2.5">
           <legend className="px-1 text-xs font-semibold text-slate-700">{t("calendarForm.participantsLabel")}</legend>

@@ -222,6 +222,8 @@ model CalendarEvent {
   houseChoreId       String?
   choreOccurrenceDate DateTime? @db.Date
   houseChore         HouseChore? @relation(fields: [houseChoreId], references: [id], onDelete: Cascade)
+  /// RFC 5545 RRULE (solo regole generate da Convivia: FREQ + INTERVAL + UNTIL opzionale).
+  recurrenceRule String?
 
   @@index([houseId])
   @@index([houseId, startsAt])
