@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BrandLogo } from "@/components/BrandLogo";
+import { LandingFeaturesIllustration } from "@/components/LandingFeaturesIllustration";
 import { createTranslator } from "@/lib/i18n/server";
 
 function IconRing({ children, className }: { children: ReactNode; className?: string }) {
@@ -201,15 +202,12 @@ export async function LandingPage() {
           ))}
         </section>
 
-        <figure className="mx-auto mt-16 max-w-4xl overflow-hidden rounded-2xl border border-emerald-200/40 bg-white/60 shadow-md shadow-emerald-900/5 ring-1 ring-white/80">
-          <Image
-            src="/landing/landing-features-abstract.png"
-            alt={t("landing.featuresStripImageAlt")}
-            width={1376}
-            height={768}
-            className="h-auto w-full object-cover"
-            sizes="(max-width: 896px) 100vw, 896px"
-          />
+        <figure
+          className="mx-auto mt-16 max-w-4xl overflow-hidden rounded-2xl border border-emerald-200/40 bg-white/60 shadow-md shadow-emerald-900/5 ring-1 ring-white/80"
+          role="img"
+          aria-label={t("landing.featuresStripImageAlt")}
+        >
+          <LandingFeaturesIllustration className="h-auto w-full text-slate-900" />
         </figure>
 
         <section id="funzionalita" className="mt-24 scroll-mt-24">
