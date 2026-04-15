@@ -8,6 +8,7 @@ import {
   IconUsers,
   IconWallet,
 } from "@/components/CasaSectionIcons";
+import { CaseListNavLink } from "@/components/CaseListNavLink";
 import { useI18n } from "@/components/I18nProvider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -51,12 +52,9 @@ export function CasaSubNav({
             </code>
           </span>
         </div>
-        <Link
-          href="/case"
-          className="cv-pill-nav shrink-0 touch-manipulation px-3 py-1.5 text-xs font-semibold sm:text-sm"
-        >
+        <CaseListNavLink className="cv-pill-nav shrink-0 touch-manipulation px-3 py-1.5 text-xs font-semibold sm:text-sm">
           {t("casaNav.switchHome")}
-        </Link>
+        </CaseListNavLink>
       </div>
 
       <nav

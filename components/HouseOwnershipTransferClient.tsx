@@ -5,6 +5,7 @@ import {
   declineHouseOwnershipTransfer,
 } from "@/lib/actions/members";
 import { useI18n } from "@/components/I18nProvider";
+import { clearLastHouseOnClient } from "@/lib/last-house-preference";
 import { formatMessage } from "@/lib/i18n/format-message";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -50,6 +51,7 @@ export function HouseOwnershipTransferClient({
       setError(r.error);
       return;
     }
+    clearLastHouseOnClient();
     router.push("/case");
     router.refresh();
   }

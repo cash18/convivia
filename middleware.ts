@@ -49,6 +49,9 @@ export default auth((req) => {
   }
 
   const res = NextResponse.next();
+  if (pathname === "/case") {
+    res.headers.set("Cache-Control", "private, no-store, must-revalidate");
+  }
   return withLocaleCookie(req, res);
 });
 

@@ -89,4 +89,12 @@ body {
   .cv-badge {
     @apply inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500/18 to-teal-500/15 px-3 py-1 text-xs font-semibold tracking-wide text-emerald-900 uppercase ring-1 ring-emerald-500/25;
   }
+
+  /**
+   * Larghezza unica per header, banner e main (max-w + gutter + safe area).
+   * min-w-0 evita che il flex item “spinga” più largo del viewport su mobile.
+   */
+  .cv-shell {
+    @apply mx-auto w-full min-w-0 max-w-6xl pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] sm:pl-[max(1.25rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.25rem,env(safe-area-inset-right,0px))];
+  }
 }

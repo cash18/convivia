@@ -1,10 +1,9 @@
+import { CaseListNavLink } from "@/components/CaseListNavLink";
 import { NotificationPreferencesForm } from "@/components/NotificationPreferencesForm";
 import { auth } from "@/auth";
 import { normalizePushNotifyPrefs } from "@/lib/push-categories";
 import { createTranslator } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
-
 export default async function ImpostazioniPage() {
   const session = await auth();
   if (!session?.user?.id) return null;
@@ -46,9 +45,9 @@ export default async function ImpostazioniPage() {
       </section>
 
       <p className="text-center text-xs text-slate-500">
-        <Link href="/case" className="cv-link font-medium">
+        <CaseListNavLink className="cv-link font-medium">
           {t("settings.backCases")}
-        </Link>
+        </CaseListNavLink>
       </p>
     </div>
   );

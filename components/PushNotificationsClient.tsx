@@ -191,8 +191,8 @@ export function PushReminderBanner() {
   }
 
   return (
-    <div className="border-b border-emerald-200/80 bg-gradient-to-r from-emerald-50/95 to-teal-50/90 px-[max(0.75rem,env(safe-area-inset-left,0px))] py-2.5 pr-[max(0.75rem,env(safe-area-inset-right,0px))] sm:px-[max(1.25rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.25rem,env(safe-area-inset-right,0px))]">
-      <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+    <div className="border-b border-emerald-200/80 bg-gradient-to-r from-emerald-50/95 to-teal-50/90 py-2.5">
+      <div className="cv-shell flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="flex min-w-0 items-start gap-2.5">
           <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-emerald-300/80 bg-white/90 text-emerald-800 shadow-sm">
             <BellIcon filled={false} className="h-4 w-4" />

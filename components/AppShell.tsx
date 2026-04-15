@@ -1,6 +1,7 @@
 "use client";
 
 import { BrandLogo } from "@/components/BrandLogo";
+import { CaseListNavLink } from "@/components/CaseListNavLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { LogoutButton } from "@/components/LogoutButton";
 import { PushNotificationsClient, PushReminderBanner } from "@/components/PushNotificationsClient";
@@ -58,12 +59,12 @@ export function AppShell({
   const initials = initialsFromDisplay(userName);
 
   return (
-    <div className="flex min-h-dvh min-h-screen flex-col">
-      <header className="sticky top-0 z-10 border-b border-white/50 bg-white/45 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl">
-        <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-2 py-2 pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] sm:py-2.5 sm:pl-[max(1.25rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.25rem,env(safe-area-inset-right,0px))]">
-          <Link href="/case" className="shrink-0 touch-manipulation py-0.5">
+    <div className="flex min-h-dvh min-h-screen min-w-0 flex-col">
+      <header className="sticky top-0 z-10 w-full min-w-0 border-b border-white/50 bg-white/45 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl">
+        <div className="cv-shell relative flex items-center justify-between gap-2 py-2 sm:py-2.5">
+          <CaseListNavLink className="shrink-0 touch-manipulation py-0.5">
             <BrandLogo />
-          </Link>
+          </CaseListNavLink>
 
           <button
             type="button"
@@ -105,14 +106,13 @@ export function AppShell({
                 <p className="border-b border-slate-100 px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                   {t("nav.menuSectionNav")}
                 </p>
-                <Link
-                  href="/case"
+                <CaseListNavLink
                   role="menuitem"
                   onClick={closeMenu}
                   className="block px-3 py-2.5 font-medium text-slate-800 hover:bg-emerald-50/90"
                 >
                   {t("nav.myHouses")}
-                </Link>
+                </CaseListNavLink>
                 <Link
                   href="/impostazioni"
                   role="menuitem"
@@ -141,7 +141,7 @@ export function AppShell({
         </div>
       </header>
       <PushReminderBanner />
-      <div className="mx-auto w-full max-w-6xl flex-1 py-4 pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] sm:py-6 sm:pl-[max(1.25rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.25rem,env(safe-area-inset-right,0px))]">
+      <div className="cv-shell flex-1 py-4 sm:py-6">
         {children}
       </div>
     </div>

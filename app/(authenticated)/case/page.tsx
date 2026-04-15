@@ -6,6 +6,8 @@ import { roleLabelKey } from "@/lib/house-roles";
 import { createTranslator } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function CasePage() {
   const session = await auth();
   if (!session?.user?.id) return null;
