@@ -1,6 +1,5 @@
+import { CaseAddHousePanel } from "@/components/CaseAddHousePanel";
 import { CaseHouseCardLink } from "@/components/CaseHouseCardLink";
-import { CreateHouseForm } from "@/components/CreateHouseForm";
-import { JoinHouseForm } from "@/components/JoinHouseForm";
 import { auth } from "@/auth";
 import { roleLabelKey } from "@/lib/house-roles";
 import { createTranslator } from "@/lib/i18n/server";
@@ -21,37 +20,65 @@ export default async function CasePage() {
   });
 
   return (
-    <div className="space-y-8 sm:space-y-10">
-      <div>
-        <p className="cv-badge w-fit">{t("case.badge")}</p>
-        <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{t("case.title")}</h1>
-        <p className="mt-2 max-w-xl text-sm text-slate-600">{t("case.intro")}</p>
-      </div>
+    <div className="mx-auto max-w-4xl space-y-12 pb-4">
+      <header className="flex flex-col gap-8 border-b border-emerald-200/25 pb-10 sm:flex-row sm:items-start sm:justify-between sm:gap-10">
+        <div className="min-w-0 flex-1 space-y-3">
+          <h1 className="text-[1.65rem] font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl sm:leading-[1.15]">
+            {t("case.title")}
+          </h1>
+          <p className="max-w-lg text-base leading-relaxed text-slate-600">{t("case.intro")}</p>
+        </div>
+        <div className="shrink-0 sm:max-w-sm sm:pt-1">
+          <CaseAddHousePanel />
+        </div>
+      </header>
 
       {memberships.length > 0 ? (
-        <ul className="grid gap-4 sm:grid-cols-2">
-          {memberships.map((m) => (
-            <li key={m.id}>
-              <CaseHouseCardLink houseId={m.houseId}>
-                <span className="text-lg font-bold text-slate-900 group-hover:text-emerald-900">{m.house.name}</span>
-                <p className="mt-2 text-xs font-medium text-slate-500">
-                  {t(roleLabelKey(m.role))} · {t("case.codeLabel")}{" "}
-                  <span className="font-mono text-emerald-700">{m.house.inviteCode}</span>
-                </p>
-              </CaseHouseCardLink>
-            </li>
-          ))}
-        </ul>
+        <section aria-label={t("case.homesListAria")}>
+          <ul className="grid gap-5 sm:grid-cols-2">
+            {memberships.map((m) => (
+              <li key={m.id}>
+                <CaseHouseCardLink
+                  houseId={m.houseId}
+                  className="min-h-[6.5rem] border-l-[6px] border-l-emerald-500 pl-5 sm:min-h-[7.25rem]"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <span className="text-xl font-bold tracking-tight text-slate-900 group-hover:text-emerald-900 sm:text-2xl">
+                        {m.house.name}
+                      </span>
+                      <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-slate-500">
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
+                          {t(roleLabelKey(m.role))}
+                        </span>
+                        <span className="text-slate-400">·</span>
+                        <span>
+                          {t("case.codeLabel")}{" "}
+                          <span className="font-mono text-sm font-bold text-emerald-700">{m.house.inviteCode}</span>
+                        </span>
+                      </p>
+                    </div>
+                    <span
+                      className="mt-1 shrink-0 text-lg font-light text-emerald-500 transition group-hover:translate-x-0.5 group-hover:text-emerald-600"
+                      aria-hidden
+                    >
+                      →
+                    </span>
+                  </div>
+                </CaseHouseCardLink>
+              </li>
+            ))}
+          </ul>
+        </section>
       ) : (
-        <p className="cv-card rounded-2xl border border-dashed border-emerald-200/60 bg-emerald-50/30 px-6 py-10 text-center text-sm font-medium text-slate-600">
-          {t("case.empty")}
-        </p>
+        <section
+          className="cv-card-solid flex flex-col items-center justify-center border-dashed border-emerald-200/70 bg-gradient-to-b from-emerald-50/40 to-white/90 px-6 py-16 text-center shadow-inner"
+          aria-live="polite"
+        >
+          <p className="text-lg font-bold text-slate-900">{t("case.emptyTitle")}</p>
+          <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-600">{t("case.emptySubtitle")}</p>
+        </section>
       )}
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <CreateHouseForm />
-        <JoinHouseForm />
-      </div>
     </div>
   );
 }

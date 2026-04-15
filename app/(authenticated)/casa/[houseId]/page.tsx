@@ -257,11 +257,11 @@ export default async function CasaDashboardPage({
         </section>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
-        <section className="flex min-h-[18rem] flex-col">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-2 xl:items-stretch">
+        <section className="flex h-full min-h-0 min-w-0 flex-col xl:min-h-[18rem]">
           <AddExpenseForm houseId={houseId} members={members} variant="compact" />
         </section>
-        <section className="cv-card-solid flex min-h-[18rem] flex-col p-5 sm:p-6">
+        <section className="cv-card-solid flex h-full min-h-0 min-w-0 flex-col p-5 sm:p-6 xl:min-h-[18rem]">
           <h2 className="text-base font-bold text-slate-900">{t("casaHome.recentHouseTitle")}</h2>
           <p className="mt-1 text-xs text-slate-500">{t("casaHome.recentHouseHint")}</p>
           <h3 className="mt-3 text-xs font-bold uppercase tracking-wide text-slate-500">{t("casaHome.recentExpensesSubtitle")}</h3>

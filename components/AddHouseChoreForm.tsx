@@ -8,7 +8,15 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from "react"
 
 type Member = { id: string; name: string };
 
-export function AddHouseChoreForm({ houseId, members }: { houseId: string; members: Member[] }) {
+export function AddHouseChoreForm({
+  houseId,
+  members,
+  embedded = false,
+}: {
+  houseId: string;
+  members: Member[];
+  embedded?: boolean;
+}) {
   const { t } = useI18n();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -85,12 +93,14 @@ export function AddHouseChoreForm({ houseId, members }: { houseId: string; membe
     });
   }, [anchorKey, maxEndKey]);
 
-  return (
-    <section className="cv-card-solid p-4 sm:p-5">
-      <h2 className="text-sm font-bold text-slate-900">{t("houseChores.formTitle")}</h2>
-      <p className="mt-1 text-xs leading-relaxed text-slate-600">{t("houseChores.formIntro")}</p>
+  const outer = embedded ? "pt-1" : "cv-card-solid p-4 sm:p-5";
 
-      <form className="mt-4 space-y-4" onSubmit={onSubmit}>
+  return (
+    <div className={outer}>
+      <h2 className={embedded ? "sr-only" : "text-sm font-bold text-slate-900"}>{t("houseChores.formTitle")}</h2>
+      {!embedded ? <p className="mt-1 text-xs leading-relaxed text-slate-600">{t("houseChores.formIntro")}</p> : null}
+
+      <form className={embedded ? "mt-3 space-y-4" : "mt-4 space-y-4"} onSubmit={onSubmit}>
         <div>
           <label className="block text-xs font-semibold text-slate-700" htmlFor="hc-title">
             {t("houseChores.fieldTitle")}
@@ -116,54 +126,62 @@ export function AddHouseChoreForm({ houseId, members }: { houseId: string; membe
           />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <label className="block text-xs font-semibold text-slate-700" htmlFor="hc-every">
-              {t("houseChores.fieldEveryDays")}
-            </label>
-            <select id="hc-every" name="everyDays" className="cv-input mt-1 w-full" defaultValue="7">
-              <option value="1">{t("houseChores.everyOption1")}</option>
-              <option value="2">{t("houseChores.everyOption2")}</option>
-              <option value="3">{t("houseChores.everyOption3")}</option>
-              <option value="7">{t("houseChores.everyOption7")}</option>
-              <option value="14">{t("houseChores.everyOption14")}</option>
-              <option value="30">{t("houseChores.everyOption30")}</option>
-            </select>
-            <p className="mt-1 text-[11px] text-slate-500">{t("houseChores.everyHint")}</p>
+        <details className="group rounded-xl border border-slate-200/80 bg-slate-50/50 open:bg-slate-50/80">
+          <summary className="cursor-pointer list-none px-3 py-2.5 text-xs font-semibold text-slate-600 marker:hidden [&::-webkit-details-marker]:hidden">
+            <span className="flex items-center justify-between gap-2">
+              <span>{t("houseChores.formDatesSummary")}</span>
+              <span className="text-slate-400 transition-transform group-open:rotate-90">›</span>
+            </span>
+          </summary>
+          <div className="grid gap-4 border-t border-slate-200/60 px-3 pb-3 pt-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700" htmlFor="hc-every">
+                {t("houseChores.fieldEveryDays")}
+              </label>
+              <select id="hc-every" name="everyDays" className="cv-input mt-1 w-full" defaultValue="7">
+                <option value="1">{t("houseChores.everyOption1")}</option>
+                <option value="2">{t("houseChores.everyOption2")}</option>
+                <option value="3">{t("houseChores.everyOption3")}</option>
+                <option value="7">{t("houseChores.everyOption7")}</option>
+                <option value="14">{t("houseChores.everyOption14")}</option>
+                <option value="30">{t("houseChores.everyOption30")}</option>
+              </select>
+              <p className="mt-1 text-[11px] text-slate-500">{t("houseChores.everyHint")}</p>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700" htmlFor="hc-anchor">
+                {t("houseChores.fieldAnchor")}
+              </label>
+              <input
+                id="hc-anchor"
+                name="anchorDate"
+                type="date"
+                required
+                value={anchorKey}
+                onChange={(e) => setAnchorKey(e.target.value)}
+                className="cv-input mt-1 w-full"
+              />
+              <p className="mt-1 text-[11px] text-slate-500">{t("houseChores.anchorHint")}</p>
+            </div>
+            <div className="sm:col-span-2 lg:col-span-1">
+              <label className="block text-xs font-semibold text-slate-700" htmlFor="hc-rec-until">
+                {t("houseChores.fieldRecurrenceEnd")}
+              </label>
+              <input
+                id="hc-rec-until"
+                name="recurrenceEndDate"
+                type="date"
+                required
+                value={recurrenceEndKey}
+                min={anchorKey}
+                max={maxEndKey}
+                onChange={(e) => setRecurrenceEndKey(e.target.value)}
+                className="cv-input mt-1 w-full"
+              />
+              <p className="mt-1 text-[11px] text-slate-500">{t("houseChores.recurrenceEndHint")}</p>
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700" htmlFor="hc-anchor">
-              {t("houseChores.fieldAnchor")}
-            </label>
-            <input
-              id="hc-anchor"
-              name="anchorDate"
-              type="date"
-              required
-              value={anchorKey}
-              onChange={(e) => setAnchorKey(e.target.value)}
-              className="cv-input mt-1 w-full"
-            />
-            <p className="mt-1 text-[11px] text-slate-500">{t("houseChores.anchorHint")}</p>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700" htmlFor="hc-rec-until">
-              {t("houseChores.fieldRecurrenceEnd")}
-            </label>
-            <input
-              id="hc-rec-until"
-              name="recurrenceEndDate"
-              type="date"
-              required
-              value={recurrenceEndKey}
-              min={anchorKey}
-              max={maxEndKey}
-              onChange={(e) => setRecurrenceEndKey(e.target.value)}
-              className="cv-input mt-1 w-full"
-            />
-            <p className="mt-1 text-[11px] text-slate-500">{t("houseChores.recurrenceEndHint")}</p>
-          </div>
-        </div>
+        </details>
 
         <div>
           <p className="text-xs font-semibold text-slate-700">{t("houseChores.fieldRotation")}</p>
@@ -234,6 +252,6 @@ export function AddHouseChoreForm({ houseId, members }: { houseId: string; membe
           {pending ? t("houseChores.submitting") : t("houseChores.submit")}
         </button>
       </form>
-    </section>
+    </div>
   );
 }

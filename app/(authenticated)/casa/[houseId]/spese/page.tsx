@@ -82,12 +82,12 @@ export default async function SpesePage({
   }
 
   return (
-    <div className="space-y-10">
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch lg:gap-8">
-        <div className="flex min-h-[22rem] flex-col lg:min-h-[28rem]">
+    <div className="mx-auto w-full min-w-0 max-w-5xl space-y-10 pb-2">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-2 xl:items-stretch xl:gap-8">
+        <div className="flex h-full min-h-0 min-w-0 flex-col xl:min-h-[28rem]">
           <AddExpenseForm houseId={houseId} members={members} />
         </div>
-        <div className="flex min-h-0 flex-col gap-6">
+        <div className="flex min-h-0 min-w-0 flex-col gap-6">
           <div className="cv-card-solid flex flex-1 flex-col p-5 sm:p-6">
             <h2 className="text-sm font-bold text-slate-900">{t("expensesPage.balancesTitle")}</h2>
             <p className="mt-1 text-xs text-slate-500">{t("expensesPage.balancesTransfersHint")}</p>
@@ -124,9 +124,9 @@ export default async function SpesePage({
       </div>
 
       {transfers.length > 0 ? (
-        <section>
+        <section className="min-w-0">
           <h2 className="text-lg font-bold text-slate-900">{t("expensesPage.recentTransfersTitle")}</h2>
-          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2">
             {transfers.map((tr) => (
               <li key={tr.id} className="cv-card-solid flex flex-col gap-2 p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -149,12 +149,12 @@ export default async function SpesePage({
         </section>
       ) : null}
 
-      <section>
+      <section className="min-w-0">
         <h2 className="text-lg font-bold text-slate-900">{t("expensesPage.expenseHistoryTitle")}</h2>
         {expenses.length === 0 ? (
           <p className="mt-2 text-sm text-slate-500">{t("expensesPage.expenseHistoryEmpty")}</p>
         ) : (
-          <ul className="mt-4 grid gap-4">
+          <ul className="mt-4 grid min-w-0 gap-4">
             {expenses.map((e) => {
               const editable: EditableExpense = {
                 id: e.id,

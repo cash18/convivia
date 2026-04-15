@@ -37,7 +37,7 @@ export default async function ListePage({
   ]);
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto w-full min-w-0 max-w-5xl space-y-8 pb-2">
       <div className="cv-card-solid p-5 sm:p-6">
         <NewShoppingListForm houseId={houseId} />
       </div>

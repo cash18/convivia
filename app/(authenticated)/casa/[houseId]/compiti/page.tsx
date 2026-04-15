@@ -50,6 +50,9 @@ export default async function CompitiPage({
     }),
   ]);
 
+  const openTasks = tasks.filter((x) => x.status !== "DONE");
+  const doneTasks = tasks.filter((x) => x.status === "DONE");
+
   const choreCards: HouseChoreCardData[] = houseChores.map((c) => {
     const membersOrdered = c.members.map((m) => ({
       userId: m.userId,
@@ -91,56 +94,87 @@ export default async function CompitiPage({
     await deleteTask(houseId, id);
   }
 
-  return (
-    <div className="space-y-8">
-      <AddTaskForm houseId={houseId} members={members} />
+  function taskMetaLine(task: (typeof tasks)[0]): string {
+    const parts: string[] = [];
+    if (task.assignee) parts.push(task.assignee.name);
+    else parts.push(t("tasksPage.unassigned"));
+    if (task.dueDate) {
+      parts.push(
+        new Date(task.dueDate).toLocaleString(intlTag, {
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      );
+    }
+    if (task.linkedCalendarEvent && !task.linkedCalendarEvent.cancelledAt) {
+      parts.push(t("tasksPage.calendarBadgeShort"));
+    }
+    return parts.join(" · ");
+  }
 
-      <section>
-        <h2 className="text-lg font-bold text-slate-900">{t("tasksPage.listTitle")}</h2>
-        {tasks.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">{t("tasksPage.empty")}</p>
+  return (
+    <div className="mx-auto max-w-2xl space-y-10 pb-12">
+      <header className="space-y-1.5">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">{t("tasksPage.pageTitle")}</h1>
+        <p className="text-sm leading-relaxed text-slate-600">{t("tasksPage.pageLead")}</p>
+      </header>
+
+      {/* Compiti */}
+      <section className="space-y-4" aria-labelledby="compiti-todo">
+        <h2 id="compiti-todo" className="text-sm font-bold uppercase tracking-wide text-slate-500">
+          {t("tasksPage.sectionTodo")}
+        </h2>
+
+        <details className="group rounded-2xl border border-emerald-200/60 bg-emerald-50/20 open:bg-emerald-50/35">
+          <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-emerald-900 marker:hidden [&::-webkit-details-marker]:hidden">
+            <span className="flex items-center justify-between gap-2">
+              <span>{t("tasksPage.toggleAddTask")}</span>
+              <span className="text-lg font-light text-emerald-600/80 transition-transform group-open:rotate-45">+</span>
+            </span>
+          </summary>
+          <div className="border-t border-emerald-200/40 px-3 pb-4 pt-1 sm:px-4">
+            <AddTaskForm houseId={houseId} members={members} embedded />
+          </div>
+        </details>
+
+        {openTasks.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50/80 px-4 py-6 text-center text-sm text-slate-500">
+            {t("tasksPage.emptyOpen")}
+          </p>
         ) : (
-          <ul className="mt-4 space-y-3">
-            {tasks.map((task) => (
+          <ul className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm">
+            {openTasks.map((task) => (
               <li
                 key={task.id}
-                className="cv-card-solid flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-2 border-b border-slate-100 px-4 py-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
               >
-                <div className="flex-1">
-                  <p
-                    className={`font-bold ${task.status === "DONE" ? "text-slate-400 line-through" : "text-slate-900"}`}
-                  >
-                    {task.title}
-                  </p>
-                  {task.description ? <p className="mt-1 text-sm text-slate-600">{task.description}</p> : null}
-                  <p className="mt-2 text-xs text-slate-500">
-                    {task.assignee
-                      ? formatMessage(t("tasksPage.assignee"), { name: task.assignee.name })
-                      : t("tasksPage.unassigned")}
-                    {task.dueDate
-                      ? ` · ${formatMessage(t("tasksPage.due"), { date: new Date(task.dueDate).toLocaleString(intlTag) })}`
-                      : ""}
-                    {task.linkedCalendarEvent && !task.linkedCalendarEvent.cancelledAt
-                      ? ` · ${t("tasksPage.calendarBadge")}`
-                      : ""}
-                    <span className="text-slate-400">
-                      {" "}
-                      {formatMessage(t("tasksPage.createdBy"), { name: task.createdBy.name })}
-                    </span>
-                  </p>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-slate-900">{task.title}</p>
+                  {task.description ? (
+                    <p className="mt-0.5 line-clamp-2 text-sm text-slate-600">{task.description}</p>
+                  ) : null}
+                  <p className="mt-1 text-xs text-slate-500">{taskMetaLine(task)}</p>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <form action={toggleTaskAction}>
+                <div className="flex shrink-0 items-center gap-2 sm:flex-col sm:items-stretch sm:gap-1.5">
+                  <form action={toggleTaskAction} className="contents sm:block">
                     <input type="hidden" name="taskId" value={task.id} />
-                    <input type="hidden" name="nextStatus" value={task.status === "DONE" ? "TODO" : "DONE"} />
-                    <button type="submit" className="cv-pill-nav text-sm">
-                      {task.status === "DONE" ? t("tasksPage.markTodo") : t("tasksPage.markDone")}
+                    <input type="hidden" name="nextStatus" value="DONE" />
+                    <button
+                      type="submit"
+                      className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 sm:w-full sm:py-2"
+                    >
+                      {t("tasksPage.markDoneShort")}
                     </button>
                   </form>
-                  <form action={removeTaskAction}>
+                  <form action={removeTaskAction} className="contents sm:block">
                     <input type="hidden" name="taskId" value={task.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-800">
-                      {t("tasksPage.delete")}
+                    <button
+                      type="submit"
+                      className="rounded-lg px-2 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-red-700 sm:w-full"
+                    >
+                      {t("tasksPage.deleteShort")}
                     </button>
                   </form>
                 </div>
@@ -148,25 +182,71 @@ export default async function CompitiPage({
             ))}
           </ul>
         )}
+
+        {doneTasks.length > 0 ? (
+          <details className="rounded-xl border border-slate-200/80 bg-slate-50/50">
+            <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-slate-600 marker:hidden [&::-webkit-details-marker]:hidden">
+              {formatMessage(t("tasksPage.doneCount"), { n: String(doneTasks.length) })}
+            </summary>
+            <ul className="divide-y divide-slate-200/80 border-t border-slate-200/80">
+              {doneTasks.map((task) => (
+                <li key={task.id} className="flex flex-col gap-2 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-400 line-through">{task.title}</p>
+                    <p className="mt-0.5 text-[11px] text-slate-400">{taskMetaLine(task)}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <form action={toggleTaskAction}>
+                      <input type="hidden" name="taskId" value={task.id} />
+                      <input type="hidden" name="nextStatus" value="TODO" />
+                      <button type="submit" className="text-xs font-medium text-emerald-700 hover:underline">
+                        {t("tasksPage.markTodoShort")}
+                      </button>
+                    </form>
+                    <form action={removeTaskAction}>
+                      <input type="hidden" name="taskId" value={task.id} />
+                      <button type="submit" className="text-xs font-medium text-slate-400 hover:text-red-600">
+                        {t("tasksPage.deleteShort")}
+                      </button>
+                    </form>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : null}
       </section>
 
-      <section className="space-y-4 border-t border-slate-200/80 pt-8">
+      {/* Faccende */}
+      <section className="space-y-4 border-t border-slate-200/80 pt-10" aria-labelledby="compiti-chores">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">{t("houseChores.sectionTitle")}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">{t("houseChores.sectionIntro")}</p>
+          <h2 id="compiti-chores" className="text-sm font-bold uppercase tracking-wide text-slate-500">
+            {t("houseChores.sectionTitleShort")}
+          </h2>
+          <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{t("houseChores.sectionLeadShort")}</p>
         </div>
 
         {choreCards.length === 0 ? (
           <p className="text-sm text-slate-500">{t("houseChores.empty")}</p>
         ) : (
-          <ul className="space-y-4">
+          <ul className="space-y-3">
             {choreCards.map((c) => (
               <HouseChoreCard key={c.id} houseId={houseId} chore={c} />
             ))}
           </ul>
         )}
 
-        <AddHouseChoreForm houseId={houseId} members={members} />
+        <details className="group rounded-2xl border border-slate-200/90 bg-slate-50/30 open:bg-white">
+          <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-800 marker:hidden [&::-webkit-details-marker]:hidden">
+            <span className="flex items-center justify-between gap-2">
+              <span>{t("houseChores.toggleAddChore")}</span>
+              <span className="text-lg font-light text-slate-400 transition-transform group-open:rotate-45">+</span>
+            </span>
+          </summary>
+          <div className="border-t border-slate-200/80 px-3 pb-4 pt-2 sm:px-4">
+            <AddHouseChoreForm houseId={houseId} members={members} embedded />
+          </div>
+        </details>
       </section>
     </div>
   );

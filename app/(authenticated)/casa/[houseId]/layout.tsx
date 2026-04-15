@@ -17,14 +17,14 @@ export default async function CasaLayout({
   const membership = await getMembershipOrRedirect(houseId, session.user.id);
 
   return (
-    <>
+    <div className="min-w-0">
       <CasaLastHouseSync houseId={houseId} />
       <CasaSubNav
         houseId={houseId}
         houseName={membership.house.name}
         inviteCode={membership.house.inviteCode}
       />
-      {children}
-    </>
+      <div className="min-w-0">{children}</div>
+    </div>
   );
 }

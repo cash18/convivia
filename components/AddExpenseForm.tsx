@@ -224,7 +224,11 @@ export function AddExpenseForm({
   }
 
   return (
-    <form onSubmit={onSubmit} encType="multipart/form-data" className="cv-card-solid flex h-full min-h-0 flex-col gap-3 p-5 sm:p-6">
+    <form
+      onSubmit={onSubmit}
+      encType="multipart/form-data"
+      className="cv-card-solid flex h-full min-h-0 w-full min-w-0 max-w-full flex-col gap-3 p-4 sm:p-5 md:p-6"
+    >
       {shoppingListMeta ? (
         <>
           <input type="hidden" name="shoppingListId" value={shoppingListMeta.listId} />
@@ -273,13 +277,13 @@ export function AddExpenseForm({
           <div className="rounded-xl border border-slate-200/80 bg-white/80 p-3">
             <p className="text-xs font-semibold text-slate-600">{t("addExpenseForm.receiptLabel")}</p>
             <p className="mt-1 text-xs text-slate-500">{t("addExpenseForm.receiptLongHint")}</p>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
+            <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
               <input
                 ref={receiptInputRef}
                 type="file"
                 name="receipt"
                 accept="image/*"
-                className="max-w-full text-xs text-slate-600 file:mr-2 file:rounded-lg file:border-0 file:bg-emerald-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-emerald-800"
+                className="min-w-0 max-w-full text-xs text-slate-600 file:mr-2 file:rounded-lg file:border-0 file:bg-emerald-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-emerald-800"
               />
               <button
                 type="button"

@@ -35,7 +35,7 @@ export function CasaSubNav({
   const pathname = usePathname();
 
   return (
-    <div className="cv-card-solid mb-4 px-3 py-3 sm:mb-5 sm:px-4 sm:py-3.5">
+    <div className="cv-card-solid mb-4 p-4 sm:mb-5 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <div className="min-w-0 flex flex-1 flex-wrap items-baseline gap-x-2 gap-y-1">
           <span className="sr-only">
