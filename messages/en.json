@@ -3,6 +3,8 @@
     "myHouses": "My homes",
     "settings": "Settings",
     "accountMenuAria": "Open account menu",
+    "welcomeUser": "Welcome, {name}",
+    "profileMenuHint": "Profile, notifications & language",
     "menuSectionNav": "Navigate",
     "menuSectionPrefs": "Preferences",
     "menuPush": "Notifications"
@@ -32,7 +34,16 @@
     "hintFailed": "Could not update. Check your connection or try from the installed app (PWA).",
     "hintOffFailed": "Could not turn off notifications.",
     "categoriesLink": "Notification categories",
-    "blocked": "Notifications blocked by the browser."
+    "blocked": "Notifications blocked by the browser.",
+    "menuLoading": "Checking…",
+    "menuOn": "On",
+    "menuOff": "Off",
+    "menuBlocked": "Blocked",
+    "menuEncourage": "Tap the bell to enable — you will get updates when housemates add expenses, events, lists or tasks.",
+    "reminderTitle": "Push notifications are off",
+    "reminderBody": "Turn them on to get timely updates from your homes. You can change categories in Settings.",
+    "reminderEnable": "Turn on notifications",
+    "reminderDismiss": "Not now"
   },
   "calendarFeed": {
     "title": "Shared calendar",

@@ -3,6 +3,8 @@
     "myHouses": "Le mie case",
     "settings": "Impostazioni",
     "accountMenuAria": "Apri menu account",
+    "welcomeUser": "Benvenuto, {name}",
+    "profileMenuHint": "Profilo, notifiche e lingua",
     "menuSectionNav": "Vai a",
     "menuSectionPrefs": "Preferenze",
     "menuPush": "Notifiche"
@@ -32,7 +34,16 @@
     "hintFailed": "Aggiornamento non riuscito. Controlla la connessione o riprova dall’app installata (PWA).",
     "hintOffFailed": "Impossibile disattivare le notifiche.",
     "categoriesLink": "Categorie notifiche",
-    "blocked": "Notifiche bloccate dal browser."
+    "blocked": "Notifiche bloccate dal browser.",
+    "menuLoading": "Verifica…",
+    "menuOn": "Attive",
+    "menuOff": "Non attive",
+    "menuBlocked": "Bloccate",
+    "menuEncourage": "Tocca la campanella per attivarle: riceverai aggiornamenti quando i coinquilini aggiungono spese, eventi, liste o compiti.",
+    "reminderTitle": "Le notifiche push sono disattivate",
+    "reminderBody": "Attivale per ricevere aggiornamenti in tempo reale dalle tue case. Le categorie si gestiscono in Impostazioni.",
+    "reminderEnable": "Attiva notifiche",
+    "reminderDismiss": "Non ora"
   },
   "calendarFeed": {
     "title": "Calendario condiviso",
