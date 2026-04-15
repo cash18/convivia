@@ -1,6 +1,5 @@
 "use client";
 
-import { clearLastHouseOnClient } from "@/lib/last-house-preference";
 import Link from "next/link";
 import type { ComponentProps } from "react";
 
@@ -9,8 +8,10 @@ type Props = Omit<ComponentProps<typeof Link>, "href" | "prefetch"> & {
 };
 
 /**
- * Link verso l’elenco case: niente prefetch (evita richieste anticipate a / case)
- * e reset del cookie «ultima casa» al tap così / non rimanda subito alla stessa casa.
+ * Link verso l’elenco case (`/case`). Prefetch disattivato per evitare richieste anticipate.
+ * Non cancelliamo l’ultima casa visitata: così alla riapertura dell’app `/` può ancora
+ * reindirizzare lì (cookie + localStorage da `CasaLastHouseSync`), mentre `/case` resta
+ * raggiungibile da qui senza essere “espulsi” dalla pagina elenco.
  */
 export function CaseListNavLink({ href = "/case", onClick, ...rest }: Props) {
   return (
@@ -18,7 +19,6 @@ export function CaseListNavLink({ href = "/case", onClick, ...rest }: Props) {
       href={href}
       prefetch={false}
       onClick={(e) => {
-        clearLastHouseOnClient();
         onClick?.(e);
       }}
       {...rest}

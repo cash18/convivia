@@ -25,6 +25,20 @@ function dateKeyLocal(d: Date): string {
   return `${y}-${String(mo).padStart(2, "0")}-${String(da).padStart(2, "0")}`;
 }
 
+function dateFromDayKey(key: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) return null;
+  const [y, m, d] = key.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  return new Date(y, m - 1, d);
+}
+
+function addDaysToDayKey(key: string, deltaDays: number): string {
+  const d = dateFromDayKey(key);
+  if (!d) return key;
+  d.setDate(d.getDate() + deltaDays);
+  return dateKeyLocal(d);
+}
+
 function startOfMondayWeek(d: Date): Date {
   const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
   const day = x.getDay();
@@ -70,7 +84,9 @@ function eventOnLocalDay(ev: CalendarEventDTO, day: Date): boolean {
     return key >= r.start && key < r.endExclusive;
   }
   const s = new Date(ev.startsAt);
-  return dateKeyLocal(s) === key;
+  const startKey = dateKeyLocal(s);
+  const endKey = ev.endsAt ? dateKeyLocal(new Date(ev.endsAt)) : startKey;
+  return key >= startKey && key <= endKey;
 }
 
 function eventsForDay(evts: CalendarEventDTO[], day: Date): CalendarEventDTO[] {
@@ -114,7 +130,11 @@ export function HouseCalendarGrid({
   const searchParams = useSearchParams();
   const dayFromUrl = parseDayKey(searchParams.get("day"));
 
-  const [cursor, setCursor] = useState(() => new Date());
+  const [cursor, setCursor] = useState(() => {
+    const k = parseDayKey(initialDayKey ?? null);
+    const d = k ? dateFromDayKey(k) : null;
+    return d ?? new Date();
+  });
   const [view, setView] = useState<ViewMode>("month");
   const [selectedDayKey, setSelectedDayKey] = useState<string | null>(() =>
     parseDayKey(initialDayKey ?? null) ?? dayFromUrl ?? dateKeyLocal(new Date()),
@@ -141,7 +161,10 @@ export function HouseCalendarGrid({
 
   useEffect(() => {
     const d = parseDayKey(initialDayKey ?? null) ?? dayFromUrl;
-    if (d) setSelectedDayKey(d);
+    if (!d) return;
+    setSelectedDayKey(d);
+    const dt = dateFromDayKey(d);
+    if (dt) setCursor(dt);
   }, [initialDayKey, dayFromUrl]);
 
   const selectDay = useCallback(
@@ -158,9 +181,7 @@ export function HouseCalendarGrid({
 
   const selectedDate = useMemo(() => {
     if (!selectedDayKey) return null;
-    const [y, m, d] = selectedDayKey.split("-").map(Number);
-    if (!y || !m || !d) return null;
-    return new Date(y, m - 1, d);
+    return dateFromDayKey(selectedDayKey);
   }, [selectedDayKey]);
 
   const selectedDayEvents = useMemo(() => {
@@ -186,25 +207,35 @@ export function HouseCalendarGrid({
   }
 
   function navPrev() {
-    setCursor((c) => {
-      if (view === "month") {
-        return new Date(c.getFullYear(), c.getMonth() - 1, 1);
-      }
-      const n = new Date(c);
-      n.setDate(n.getDate() - 7);
-      return n;
-    });
+    if (view === "month") {
+      setCursor((c) => new Date(c.getFullYear(), c.getMonth() - 1, 1));
+      return;
+    }
+    const anchor = selectedDayKey ?? dateKeyLocal(new Date());
+    const newKey = addDaysToDayKey(anchor, -7);
+    const d = dateFromDayKey(newKey);
+    if (d) setCursor(d);
+    selectDay(newKey);
   }
 
   function navNext() {
-    setCursor((c) => {
-      if (view === "month") {
-        return new Date(c.getFullYear(), c.getMonth() + 1, 1);
-      }
-      const n = new Date(c);
-      n.setDate(n.getDate() + 7);
-      return n;
-    });
+    if (view === "month") {
+      setCursor((c) => new Date(c.getFullYear(), c.getMonth() + 1, 1));
+      return;
+    }
+    const anchor = selectedDayKey ?? dateKeyLocal(new Date());
+    const newKey = addDaysToDayKey(anchor, 7);
+    const d = dateFromDayKey(newKey);
+    if (d) setCursor(d);
+    selectDay(newKey);
+  }
+
+  function goWeekView() {
+    setView("week");
+    if (selectedDayKey) {
+      const d = dateFromDayKey(selectedDayKey);
+      if (d) setCursor(d);
+    }
   }
 
   return (
@@ -231,7 +262,7 @@ export function HouseCalendarGrid({
             </button>
             <button
               type="button"
-              onClick={() => setView("week")}
+              onClick={goWeekView}
               className={
                 view === "week"
                   ? "rounded-md bg-emerald-600 px-2.5 py-1 text-white"
@@ -333,30 +364,40 @@ export function HouseCalendarGrid({
           </div>
         </div>
       ) : (
-        <div className="overflow-x-auto border-t border-slate-200/80">
-          <div className="grid min-w-0 grid-cols-7 gap-px bg-slate-200/80 p-0">
+        <div className="overflow-x-auto border-t border-slate-200/80 [-webkit-overflow-scrolling:touch]">
+          <div className="grid min-w-[52rem] grid-cols-7 gap-px rounded-b-xl border-x border-b border-slate-200/80 bg-slate-200/80 sm:min-w-0 sm:rounded-none sm:border-x-0">
             {weekDays.map((day) => {
               const dayEvts = eventsForDay(events, day);
               const today = isToday(day);
               const key = dateKeyLocal(day);
               const selected = selectedDayKey === key;
+              const dayHeader = formatDayHeader(day);
               return (
                 <div
                   key={`w-${key}`}
-                  className={`flex min-h-[12rem] flex-col border-slate-100 bg-white sm:min-h-[16rem] ${
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={selected}
+                  aria-label={formatMessage(t("calendarGrid.weekDaySelectAria"), { day: dayHeader })}
+                  onClick={() => selectDay(key)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      selectDay(key);
+                    }
+                  }}
+                  className={`flex min-h-[13rem] cursor-pointer flex-col border-slate-100 bg-white outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500 sm:min-h-[17rem] ${
                     today ? "ring-1 ring-inset ring-emerald-400" : ""
                   } ${selected ? "ring-2 ring-inset ring-emerald-500" : ""}`}
                 >
-                  <button
-                    type="button"
-                    onClick={() => selectDay(key)}
-                    className={`border-b border-slate-100 px-2 py-2 text-center text-xs font-semibold ${
+                  <div
+                    className={`shrink-0 border-b border-slate-100 px-1.5 py-2 text-center text-[11px] font-semibold leading-tight sm:px-2 sm:text-xs ${
                       today ? "bg-emerald-50 text-emerald-800" : "bg-slate-50/90 text-slate-700"
                     }`}
                   >
-                    {formatDayHeader(day)}
-                  </button>
-                  <ul className="flex flex-1 flex-col gap-1.5 p-2">
+                    {dayHeader}
+                  </div>
+                  <ul className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-2">
                     {dayEvts.map((ev) => (
                       <li
                         key={ev.id}

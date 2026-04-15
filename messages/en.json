@@ -140,6 +140,7 @@
     "noEventsDay": "No events on this day.",
     "createdBy": "Created by",
     "participants": "Participants:",
+    "weekDaySelectAria": "Select {{day}}, show events for this day below",
     "delete": "Delete"
   },
   "calendarPage": {

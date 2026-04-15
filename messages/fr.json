@@ -116,6 +116,7 @@
     "dayPanelHintEnd": "above. Review and remove events here.",
     "noEventsDay": "No events on this day.",
     "createdBy": "Created by",
+    "weekDaySelectAria": "Select {{day}}, show events for this day below",
     "delete": "Delete"
   },
   "calendarPage": {
