@@ -30,6 +30,7 @@ model User {
   transfersReceived    MoneyTransfer[]        @relation("TransferTo")
   transfersRecorded    MoneyTransfer[]        @relation("TransferRecorder")
   eventsCreated        CalendarEvent[]        @relation("EventCreator")
+  calendarParticipations CalendarEventParticipant[]
   tasksAssigned        Task[]                 @relation("TaskAssignee")
   tasksCreated         Task[]                 @relation("TaskCreator")
   shoppingItems        ShoppingListItem[]     @relation("ItemAdder")
@@ -208,6 +209,19 @@ model CalendarEvent {
   calendarSequence Int @default(0)
   house       House     @relation(fields: [houseId], references: [id], onDelete: Cascade)
   createdBy   User      @relation("EventCreator", fields: [createdById], references: [id])
+  participants CalendarEventParticipant[]
+}
+
+/// Membri della casa invitati come partecipanti a un evento calendario.
+model CalendarEventParticipant {
+  eventId   String
+  userId    String
+  createdAt DateTime @default(now())
+  event     CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, userId])
+  @@index([userId])
 }
 
 model ShoppingList {

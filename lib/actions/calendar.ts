@@ -38,6 +38,12 @@ export async function createCalendarEvent(
 
   if (!title) return { error: await ta("errors.calendarTitleRequired") };
 
+  const rawParticipantIds = formData
+    .getAll("participantIds")
+    .map((v) => String(v).trim())
+    .filter(Boolean);
+  const participantIds = [...new Set(rawParticipantIds)];
+
   let startsAt: Date;
   let endsAt: Date | null = null;
 
@@ -62,6 +68,13 @@ export async function createCalendarEvent(
     }
   }
 
+  const members = await prisma.houseMember.findMany({
+    where: { houseId, userId: { in: participantIds } },
+    select: { userId: true },
+  });
+  const allowedIds = new Set(members.map((m) => m.userId));
+  const participantsCreate = participantIds.filter((id) => allowedIds.has(id)).map((userId) => ({ userId }));
+
   await prisma.calendarEvent.create({
     data: {
       houseId,
@@ -71,6 +84,7 @@ export async function createCalendarEvent(
       endsAt,
       allDay,
       createdById: session.user.id,
+      participants: participantsCreate.length ? { create: participantsCreate } : undefined,
     },
   });
 

@@ -10,6 +10,8 @@ type Props = {
   houseName: string;
   feedHttpsUrl: string;
   canRotateToken: boolean;
+  /** Se true: niente card esterna né titolo (usato dentro `<details>`). */
+  embedded?: boolean;
 };
 
 type PhoneKind = "ios" | "android" | "desktop";
@@ -39,7 +41,7 @@ function usePhoneKind(): PhoneKind {
 const btnPrimary =
   "inline-flex w-full touch-manipulation items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition hover:from-emerald-500 hover:to-green-500 active:scale-[0.97] active:shadow-inner active:brightness-95";
 
-export function CalendarFeedPanel({ houseId, houseName, feedHttpsUrl, canRotateToken }: Props) {
+function CalendarFeedPanelInner({ houseId, houseName, feedHttpsUrl, canRotateToken, embedded }: Props) {
   const { t } = useI18n();
   const router = useRouter();
   const phoneKind = usePhoneKind();
@@ -78,17 +80,31 @@ export function CalendarFeedPanel({ houseId, houseName, feedHttpsUrl, canRotateT
     router.refresh();
   }
 
+  const wrapClass = embedded ? "flex flex-col gap-4" : "cv-card-solid flex flex-col gap-4 p-5 sm:p-6";
+
   return (
-    <div className="cv-card-solid flex flex-col gap-4 p-5 sm:p-6">
-      <div>
-        <h2 className="text-sm font-bold text-slate-900">{t("calendarFeed.title")}</h2>
-        <p className="mt-1 text-xs leading-relaxed text-slate-600">
+    <div className={wrapClass}>
+      {!embedded ? (
+        <div>
+          <h2 className="text-sm font-bold text-slate-900">{t("calendarFeed.title")}</h2>
+          <p className="mt-1 text-xs leading-relaxed text-slate-600">
+            {t("calendarFeed.subtitle")}{" "}
+            <span className="font-medium text-slate-800">{houseName}</span>
+          </p>
+        </div>
+      ) : (
+        <p className="text-xs leading-relaxed text-slate-600">
           {t("calendarFeed.subtitle")}{" "}
           <span className="font-medium text-slate-800">{houseName}</span>
         </p>
-      </div>
+      )}
 
-      <a href={primaryHref} target={phoneKind === "ios" ? undefined : "_blank"} rel={phoneKind === "ios" ? undefined : "noopener noreferrer"} className={btnPrimary}>
+      <a
+        href={primaryHref}
+        target={phoneKind === "ios" ? undefined : "_blank"}
+        rel={phoneKind === "ios" ? undefined : "noopener noreferrer"}
+        className={btnPrimary}
+      >
         <span aria-hidden>📅</span>
         {primaryLabel}
       </a>
@@ -134,5 +150,38 @@ export function CalendarFeedPanel({ houseId, houseName, feedHttpsUrl, canRotateT
         </button>
       ) : null}
     </div>
+  );
+}
+
+/** Pannello feed a scheda intera (layout precedente). */
+export function CalendarFeedPanel(props: Props) {
+  return <CalendarFeedPanelInner {...props} embedded={false} />;
+}
+
+/**
+ * Sezione compatta: chiusa di default; aprendo mostra istruzioni e link per aggiungere il calendario al telefono.
+ */
+export function CalendarFeedSubscribeSection(props: Props) {
+  const { t } = useI18n();
+  return (
+    <details className="group cv-card-solid overflow-hidden rounded-2xl border border-white/60 bg-white/90 shadow-sm backdrop-blur-md">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 transition hover:bg-emerald-50/40 [&::-webkit-details-marker]:hidden">
+        <div className="min-w-0 flex-1 text-left">
+          <p className="text-sm font-bold text-slate-900">{t("calendarFeed.collapsedTitle")}</p>
+          <p className="mt-0.5 text-xs leading-snug text-slate-600">{t("calendarFeed.collapsedHint")}</p>
+        </div>
+        <span
+          className="shrink-0 rounded-full border border-slate-200/90 bg-white/80 p-1 text-slate-600 transition group-open:rotate-180 motion-reduce:transition-none"
+          aria-hidden
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      </summary>
+      <div className="border-t border-slate-200/70 px-4 pb-4 pt-1">
+        <CalendarFeedPanelInner {...props} embedded />
+      </div>
+    </details>
   );
 }

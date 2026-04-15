@@ -15,6 +15,7 @@ export type CalendarEventDTO = {
   endsAt: string | null;
   allDay: boolean;
   createdByName: string;
+  participantNames: string[];
 };
 
 function dateKeyLocal(d: Date): string {
@@ -422,6 +423,12 @@ export function HouseCalendarGrid({
                     <p className="text-[10px] text-slate-400">
                       {t("calendarGrid.createdBy")} {ev.createdByName}
                     </p>
+                    {ev.participantNames.length > 0 ? (
+                      <p className="mt-1 text-[10px] text-slate-600">
+                        <span className="font-medium text-slate-700">{t("calendarGrid.participants")}</span>{" "}
+                        {ev.participantNames.join(", ")}
+                      </p>
+                    ) : null}
                   </div>
                   <form action={removeEventAction}>
                     <input type="hidden" name="eventId" value={ev.id} />

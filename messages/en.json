@@ -48,7 +48,9 @@
     "rotate": "Regenerate link (revokes old URL)",
     "rotateConfirm": "Regenerating invalidates old subscriptions (Google/Apple must be updated with the new URL). Continue?",
     "security": "Do not share this link outside your household — anyone with it can subscribe to these events.",
-    "rotating": "Regenerating…"
+    "rotating": "Regenerating…",
+    "collapsedTitle": "Phone & Google Calendar",
+    "collapsedHint": "Subscribe to sync this home’s events — tap to open steps."
   },
   "settings": {
     "badge": "User portal",
@@ -106,7 +108,9 @@
     "startsAt": "Starts",
     "endsAt": "Ends (optional)",
     "submit": "Add event",
-    "submitting": "Saving…"
+    "submitting": "Saving…",
+    "participantsLabel": "Participants",
+    "participantsHint": "Optional — choose housemates involved (shown in the app and in the shared calendar feed)."
   },
   "calendarGrid": {
     "viewTitle": "Calendar view",
@@ -122,6 +126,7 @@
     "dayPanelHintEnd": "above. Review and remove events here.",
     "noEventsDay": "No events on this day.",
     "createdBy": "Created by",
+    "participants": "Participants:",
     "delete": "Delete"
   },
   "calendarPage": {
@@ -130,7 +135,8 @@
     "eventListTitle": "All events",
     "eventListEmpty": "No events yet. Add the first one above.",
     "allDayLine": "All day · {{date}}",
-    "createdBy": "Created by"
+    "createdBy": "Created by",
+    "participants": "Participants:"
   },
   "casaHome": {
     "badge": "House home",

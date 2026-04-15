@@ -1,5 +1,5 @@
 import { AddEventForm } from "@/components/AddEventForm";
-import { CalendarFeedPanel } from "@/components/CalendarFeedPanel";
+import { CalendarFeedSubscribeSection } from "@/components/CalendarFeedPanel";
 import { HouseCalendarGrid, type CalendarEventDTO } from "@/components/HouseCalendarGrid";
 import { auth } from "@/auth";
 import { deleteCalendarEvent } from "@/lib/actions/calendar";
@@ -50,11 +50,23 @@ export default async function CalendarioPage({
 
   const membership = await getMembershipOrRedirect(houseId, session.user.id);
 
-  const events = await prisma.calendarEvent.findMany({
-    where: { houseId, cancelledAt: null },
-    orderBy: { startsAt: "asc" },
-    include: { createdBy: { select: { name: true } } },
-  });
+  const [events, houseMembers] = await Promise.all([
+    prisma.calendarEvent.findMany({
+      where: { houseId, cancelledAt: null },
+      orderBy: { startsAt: "asc" },
+      include: {
+        createdBy: { select: { name: true } },
+        participants: { include: { user: { select: { name: true } } } },
+      },
+    }),
+    prisma.houseMember.findMany({
+      where: { houseId },
+      include: { user: { select: { id: true, name: true } } },
+      orderBy: { joinedAt: "asc" },
+    }),
+  ]);
+
+  const membersForForm = houseMembers.map((m) => ({ id: m.userId, name: m.user.name }));
 
   const headerList = await headers();
   const host = headerList.get("x-forwarded-host") ?? headerList.get("host") ?? "";
@@ -74,6 +86,7 @@ export default async function CalendarioPage({
     endsAt: ev.endsAt?.toISOString() ?? null,
     allDay: ev.allDay,
     createdByName: ev.createdBy.name,
+    participantNames: ev.participants.map((p) => p.user.name),
   }));
 
   async function removeEventAction(formData: FormData) {
@@ -85,27 +98,26 @@ export default async function CalendarioPage({
   const calPath = `/casa/${houseId}/calendario`;
 
   return (
-    <div className="space-y-8">
-      <div className="grid gap-8 lg:grid-cols-2">
-        <Suspense
-          fallback={<div className="cv-card-solid h-48 animate-pulse rounded-2xl bg-slate-100/80" aria-hidden />}
-        >
-          <AddEventForm houseId={houseId} defaultDayKey={day ?? null} />
-        </Suspense>
-        {feedHttpsUrl ? (
-          <CalendarFeedPanel
-            houseId={houseId}
-            houseName={membership.house.name}
-            feedHttpsUrl={feedHttpsUrl}
-            canRotateToken={canRotateCalendarFeed(membership.role)}
-          />
-        ) : (
-          <div className="cv-card-solid p-5 text-sm text-slate-600">
-            {t("calendarPage.feedUrlError")}{" "}
-            <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_APP_URL</code> {t("calendarPage.feedUrlErrorSuffix")}
-          </div>
-        )}
-      </div>
+    <div className="space-y-6 sm:space-y-8">
+      <Suspense
+        fallback={<div className="cv-card-solid h-48 animate-pulse rounded-2xl bg-slate-100/80" aria-hidden />}
+      >
+        <AddEventForm houseId={houseId} defaultDayKey={day ?? null} members={membersForForm} />
+      </Suspense>
+
+      {feedHttpsUrl ? (
+        <CalendarFeedSubscribeSection
+          houseId={houseId}
+          houseName={membership.house.name}
+          feedHttpsUrl={feedHttpsUrl}
+          canRotateToken={canRotateCalendarFeed(membership.role)}
+        />
+      ) : (
+        <div className="cv-card-solid p-5 text-sm text-slate-600">
+          {t("calendarPage.feedUrlError")}{" "}
+          <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_APP_URL</code> {t("calendarPage.feedUrlErrorSuffix")}
+        </div>
+      )}
 
       <Suspense
         fallback={<div className="cv-card-solid h-80 animate-pulse rounded-2xl bg-slate-100/80" aria-hidden />}
@@ -145,6 +157,12 @@ export default async function CalendarioPage({
                   <p className="text-xs text-slate-400">
                     {t("calendarPage.createdBy")} {ev.createdBy.name}
                   </p>
+                  {ev.participants.length > 0 ? (
+                    <p className="mt-1 text-xs text-slate-600">
+                      <span className="font-medium text-slate-700">{t("calendarPage.participants")}</span>{" "}
+                      {ev.participants.map((p) => p.user.name).join(", ")}
+                    </p>
+                  ) : null}
                 </div>
                 <form action={removeEventAction}>
                   <input type="hidden" name="eventId" value={ev.id} />

@@ -10,7 +10,17 @@ function dayKeyToDatetimeLocal(dayKey: string): string | null {
   return `${dayKey}T12:00`;
 }
 
-export function AddEventForm({ houseId, defaultDayKey }: { houseId: string; defaultDayKey?: string | null }) {
+type Member = { id: string; name: string };
+
+export function AddEventForm({
+  houseId,
+  defaultDayKey,
+  members,
+}: {
+  houseId: string;
+  defaultDayKey?: string | null;
+  members: Member[];
+}) {
   const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -85,6 +95,24 @@ export function AddEventForm({ houseId, defaultDayKey }: { houseId: string; defa
           <input name="endsAt" type="datetime-local" className="cv-input-sm" />
         </label>
       </div>
+
+      {members.length > 0 ? (
+        <fieldset className="rounded-xl border border-slate-200/80 bg-slate-50/50 px-3 py-2.5">
+          <legend className="px-1 text-xs font-semibold text-slate-700">{t("calendarForm.participantsLabel")}</legend>
+          <p className="mb-2 text-[11px] leading-snug text-slate-600">{t("calendarForm.participantsHint")}</p>
+          <ul className="flex max-h-36 flex-col gap-1.5 overflow-y-auto sm:max-h-48">
+            {members.map((m) => (
+              <li key={m.id}>
+                <label className="flex cursor-pointer items-center gap-2 rounded-lg px-1 py-0.5 text-sm text-slate-800 hover:bg-white/80">
+                  <input type="checkbox" name="participantIds" value={m.id} className="rounded border-emerald-300 text-emerald-600" />
+                  <span className="min-w-0 truncate">{m.name}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </fieldset>
+      ) : null}
+
       <button
         type="submit"
         disabled={pending}

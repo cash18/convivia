@@ -48,7 +48,9 @@
     "rotate": "Rigenera link (revoca il vecchio URL)",
     "rotateConfirm": "Rigenerando si invalidano i vecchi abbonamenti (Google/Apple vanno aggiornati con il nuovo URL). Continuare?",
     "security": "Non condividere il link fuori dalla casa: chi lo ha può iscriversi a questi eventi.",
-    "rotating": "Rigenerazione…"
+    "rotating": "Rigenerazione…",
+    "collapsedTitle": "Calendario telefono e Google",
+    "collapsedHint": "Abbonati per sincronizzare gli eventi di questa casa — tocca per aprire i passaggi."
   },
   "settings": {
     "badge": "Portale utente",
@@ -106,7 +108,9 @@
     "startsAt": "Inizio",
     "endsAt": "Fine (opzionale)",
     "submit": "Aggiungi evento",
-    "submitting": "Salvataggio…"
+    "submitting": "Salvataggio…",
+    "participantsLabel": "Partecipanti",
+    "participantsHint": "Facoltativo — scegli i coinquilini coinvolti (visibili nell’app e nel feed calendario condiviso)."
   },
   "calendarGrid": {
     "viewTitle": "Vista calendario",
@@ -122,6 +126,7 @@
     "dayPanelHintEnd": "in alto. Qui puoi consultare e rimuovere.",
     "noEventsDay": "Nessun evento in questo giorno.",
     "createdBy": "Creato da",
+    "participants": "Partecipanti:",
     "delete": "Elimina"
   },
   "calendarPage": {
@@ -130,7 +135,8 @@
     "eventListTitle": "Elenco eventi",
     "eventListEmpty": "Nessun evento. Aggiungi il primo sopra.",
     "allDayLine": "Giornata intera · {{date}}",
-    "createdBy": "Creato da"
+    "createdBy": "Creato da",
+    "participants": "Partecipanti:"
   },
   "casaHome": {
     "badge": "Home della casa",

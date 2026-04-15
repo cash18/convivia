@@ -15,6 +15,8 @@ export type IcsEventInput = {
   cancelledAt: Date | null;
   calendarSequence: number;
   updatedAt: Date;
+  /** Nomi partecipanti (membri casa) da aggiungere in description nel feed. */
+  participantNames?: string[];
 };
 
 function icsEscape(text: string): string {
@@ -61,7 +63,14 @@ function buildVEvent(ev: IcsEventInput, calName: string): string[] {
 
   lines.push("STATUS:CONFIRMED");
   const summary = icsEscape(ev.title);
-  const desc = ev.description ? icsEscape(ev.description) : "";
+  const parts =
+    ev.participantNames && ev.participantNames.length > 0
+      ? ev.participantNames.map((n) => n.trim()).filter(Boolean)
+      : [];
+  const descParts = [ev.description?.trim() ?? "", parts.length ? `Participants: ${parts.join(", ")}` : ""].filter(
+    Boolean,
+  );
+  const desc = descParts.length ? icsEscape(descParts.join("\n\n")) : "";
   lines.push(icsFold(`SUMMARY:${summary}`));
   if (desc) lines.push(icsFold(`DESCRIPTION:${desc}`));
   lines.push(icsFold(`LOCATION:${icsEscape(calName)}`));

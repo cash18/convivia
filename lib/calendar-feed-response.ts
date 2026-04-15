@@ -25,6 +25,11 @@ export async function getCalendarFeedIcsResponse(
     include: {
       events: {
         orderBy: { startsAt: "asc" },
+        include: {
+          participants: {
+            include: { user: { select: { name: true } } },
+          },
+        },
       },
     },
   });
@@ -43,6 +48,7 @@ export async function getCalendarFeedIcsResponse(
     cancelledAt: e.cancelledAt,
     calendarSequence: e.calendarSequence,
     updatedAt: e.updatedAt,
+    participantNames: e.participants.map((p) => p.user.name),
   }));
 
   const ics = buildHouseCalendarIcs(
