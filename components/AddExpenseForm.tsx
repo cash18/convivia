@@ -5,6 +5,11 @@ import { useI18n } from "@/components/I18nProvider";
 import { createExpense } from "@/lib/actions/expenses";
 import { MAX_RECEIPT_BYTES } from "@/lib/expense-receipt-limits";
 import { formatMessage } from "@/lib/i18n/format-message";
+import {
+  fillAutoCustomEuroFields,
+  parseTotalEurosToCents,
+  splitIntegerEqually,
+} from "@/lib/expense-custom-split";
 import { formatEuroNumberForInput } from "@/lib/money";
 import { runReceiptOcr } from "@/lib/receipt-ocr-browser";
 import { extractEuroTotalFromDualOcr } from "@/lib/receipt-total-parse";
@@ -15,13 +20,6 @@ type Member = { id: string; name: string };
 
 export type ShoppingListExpenseMeta = { listId: string; itemIds: string[] };
 
-function splitIntegerEqually(total: number, n: number): number[] {
-  if (n <= 0) return [];
-  const base = Math.floor(total / n);
-  const r = total - base * n;
-  return Array.from({ length: n }, (_, i) => base + (i < r ? 1 : 0));
-}
-
 function equalPercentsForIds(ids: string[]): Record<string, number> {
   if (ids.length === 0) return {};
   const parts = splitIntegerEqually(100, ids.length);
@@ -30,10 +28,6 @@ function equalPercentsForIds(ids: string[]): Record<string, number> {
     out[id] = parts[i]!;
   });
   return out;
-}
-
-function centsToInputEuro(cents: number): string {
-  return formatEuroNumberForInput(cents / 100);
 }
 
 export function AddExpenseForm({
@@ -75,12 +69,34 @@ export function AddExpenseForm({
   const [ocrBusy, setOcrBusy] = useState(false);
   const amountInputRef = useRef<HTMLInputElement>(null);
   const receiptInputRef = useRef<HTMLInputElement>(null);
+  /** In modalità CUSTOM, chi ha modificato a mano il proprio importo (non sovrascritto dall’auto). */
+  const customManualRef = useRef<Set<string>>(new Set());
 
   const checkedIds = useMemo(
     () => members.filter((m) => checked[m.id]).map((m) => m.id),
     [members, checked],
   );
   const checkedKey = checkedIds.join("|");
+
+  const memberIds = useMemo(() => members.map((m) => m.id), [members]);
+
+  useEffect(() => {
+    if (splitMode !== "CUSTOM") {
+      customManualRef.current = new Set();
+    }
+  }, [splitMode]);
+
+  useEffect(() => {
+    if (compact || splitMode !== "CUSTOM") return;
+    const total = parseTotalEurosToCents(amountInputRef.current?.value ?? "");
+    if (total === null) return;
+    for (const m of members) {
+      if (!checked[m.id]) customManualRef.current.delete(m.id);
+    }
+    setCustomEur((prev) =>
+      fillAutoCustomEuroFields(prev, customManualRef.current, checkedIds, memberIds, total),
+    );
+  }, [splitMode, checkedKey, compact, members, checked, memberIds, checkedIds]);
 
   useEffect(() => {
     if (splitMode !== "PERCENT") return;
@@ -127,23 +143,35 @@ export function AddExpenseForm({
 
   function distributeCustomEqually() {
     const raw = amountInputRef.current?.value ?? "";
-    const normalized = raw.replace(",", ".").trim();
-    const n = parseFloat(normalized);
-    if (Number.isNaN(n) || n <= 0 || checkedIds.length === 0) {
+    const totalCents = parseTotalEurosToCents(raw);
+    if (totalCents === null || checkedIds.length === 0) {
       setError(t("addExpenseForm.errorAmountParticipants"));
       return;
     }
-    const totalCents = Math.round(n * 100);
-    const parts = splitIntegerEqually(totalCents, checkedIds.length);
-    const next: Record<string, string> = { ...customEur };
-    checkedIds.forEach((id, i) => {
-      next[id] = centsToInputEuro(parts[i]!);
-    });
-    members.forEach((m) => {
-      if (!checked[m.id]) next[m.id] = "";
-    });
-    setCustomEur(next);
+    customManualRef.current = new Set();
+    setCustomEur((prev) =>
+      fillAutoCustomEuroFields(prev, customManualRef.current, checkedIds, memberIds, totalCents),
+    );
     setError(null);
+  }
+
+  function onAmountInputForCustomSplit() {
+    if (compact || splitMode !== "CUSTOM") return;
+    const total = parseTotalEurosToCents(amountInputRef.current?.value ?? "");
+    if (total === null) return;
+    setCustomEur((prev) =>
+      fillAutoCustomEuroFields(prev, customManualRef.current, checkedIds, memberIds, total),
+    );
+  }
+
+  function onCustomEuroChange(id: string, raw: string) {
+    customManualRef.current.add(id);
+    const total = parseTotalEurosToCents(amountInputRef.current?.value ?? "");
+    setCustomEur((prev) => {
+      const next = { ...prev, [id]: raw };
+      if (total === null) return next;
+      return fillAutoCustomEuroFields(next, customManualRef.current, checkedIds, memberIds, total);
+    });
   }
 
   async function scanReceiptTotal() {
@@ -168,6 +196,14 @@ export function AddExpenseForm({
       }
       const el = amountInputRef.current;
       if (el) el.value = formatEuroNumberForInput(euro);
+      if (!compact && splitMode === "CUSTOM") {
+        const total = parseTotalEurosToCents(el?.value ?? "");
+        if (total !== null) {
+          setCustomEur((prev) =>
+            fillAutoCustomEuroFields(prev, customManualRef.current, checkedIds, memberIds, total),
+          );
+        }
+      }
     } catch {
       setError(t("addExpenseForm.errorOcrRead"));
     } finally {
@@ -217,6 +253,7 @@ export function AddExpenseForm({
     form.reset();
     setChecked(Object.fromEntries(members.map((m) => [m.id, true])));
     setPercents(equalPercentsForIds(members.map((m) => m.id)));
+    customManualRef.current = new Set();
     setCustomEur(Object.fromEntries(members.map((m) => [m.id, ""])));
     setSplitMode("EQUAL");
     if (receiptInputRef.current) receiptInputRef.current.value = "";
@@ -257,6 +294,7 @@ export function AddExpenseForm({
           inputMode="decimal"
           placeholder={t("addExpenseForm.placeholderAmount")}
           className="cv-input-sm"
+          onInput={onAmountInputForCustomSplit}
         />
         <select
           name="paidById"
@@ -386,7 +424,7 @@ export function AddExpenseForm({
                     type="text"
                     inputMode="decimal"
                     value={customEur[m.id] ?? ""}
-                    onChange={(e) => setCustomEur((prev) => ({ ...prev, [m.id]: e.target.value }))}
+                    onChange={(e) => onCustomEuroChange(m.id, e.target.value)}
                     placeholder="0,00"
                     className="cv-input-sm w-24 py-1 text-right tabular-nums"
                     aria-label={formatMessage(t("addExpenseForm.ariaEuroFor"), { name: m.name ?? "" })}
@@ -447,6 +485,7 @@ export function AddExpenseForm({
         {!compact && splitMode === "CUSTOM" ? (
           <div className="mt-3 space-y-2 border-t border-slate-100 pt-3 text-xs text-slate-600">
             <p>{t("addExpenseForm.customIntro")}</p>
+            <p className="text-[11px] leading-relaxed text-slate-500">{t("addExpenseForm.customAutoHint")}</p>
             <button
               type="button"
               onClick={distributeCustomEqually}

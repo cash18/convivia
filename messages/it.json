@@ -742,6 +742,7 @@
     "redistribute100": "Ripartisci il 100% in parti uguali tra i selezionati",
     "percentFooterHint": "Se modifichi chi partecipa, le percentuali si aggiornano in parti uguali; poi puoi rifinirle.",
     "customIntro": "Indica quanto spetta a ciascuno: la somma deve coincidere esattamente con l'importo totale della spesa.",
+    "customAutoHint": "Gli importi che non hai ancora modificato si aggiornano da soli quando cambi il totale o le quote già impostate: il resto si divide in parti uguali (in centesimi) tra chi resta in automatico.",
     "ariaPercentFor": "Percentuale per {{name}}",
     "ariaEuroFor": "Quota in euro per {{name}}"
   },

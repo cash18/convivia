@@ -742,6 +742,7 @@
     "redistribute100": "Split 100% evenly among selected",
     "percentFooterHint": "When you change participants, percentages update equally; then you can fine-tune.",
     "customIntro": "Enter each person's share: the sum must match the expense total exactly.",
+    "customAutoHint": "Amounts you have not edited yet update automatically when the total or fixed shares change (equal split of the remainder in cents).",
     "ariaPercentFor": "Percentage for {{name}}",
     "ariaEuroFor": "Euro share for {{name}}"
   },

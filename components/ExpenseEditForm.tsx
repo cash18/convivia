@@ -4,10 +4,11 @@ import { ExpenseNotesBody } from "@/components/ExpenseNotesBody";
 import { useI18n } from "@/components/I18nProvider";
 import { updateExpense } from "@/lib/actions/expenses";
 import { formatMessage } from "@/lib/i18n/format-message";
+import { fillAutoCustomEuroFields, parseTotalEurosToCents } from "@/lib/expense-custom-split";
 import { formatEuroNumberForInput } from "@/lib/money";
 import { parseExpenseNotes } from "@/lib/shopping-list-expense-notes";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Member = { id: string; name: string };
 
@@ -21,13 +22,6 @@ export type EditableExpense = {
   receiptUrl: string | null;
   splits: { userId: string; shareCents: number; sharePercent: number | null }[];
 };
-
-function splitIntegerEqually(total: number, n: number): number[] {
-  if (n <= 0) return [];
-  const base = Math.floor(total / n);
-  const r = total - base * n;
-  return Array.from({ length: n }, (_, i) => base + (i < r ? 1 : 0));
-}
 
 function centsToInputEuro(cents: number): string {
   return formatEuroNumberForInput(cents / 100);
@@ -47,6 +41,10 @@ export function ExpenseEditForm({
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const amountInputRef = useRef<HTMLInputElement>(null);
+  const customManualRef = useRef<Set<string>>(new Set());
+  const checkedRef = useRef<Record<string, boolean>>({});
+  const splitModeRef = useRef<"EQUAL" | "PERCENT" | "CUSTOM">("EQUAL");
 
   const [splitMode, setSplitMode] = useState<"EQUAL" | "PERCENT" | "CUSTOM">(() => {
     if (expense.splitMode === "PERCENT") return "PERCENT";
@@ -86,11 +84,15 @@ export function ExpenseEditForm({
 
   useEffect(() => {
     if (!open) return;
-    setSplitMode(expense.splitMode === "PERCENT" ? "PERCENT" : expense.splitMode === "CUSTOM" ? "CUSTOM" : "EQUAL");
+    const sm: "EQUAL" | "PERCENT" | "CUSTOM" =
+      expense.splitMode === "PERCENT" ? "PERCENT" : expense.splitMode === "CUSTOM" ? "CUSTOM" : "EQUAL";
+    splitModeRef.current = sm;
+    setSplitMode(sm);
     const c: Record<string, boolean> = {};
     members.forEach((m) => {
       c[m.id] = expense.splits.some((s) => s.userId === m.id);
     });
+    checkedRef.current = c;
     setChecked(c);
     const p: Record<string, number> = {};
     expense.splits.forEach((s) => {
@@ -108,6 +110,11 @@ export function ExpenseEditForm({
       if (e[m.id] === undefined) e[m.id] = "";
     });
     setCustomEur(e);
+    if (expense.splitMode === "CUSTOM") {
+      customManualRef.current = new Set(expense.splits.map((s) => s.userId));
+    } else {
+      customManualRef.current = new Set();
+    }
     setError(null);
   }, [open, expense, members]);
 
@@ -115,6 +122,30 @@ export function ExpenseEditForm({
     () => members.filter((m) => checked[m.id]).map((m) => m.id),
     [members, checked],
   );
+  const checkedKey = checkedIds.join("|");
+  const memberIds = useMemo(() => members.map((m) => m.id), [members]);
+
+  checkedRef.current = checked;
+  splitModeRef.current = splitMode;
+
+  useEffect(() => {
+    if (splitMode !== "CUSTOM") {
+      customManualRef.current = new Set();
+    }
+  }, [splitMode]);
+
+  useEffect(() => {
+    if (!open || splitModeRef.current !== "CUSTOM") return;
+    const total = parseTotalEurosToCents(amountInputRef.current?.value ?? "");
+    if (total === null) return;
+    const ids = members.filter((m) => checkedRef.current[m.id]).map((m) => m.id);
+    for (const m of members) {
+      if (!checkedRef.current[m.id]) customManualRef.current.delete(m.id);
+    }
+    setCustomEur((prev) =>
+      fillAutoCustomEuroFields(prev, customManualRef.current, ids, memberIds, total),
+    );
+  }, [open, splitMode, checkedKey, members, memberIds, expense.id]);
 
   const percentSum = useMemo(
     () => checkedIds.reduce((s, id) => s + (percents[id] ?? 0), 0),
@@ -132,24 +163,38 @@ export function ExpenseEditForm({
   }
 
   function distributeCustomEqually() {
-    const el = document.getElementById(`edit-amount-${expense.id}`) as HTMLInputElement | null;
-    const raw = el?.value ?? "";
-    const n = parseFloat(raw.replace(",", ".").trim());
-    if (Number.isNaN(n) || n <= 0 || checkedIds.length === 0) {
+    const raw = amountInputRef.current?.value ?? "";
+    const totalCents = parseTotalEurosToCents(raw);
+    if (totalCents === null || checkedIds.length === 0) {
       setError(t("expenseEditForm.invalid"));
       return;
     }
-    const totalCents = Math.round(n * 100);
-    const parts = splitIntegerEqually(totalCents, checkedIds.length);
-    const next: Record<string, string> = { ...customEur };
-    checkedIds.forEach((id, i) => {
-      next[id] = centsToInputEuro(parts[i]!);
-    });
-    members.forEach((m) => {
-      if (!checked[m.id]) next[m.id] = "";
-    });
-    setCustomEur(next);
+    customManualRef.current = new Set();
+    setCustomEur((prev) =>
+      fillAutoCustomEuroFields(prev, customManualRef.current, checkedIds, memberIds, totalCents),
+    );
     setError(null);
+  }
+
+  function onAmountInputForCustomSplit() {
+    if (!open || splitMode !== "CUSTOM") return;
+    const total = parseTotalEurosToCents(amountInputRef.current?.value ?? "");
+    if (total === null) return;
+    const ids = members.filter((m) => checkedRef.current[m.id]).map((m) => m.id);
+    setCustomEur((prev) =>
+      fillAutoCustomEuroFields(prev, customManualRef.current, ids, memberIds, total),
+    );
+  }
+
+  function onCustomEuroChange(id: string, raw: string) {
+    customManualRef.current.add(id);
+    const total = parseTotalEurosToCents(amountInputRef.current?.value ?? "");
+    setCustomEur((prev) => {
+      const next = { ...prev, [id]: raw };
+      if (total === null) return next;
+      const ids = members.filter((m) => checkedRef.current[m.id]).map((m) => m.id);
+      return fillAutoCustomEuroFields(next, customManualRef.current, ids, memberIds, total);
+    });
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -216,6 +261,7 @@ export function ExpenseEditForm({
               ) : null}
               <input name="title" required defaultValue={expense.title} className="cv-input-sm" />
               <input
+                ref={amountInputRef}
                 id={`edit-amount-${expense.id}`}
                 name="amount"
                 required
@@ -223,6 +269,7 @@ export function ExpenseEditForm({
                 inputMode="decimal"
                 defaultValue={formatEuroNumberForInput(expense.amountCents / 100)}
                 className="cv-input-sm"
+                onInput={onAmountInputForCustomSplit}
               />
               <select name="paidById" required className="cv-input-sm" defaultValue={expense.paidById}>
                 {members.map((m) => (
@@ -292,7 +339,11 @@ export function ExpenseEditForm({
                     <input
                       type="radio"
                       checked={splitMode === "CUSTOM"}
-                      onChange={() => setSplitMode("CUSTOM")}
+                      onChange={() => {
+                        customManualRef.current = new Set();
+                        splitModeRef.current = "CUSTOM";
+                        setSplitMode("CUSTOM");
+                      }}
                       className="border-emerald-300 text-emerald-600"
                     />
                     {t("addExpenseForm.modeCustom")}
@@ -309,7 +360,13 @@ export function ExpenseEditForm({
                         <input
                           type="checkbox"
                           checked={!!checked[m.id]}
-                          onChange={() => setChecked((c) => ({ ...c, [m.id]: !c[m.id] }))}
+                          onChange={() =>
+                            setChecked((c) => {
+                              const next = { ...c, [m.id]: !c[m.id] };
+                              checkedRef.current = next;
+                              return next;
+                            })
+                          }
                           className="rounded border-emerald-300 text-emerald-600"
                         />
                         {m.name}
@@ -329,7 +386,7 @@ export function ExpenseEditForm({
                           type="text"
                           inputMode="decimal"
                           value={customEur[m.id] ?? ""}
-                          onChange={(e) => setCustomEur((prev) => ({ ...prev, [m.id]: e.target.value }))}
+                          onChange={(e) => onCustomEuroChange(m.id, e.target.value)}
                           className="cv-input-sm w-24 py-1 text-right"
                         />
                       ) : null}
@@ -342,13 +399,16 @@ export function ExpenseEditForm({
                   </p>
                 ) : null}
                 {splitMode === "CUSTOM" ? (
-                  <button
-                    type="button"
-                    onClick={distributeCustomEqually}
-                    className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium"
-                  >
-                    {t("addExpenseForm.distributeAmounts")}
-                  </button>
+                  <div className="mt-2 space-y-2 text-xs text-slate-600">
+                    <p className="text-[11px] leading-relaxed text-slate-500">{t("addExpenseForm.customAutoHint")}</p>
+                    <button
+                      type="button"
+                      onClick={distributeCustomEqually}
+                      className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium"
+                    >
+                      {t("addExpenseForm.distributeAmounts")}
+                    </button>
+                  </div>
                 ) : null}
               </fieldset>
 
