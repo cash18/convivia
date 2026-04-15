@@ -56,7 +56,7 @@ export function AppShell({
       <header className="sticky top-0 z-10 border-b border-white/50 bg-white/45 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl">
         <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-2 py-2 pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] sm:py-2.5 sm:pl-[max(1.25rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.25rem,env(safe-area-inset-right,0px))]">
           <Link href="/case" className="shrink-0 touch-manipulation py-0.5">
-            <BrandLogo className="scale-[0.92] sm:scale-100" />
+            <BrandLogo />
           </Link>
 
           <button

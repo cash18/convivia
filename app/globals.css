@@ -16,13 +16,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* ~80% zoom feel on phones: slightly smaller root rem + tighter rhythm */
-@media (max-width: 768px) {
-  html {
-    font-size: 13px;
-  }
-}
-
 body {
   color: var(--foreground);
   font-family: var(--font-sans);
@@ -67,8 +60,8 @@ body {
   }
 
   /*
-   * iOS Safari ingrandisce al focus se il font dell’input è <16px (qui rem è ridotto a 13px su mobile).
-   * Almeno 16px sui controlli testuali evita lo zoom automatico senza bloccare lo zoom pagina.
+   * iOS Safari zooma al focus se il font calcolato dell’input è <16px.
+   * Forziamo 16px sui controlli testuali (anche con text-sm in rem) per evitare lo zoom automatico.
    */
   @media (max-width: 768px) {
     .cv-input,
