@@ -19,6 +19,8 @@ export type IcsEventInput = {
   /** Nomi partecipanti (membri casa) da aggiungere in description nel feed. */
   participantNames?: string[];
   recurrenceRule?: string | null;
+  /** Promemoria display (minuti prima dell’inizio), tipicamente per task nel calendario. */
+  icalAlarmMinutes?: number | null;
 };
 
 function icsEscape(text: string): string {
@@ -96,6 +98,16 @@ function buildVEvent(ev: IcsEventInput, calName: string): string[] {
   const rrule = ev.recurrenceRule?.trim();
   if (rrule && parseRecurrenceRule(rrule, ev.allDay)) {
     lines.push(icsFold(`RRULE:${rrule}`));
+  }
+
+  const alarm = ev.icalAlarmMinutes;
+  if (!ev.allDay && alarm != null && alarm > 0) {
+    const m = Math.min(24 * 60, Math.max(1, Math.floor(alarm)));
+    lines.push("BEGIN:VALARM");
+    lines.push(`TRIGGER:-PT${m}M`);
+    lines.push("ACTION:DISPLAY");
+    lines.push(icsFold(`DESCRIPTION:${summary}`));
+    lines.push("END:VALARM");
   }
 
   lines.push("END:VEVENT");

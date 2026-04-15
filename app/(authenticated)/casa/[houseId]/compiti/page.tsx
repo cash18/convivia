@@ -36,6 +36,7 @@ export default async function CompitiPage({
       include: {
         assignee: { select: { name: true } },
         createdBy: { select: { name: true } },
+        linkedCalendarEvent: { select: { id: true, cancelledAt: true } },
       },
     }),
     prisma.houseChore.findMany({
@@ -56,13 +57,21 @@ export default async function CompitiPage({
       sortOrder: m.sortOrder,
     }));
     const swapsByKey = new Map(c.swaps.map((s) => [utcCalendarDateKey(s.occurrenceDate), s.assigneeUserId]));
-    const preview = previewUpcomingAssignments(c.anchorDate, c.everyDays, membersOrdered, swapsByKey, 8);
+    const preview = previewUpcomingAssignments(
+      c.anchorDate,
+      c.everyDays,
+      c.recurrenceEndDate,
+      membersOrdered,
+      swapsByKey,
+      8,
+    );
     return {
       id: c.id,
       title: c.title,
       description: c.description,
       everyDays: c.everyDays,
       syncCalendar: c.syncCalendar,
+      recurrenceEndDateKey: utcCalendarDateKey(c.recurrenceEndDate),
       createdByName: c.createdBy.name,
       members: membersOrdered,
       preview,
@@ -110,6 +119,9 @@ export default async function CompitiPage({
                       : t("tasksPage.unassigned")}
                     {task.dueDate
                       ? ` · ${formatMessage(t("tasksPage.due"), { date: new Date(task.dueDate).toLocaleString(intlTag) })}`
+                      : ""}
+                    {task.linkedCalendarEvent && !task.linkedCalendarEvent.cancelledAt
+                      ? ` · ${t("tasksPage.calendarBadge")}`
                       : ""}
                     <span className="text-slate-400">
                       {" "}

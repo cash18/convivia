@@ -1,4 +1,7 @@
-import { addDaysToDateKey, utcCalendarDateKey } from "@/lib/calendar-all-day";
+import { addDaysToDateKey, minDateKey, utcCalendarDateKey } from "@/lib/calendar-all-day";
+
+/** Massimo numero di occorrenze calendario/turni generabili per una faccenda. */
+export const HOUSE_CHORE_MAX_OCCURRENCES = 365;
 
 /** Indice del turno (0 = anchor, poi +everyDays, …). -1 se la data non è sul calendario della ricorrenza. */
 export function rotationSlotIndex(anchorAtDb: Date, everyDays: number, occurrenceDateKey: string): number {
@@ -65,13 +68,16 @@ export type ChorePreviewRow = {
 export function previewUpcomingAssignments(
   anchorAtDb: Date,
   everyDays: number,
+  recurrenceEndAtDb: Date,
   membersOrdered: { userId: string; name: string }[],
   swapsByKey: Map<string, string>,
   maxRows: number,
 ): ChorePreviewRow[] {
   const todayKey = utcCalendarDateKey(new Date());
-  const toKey = addDaysToDateKey(todayKey, 400);
-  const keys = occurrenceDateKeysInRange(anchorAtDb, everyDays, todayKey, toKey);
+  const recurrenceEndKey = utcCalendarDateKey(recurrenceEndAtDb);
+  const horizonKey = addDaysToDateKey(todayKey, 400);
+  const toKey = minDateKey(horizonKey, recurrenceEndKey);
+  const keys = occurrenceDateKeysInRange(anchorAtDb, everyDays, todayKey, toKey).slice(0, HOUSE_CHORE_MAX_OCCURRENCES);
   const uids = membersOrdered.map((m) => ({ userId: m.userId }));
   const out: ChorePreviewRow[] = [];
   for (const k of keys.slice(0, maxRows)) {

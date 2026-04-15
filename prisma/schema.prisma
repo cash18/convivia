@@ -222,6 +222,9 @@ model CalendarEvent {
   houseChoreId       String?
   choreOccurrenceDate DateTime? @db.Date
   houseChore         HouseChore? @relation(fields: [houseChoreId], references: [id], onDelete: Cascade)
+  /// Evento generato da un task con “Aggiungi al calendario”.
+  taskId String? @unique
+  task   Task?   @relation(fields: [taskId], references: [id], onDelete: Cascade)
   /// RFC 5545 RRULE (solo regole generate da Convivia: FREQ + INTERVAL + UNTIL opzionale).
   recurrenceRule String?
 
@@ -279,6 +282,7 @@ model Task {
   house       House     @relation(fields: [houseId], references: [id], onDelete: Cascade)
   assignee    User?     @relation("TaskAssignee", fields: [assigneeId], references: [id])
   createdBy   User      @relation("TaskCreator", fields: [createdById], references: [id])
+  linkedCalendarEvent CalendarEvent?
 
   @@index([houseId])
 }
@@ -295,6 +299,8 @@ model HouseChore {
   anchorDate     DateTime @db.Date
   /// Se true, genera eventi calendario all-day con il responsabile del turno.
   syncCalendar   Boolean  @default(true)
+  /// Ultimo giorno civile (UTC) in cui può esistere un turno; non oltre anchor + 365 giorni.
+  recurrenceEndDate DateTime @db.Date
   createdById    String
   createdAt      DateTime @default(now())
   house          House    @relation(fields: [houseId], references: [id], onDelete: Cascade)

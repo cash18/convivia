@@ -1,5 +1,6 @@
 import { formatMessage } from "@/lib/i18n/format-message";
-import { addDaysToDateKey, utcCalendarDateKey } from "@/lib/calendar-all-day";
+import { addDaysToDateKey, minDateKey, utcCalendarDateKey } from "@/lib/calendar-all-day";
+import { HOUSE_CHORE_MAX_OCCURRENCES } from "@/lib/house-chore-utils";
 import { occurrenceDateKeysInRange, effectiveAssigneeUserId } from "@/lib/house-chore-utils";
 import { prisma } from "@/lib/prisma";
 
@@ -29,8 +30,13 @@ export async function replaceChoreCalendarEvents(houseId: string, choreId: strin
 
   const today = new Date();
   const fromKey = addDaysToDateKey(utcCalendarDateKey(today), -HORIZON_PAST_DAYS);
-  const toKey = addDaysToDateKey(utcCalendarDateKey(today), HORIZON_FUTURE_DAYS);
-  const keys = occurrenceDateKeysInRange(chore.anchorDate, chore.everyDays, fromKey, toKey);
+  const horizonToKey = addDaysToDateKey(utcCalendarDateKey(today), HORIZON_FUTURE_DAYS);
+  const recurrenceEndKey = utcCalendarDateKey(chore.recurrenceEndDate);
+  const toKey = minDateKey(horizonToKey, recurrenceEndKey);
+  const keys = occurrenceDateKeysInRange(chore.anchorDate, chore.everyDays, fromKey, toKey).slice(
+    0,
+    HOUSE_CHORE_MAX_OCCURRENCES,
+  );
 
   const swapByKey = new Map<string, string>();
   for (const s of chore.swaps) {

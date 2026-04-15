@@ -1,8 +1,9 @@
 "use server";
 
 import { auth } from "@/auth";
-import { parseDateKeyFromDatetimeLocal } from "@/lib/calendar-all-day";
+import { addDaysToDateKey, parseDateKeyFromDatetimeLocal, utcCalendarDateKey } from "@/lib/calendar-all-day";
 import { replaceChoreCalendarEvents } from "@/lib/house-chores-calendar-sync";
+import { HOUSE_CHORE_MAX_OCCURRENCES, occurrenceDateKeysInRange } from "@/lib/house-chore-utils";
 import { ta } from "@/lib/i18n/action-messages";
 import { createTranslator } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
@@ -40,11 +41,14 @@ export async function createHouseChore(houseId: string, formData: FormData): Pro
   const everyDays = Math.max(1, Math.min(366, parseInt(String(formData.get("everyDays") ?? "7"), 10) || 7));
   const anchorRaw = String(formData.get("anchorDate") ?? "").trim();
   const anchorDay = parseDateKeyFromDatetimeLocal(`${anchorRaw}T00:00`);
+  const recurrenceEndRaw = String(formData.get("recurrenceEndDate") ?? "").trim();
+  const recurrenceEndDay = parseDateKeyFromDatetimeLocal(`${recurrenceEndRaw}T00:00`);
   const syncCalendar = formData.get("syncCalendar") === "on";
   const rotationOrder = parseRotationOrder(String(formData.get("rotationOrder") ?? ""));
 
   if (!title) return { error: await ta("errors.choreTitleRequired") };
   if (!anchorDay) return { error: await ta("errors.choreAnchorInvalid") };
+  if (!recurrenceEndDay) return { error: await ta("errors.choreRecurrenceEndInvalid") };
   if (rotationOrder.length < 2) return { error: await ta("errors.choreRotationMinTwo") };
 
   const allowed = new Set(
@@ -55,6 +59,20 @@ export async function createHouseChore(houseId: string, formData: FormData): Pro
   }
 
   const anchorDate = new Date(`${anchorDay}T12:00:00.000Z`);
+  const recurrenceEndDate = new Date(`${recurrenceEndDay}T12:00:00.000Z`);
+
+  const anchorKey = utcCalendarDateKey(anchorDate);
+  const maxEndKey = addDaysToDateKey(anchorKey, 365);
+  if (recurrenceEndDay < anchorKey) {
+    return { error: await ta("errors.choreRecurrenceEndBeforeAnchor") };
+  }
+  if (recurrenceEndDay > maxEndKey) {
+    return { error: await ta("errors.choreRecurrenceEndTooFar") };
+  }
+  const occCount = occurrenceDateKeysInRange(anchorDate, everyDays, anchorKey, recurrenceEndDay).length;
+  if (occCount > HOUSE_CHORE_MAX_OCCURRENCES) {
+    return { error: await ta("errors.choreTooManyOccurrences") };
+  }
 
   const chore = await prisma.houseChore.create({
     data: {
@@ -63,6 +81,7 @@ export async function createHouseChore(houseId: string, formData: FormData): Pro
       description,
       everyDays,
       anchorDate,
+      recurrenceEndDate,
       syncCalendar,
       createdById: session.user.id,
       members: {

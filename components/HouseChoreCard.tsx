@@ -18,6 +18,7 @@ export type HouseChoreCardData = {
   description: string | null;
   everyDays: number;
   syncCalendar: boolean;
+  recurrenceEndDateKey: string;
   createdByName: string;
   members: HouseChoreCardMember[];
   preview: ChorePreviewRow[];
@@ -46,6 +47,9 @@ export function HouseChoreCard({ houseId, chore }: { houseId: string; chore: Hou
               {" "}
               · {formatMessage(t("houseChores.cardCreatedBy"), { name: chore.createdByName })}
             </span>
+          </p>
+          <p className="mt-1 text-xs text-slate-600">
+            {formatMessage(t("houseChores.cardUntil"), { date: formatOccurrenceDate(chore.recurrenceEndDateKey) })}
           </p>
           <p className="mt-1 text-[11px] text-slate-500">{t("houseChores.cardRotationOrder")}</p>
           <ol className="mt-1 list-decimal pl-4 text-sm text-slate-800">

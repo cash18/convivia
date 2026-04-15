@@ -50,6 +50,7 @@ export async function getCalendarFeedIcsResponse(
     updatedAt: e.updatedAt,
     participantNames: e.participants.map((p) => p.user.name),
     recurrenceRule: e.recurrenceRule,
+    icalAlarmMinutes: e.taskId ? 15 : null,
   }));
 
   const ics = buildHouseCalendarIcs(

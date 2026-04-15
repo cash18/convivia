@@ -3,7 +3,9 @@
 import { auth } from "@/auth";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { ta } from "@/lib/i18n/action-messages";
+import { createTranslator } from "@/lib/i18n/server";
 import { notifyHouseMembersExceptActor } from "@/lib/push-notify";
+import { createTaskCalendarEvent, setTaskLinkedCalendarCancelled } from "@/lib/task-calendar";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -33,7 +35,13 @@ export async function createTask(
     if (Number.isNaN(dueDate.getTime())) dueDate = null;
   }
 
+  const syncCalendar = formData.get("syncCalendar") === "on";
+  const durationRaw = String(formData.get("durationMinutes") ?? "").trim();
+  let durationMinutes = parseInt(durationRaw, 10);
+  if (Number.isNaN(durationMinutes) || durationRaw === "") durationMinutes = 0;
+
   if (!title) return { error: await ta("errors.taskTitleRequired") };
+  if (syncCalendar && !dueDate) return { error: await ta("errors.taskCalendarNeedsDue") };
 
   if (assigneeId) {
     const ok = await prisma.houseMember.findFirst({
@@ -42,7 +50,7 @@ export async function createTask(
     if (!ok) return { error: await ta("errors.assigneeInvalid") };
   }
 
-  await prisma.task.create({
+  const task = await prisma.task.create({
     data: {
       houseId,
       title,
@@ -54,7 +62,29 @@ export async function createTask(
     },
   });
 
+  if (syncCalendar && dueDate) {
+    const { t } = await createTranslator();
+    let endsAt: Date | null = null;
+    if (durationMinutes > 0) {
+      const capped = Math.min(durationMinutes, 24 * 60 * 7);
+      endsAt = new Date(dueDate.getTime() + capped * 60_000);
+    }
+    const reminderLine = t("tasksPage.calendarEventReminderLine");
+    const calDesc = [description, reminderLine].filter(Boolean).join("\n\n") || reminderLine;
+    await createTaskCalendarEvent({
+      houseId,
+      taskId: task.id,
+      title,
+      description: calDesc,
+      startsAt: dueDate,
+      endsAt,
+      createdById: session.user.id,
+      assigneeId,
+    });
+  }
+
   revalidatePath(`/casa/${houseId}/compiti`);
+  revalidatePath(`/casa/${houseId}/calendario`);
   revalidatePath(`/casa/${houseId}`);
   const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
   const assignHint = assigneeId ? await ta("push.taskAssignSuffix") : "";
@@ -88,7 +118,11 @@ export async function setTaskStatus(
     where: { id: taskId },
     data: { status },
   });
+
+  await setTaskLinkedCalendarCancelled(taskId, status === "DONE");
+
   revalidatePath(`/casa/${houseId}/compiti`);
+  revalidatePath(`/casa/${houseId}/calendario`);
   revalidatePath(`/casa/${houseId}`);
   if (status === "DONE") {
     const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
@@ -118,6 +152,7 @@ export async function deleteTask(houseId: string, taskId: string) {
   const title = task.title;
   await prisma.task.delete({ where: { id: taskId } });
   revalidatePath(`/casa/${houseId}/compiti`);
+  revalidatePath(`/casa/${houseId}/calendario`);
   revalidatePath(`/casa/${houseId}`);
   const who = session.user.name?.trim() || (await ta("push.fallbackActor"));
   void notifyHouseMembersExceptActor({

@@ -12,6 +12,7 @@ export function AddTaskForm({ houseId, members }: { houseId: string; members: Me
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [dueHasValue, setDueHasValue] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,6 +27,7 @@ export function AddTaskForm({ houseId, members }: { houseId: string; members: Me
       return;
     }
     form.reset();
+    setDueHasValue(false);
     router.refresh();
   }
 
@@ -60,8 +62,33 @@ export function AddTaskForm({ houseId, members }: { houseId: string; members: Me
           name="dueDate"
           type="datetime-local"
           className="cv-input-sm"
+          onChange={(e) => setDueHasValue(Boolean(e.target.value.trim()))}
         />
       </div>
+      <label className="flex cursor-pointer items-start gap-2 text-sm text-slate-800">
+        <input
+          type="checkbox"
+          name="syncCalendar"
+          disabled={!dueHasValue}
+          className="mt-1 rounded border-slate-300 text-emerald-600 disabled:opacity-40"
+        />
+        <span>
+          <span className="font-semibold">{t("tasksForm.syncCalendarLabel")}</span>
+          <span className="mt-0.5 block text-xs font-normal text-slate-600">{t("tasksForm.syncCalendarHint")}</span>
+        </span>
+      </label>
+      <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        {t("tasksForm.durationLabel")}
+        <select name="durationMinutes" className="cv-input-sm" disabled={!dueHasValue}>
+          <option value="">{t("tasksForm.durationNone")}</option>
+          <option value="15">{t("tasksForm.duration15")}</option>
+          <option value="30">{t("tasksForm.duration30")}</option>
+          <option value="60">{t("tasksForm.duration60")}</option>
+          <option value="120">{t("tasksForm.duration120")}</option>
+          <option value="240">{t("tasksForm.durationHalfDay")}</option>
+          <option value="480">{t("tasksForm.durationFullDay")}</option>
+        </select>
+      </label>
       <button
         type="submit"
         disabled={pending}

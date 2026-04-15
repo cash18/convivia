@@ -2,8 +2,9 @@
 
 import { createHouseChore } from "@/lib/actions/house-chores";
 import { useI18n } from "@/components/I18nProvider";
+import { addDaysToDateKey } from "@/lib/calendar-all-day";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
 type Member = { id: string; name: string };
 
@@ -53,6 +54,13 @@ export function AddHouseChoreForm({ houseId, members }: { houseId: string; membe
       }
       e.currentTarget.reset();
       setSelectedIds(members.slice(0, Math.min(2, members.length)).map((m) => m.id));
+      const d = new Date();
+      const y = d.getFullYear();
+      const mo = String(d.getMonth() + 1).padStart(2, "0");
+      const da = String(d.getDate()).padStart(2, "0");
+      const nextAnchor = `${y}-${mo}-${da}`;
+      setAnchorKey(nextAnchor);
+      setRecurrenceEndKey(addDaysToDateKey(nextAnchor, 365));
       router.refresh();
     });
   }
@@ -64,6 +72,18 @@ export function AddHouseChoreForm({ houseId, members }: { houseId: string; membe
     const da = String(d.getDate()).padStart(2, "0");
     return `${y}-${mo}-${da}`;
   }, []);
+
+  const [anchorKey, setAnchorKey] = useState(defaultAnchor);
+  const maxEndKey = useMemo(() => addDaysToDateKey(anchorKey, 365), [anchorKey]);
+  const [recurrenceEndKey, setRecurrenceEndKey] = useState(() => addDaysToDateKey(defaultAnchor, 365));
+
+  useEffect(() => {
+    setRecurrenceEndKey((prev) => {
+      if (prev < anchorKey) return anchorKey;
+      if (prev > maxEndKey) return maxEndKey;
+      return prev;
+    });
+  }, [anchorKey, maxEndKey]);
 
   return (
     <section className="cv-card-solid p-4 sm:p-5">
@@ -96,7 +116,7 @@ export function AddHouseChoreForm({ houseId, members }: { houseId: string; membe
           />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <label className="block text-xs font-semibold text-slate-700" htmlFor="hc-every">
               {t("houseChores.fieldEveryDays")}
@@ -120,10 +140,28 @@ export function AddHouseChoreForm({ houseId, members }: { houseId: string; membe
               name="anchorDate"
               type="date"
               required
-              defaultValue={defaultAnchor}
+              value={anchorKey}
+              onChange={(e) => setAnchorKey(e.target.value)}
               className="cv-input mt-1 w-full"
             />
             <p className="mt-1 text-[11px] text-slate-500">{t("houseChores.anchorHint")}</p>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700" htmlFor="hc-rec-until">
+              {t("houseChores.fieldRecurrenceEnd")}
+            </label>
+            <input
+              id="hc-rec-until"
+              name="recurrenceEndDate"
+              type="date"
+              required
+              value={recurrenceEndKey}
+              min={anchorKey}
+              max={maxEndKey}
+              onChange={(e) => setRecurrenceEndKey(e.target.value)}
+              className="cv-input mt-1 w-full"
+            />
+            <p className="mt-1 text-[11px] text-slate-500">{t("houseChores.recurrenceEndHint")}</p>
           </div>
         </div>
 

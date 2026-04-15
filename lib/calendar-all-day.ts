@@ -19,6 +19,11 @@ export function addDaysToDateKey(key: string, days: number): string {
   return utcCalendarDateKey(x);
 }
 
+/** Minimo tra due chiavi data YYYY-MM-DD (UTC civile). */
+export function minDateKey(a: string, b: string): string {
+  return a <= b ? a : b;
+}
+
 /** Intervallo [start, endExclusive) in chiavi YYYY-MM-DD (confrontabile con dateKeyLocal delle celle). */
 export function allDayRangeDateKeysFromDb(startsAt: Date, endsAt: Date | null): { start: string; endExclusive: string } {
   const start = utcCalendarDateKey(startsAt);
