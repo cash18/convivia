@@ -1,6 +1,10 @@
+import { AddHouseChoreForm } from "@/components/AddHouseChoreForm";
 import { AddTaskForm } from "@/components/AddTaskForm";
+import { HouseChoreCard, type HouseChoreCardData } from "@/components/HouseChoreCard";
 import { auth } from "@/auth";
+import { utcCalendarDateKey } from "@/lib/calendar-all-day";
 import { deleteTask, setTaskStatus } from "@/lib/actions/tasks";
+import { previewUpcomingAssignments } from "@/lib/house-chore-utils";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { intlLocaleTag } from "@/lib/i18n/intl-locale";
 import { createTranslator } from "@/lib/i18n/server";
@@ -25,13 +29,44 @@ export default async function CompitiPage({
     name: m.user.name,
   }));
 
-  const tasks = await prisma.task.findMany({
-    where: { houseId },
-    orderBy: [{ status: "asc" }, { dueDate: "asc" }, { createdAt: "desc" }],
-    include: {
-      assignee: { select: { name: true } },
-      createdBy: { select: { name: true } },
-    },
+  const [tasks, houseChores] = await Promise.all([
+    prisma.task.findMany({
+      where: { houseId },
+      orderBy: [{ status: "asc" }, { dueDate: "asc" }, { createdAt: "desc" }],
+      include: {
+        assignee: { select: { name: true } },
+        createdBy: { select: { name: true } },
+      },
+    }),
+    prisma.houseChore.findMany({
+      where: { houseId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        members: { orderBy: { sortOrder: "asc" }, include: { user: { select: { name: true } } } },
+        swaps: true,
+        createdBy: { select: { name: true } },
+      },
+    }),
+  ]);
+
+  const choreCards: HouseChoreCardData[] = houseChores.map((c) => {
+    const membersOrdered = c.members.map((m) => ({
+      userId: m.userId,
+      name: m.user.name,
+      sortOrder: m.sortOrder,
+    }));
+    const swapsByKey = new Map(c.swaps.map((s) => [utcCalendarDateKey(s.occurrenceDate), s.assigneeUserId]));
+    const preview = previewUpcomingAssignments(c.anchorDate, c.everyDays, membersOrdered, swapsByKey, 8);
+    return {
+      id: c.id,
+      title: c.title,
+      description: c.description,
+      everyDays: c.everyDays,
+      syncCalendar: c.syncCalendar,
+      createdByName: c.createdBy.name,
+      members: membersOrdered,
+      preview,
+    };
   });
 
   async function toggleTaskAction(formData: FormData) {
@@ -101,6 +136,25 @@ export default async function CompitiPage({
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="space-y-4 border-t border-slate-200/80 pt-8">
+        <div>
+          <h2 className="text-lg font-bold text-slate-900">{t("houseChores.sectionTitle")}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">{t("houseChores.sectionIntro")}</p>
+        </div>
+
+        {choreCards.length === 0 ? (
+          <p className="text-sm text-slate-500">{t("houseChores.empty")}</p>
+        ) : (
+          <ul className="space-y-4">
+            {choreCards.map((c) => (
+              <HouseChoreCard key={c.id} houseId={houseId} chore={c} />
+            ))}
+          </ul>
+        )}
+
+        <AddHouseChoreForm houseId={houseId} members={members} />
       </section>
     </div>
   );
