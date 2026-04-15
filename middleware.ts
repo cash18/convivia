@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { authConfig } from "@/auth.config";
 import { LOCALE_COOKIE_NAME } from "@/lib/i18n/config";
 import { pickLocaleFromAcceptLanguage } from "@/lib/i18n/resolve-locale";
+import { LAST_HOUSE_ID_KEY, LAST_HOUSE_MAX_AGE_SEC } from "@/lib/last-house-preference";
 
 const { auth } = NextAuth(authConfig);
 
@@ -52,6 +53,21 @@ export default auth((req) => {
   if (pathname === "/case") {
     res.headers.set("Cache-Control", "private, no-store, must-revalidate");
   }
+
+  /** Ultima casa visitata: deve essere impostata in middleware così esiste già al primo GET (prima dell’hydration). */
+  if (isLoggedIn) {
+    const casaMatch = pathname.match(/^\/casa\/([^/]+)/);
+    const houseId = casaMatch?.[1]?.trim();
+    if (houseId && houseId.length > 0 && houseId.length < 200) {
+      res.cookies.set(LAST_HOUSE_ID_KEY, houseId, {
+        path: "/",
+        maxAge: LAST_HOUSE_MAX_AGE_SEC,
+        sameSite: "lax",
+        secure: req.nextUrl.protocol === "https:",
+      });
+    }
+  }
+
   return withLocaleCookie(req, res);
 });
 
