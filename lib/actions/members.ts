@@ -13,6 +13,7 @@ import {
   canRemoveMember,
   isOwnerRole,
 } from "@/lib/house-roles";
+import { getAppBaseUrlFromRequest } from "@/lib/app-url";
 import { newSecureToken } from "@/lib/crypto-token";
 import { sendTransactionalEmail } from "@/lib/email";
 import { houseInviteEmailContent, ownershipTransferEmailContent } from "@/lib/email-messages";
@@ -28,7 +29,7 @@ async function membership(houseId: string, userId: string) {
 export async function inviteHouseMemberByEmail(
   houseId: string,
   emailRaw: string,
-): Promise<{ ok: true } | { error: string }> {
+): Promise<{ ok: true; inviteUrl: string } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: await ta("errors.notAuthenticated") };
   const parsed = z.string().email().safeParse(emailRaw.trim().toLowerCase());
@@ -70,8 +71,11 @@ export async function inviteHouseMemberByEmail(
   });
   if (!sent.ok) return { error: await ta("errors.emailSendFailed") };
 
+  const base = await getAppBaseUrlFromRequest();
+  const inviteUrl = `${base}/invito-casa?token=${encodeURIComponent(token)}`;
+
   revalidatePath(`/casa/${houseId}/membri`);
-  return { ok: true };
+  return { ok: true, inviteUrl };
 }
 
 export async function acceptHouseEmailInvite(

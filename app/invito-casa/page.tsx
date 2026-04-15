@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { HouseInviteClient } from "@/components/HouseInviteClient";
 import { auth } from "@/auth";
+import { getAppBaseUrlFromRequest } from "@/lib/app-url";
 import { createTranslator } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -28,7 +29,10 @@ export default async function InvitoCasaPage({
       where: { token },
       include: { house: { select: { name: true } } },
     });
-    if (inv && !inv.usedAt && inv.expiresAt.getTime() >= Date.now()) {
+    if (inv && !inv.usedAt && inv.expiresAt > new Date()) {
+      const base = await getAppBaseUrlFromRequest();
+      const invitePath = `/invito-casa?token=${encodeURIComponent(token)}`;
+      const inviteFullUrl = base ? `${base}${invitePath}` : invitePath;
       inner = (
         <HouseInviteClient
           token={token}
@@ -36,6 +40,7 @@ export default async function InvitoCasaPage({
           inviteEmail={inv.email}
           isLoggedIn={!!session?.user}
           sessionEmail={session?.user?.email ?? null}
+          inviteUrl={inviteFullUrl}
         />
       );
     }

@@ -18,6 +18,7 @@ import {
   HouseRole,
   isOwnerRole,
 } from "@/lib/house-roles";
+import { InviteLinkShareRow } from "@/components/InviteLinkShareRow";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
@@ -51,6 +52,7 @@ export function HouseMembersPanel({
   const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteBusy, setInviteBusy] = useState(false);
+  const [inviteShareUrl, setInviteShareUrl] = useState<string | null>(null);
   const [transferTo, setTransferTo] = useState("");
   const [transferBusy, setTransferBusy] = useState(false);
 
@@ -62,6 +64,7 @@ export function HouseMembersPanel({
   async function onInvite(e: React.FormEvent) {
     e.preventDefault();
     setInviteBusy(true);
+    setInviteShareUrl(null);
     const r = await inviteHouseMemberByEmail(houseId, inviteEmail);
     setInviteBusy(false);
     if ("error" in r) {
@@ -69,6 +72,7 @@ export function HouseMembersPanel({
       return;
     }
     setInviteEmail("");
+    setInviteShareUrl(r.inviteUrl);
     showFlash({ type: "ok", text: t("membersPage.msgInviteSent") });
     router.refresh();
   }
@@ -175,6 +179,7 @@ export function HouseMembersPanel({
         <section className="cv-card-solid space-y-4 p-5 sm:p-6">
           <h2 className="text-lg font-bold text-slate-900">{t("membersPage.inviteTitle")}</h2>
           <p className="text-sm text-slate-600">{t("membersPage.inviteHint")}</p>
+          <p className="text-xs leading-relaxed text-slate-500">{t("membersPage.inviteLinkIntro")}</p>
           <form onSubmit={(e) => void onInvite(e)} className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm font-semibold text-slate-700">
               {t("membersPage.inviteEmail")}
@@ -191,6 +196,13 @@ export function HouseMembersPanel({
               {inviteBusy ? t("membersPage.inviteSending") : t("membersPage.inviteSend")}
             </button>
           </form>
+          {inviteShareUrl ? (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-slate-700">{t("membersPage.inviteLinkTitle")}</p>
+              <InviteLinkShareRow href={inviteShareUrl} />
+              <p className="text-[11px] leading-snug text-slate-500">{t("membersPage.inviteLinkHint")}</p>
+            </div>
+          ) : null}
         </section>
       ) : null}
 
